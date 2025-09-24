@@ -72,29 +72,49 @@
       justify-content: center;
       align-items: center;
       text-align: center;
+      padding-inline: 12px; /* beri sedikit ruang kiri kanan untuk layar sempit */
+      box-sizing: border-box;
     }
 
+    /* --- Perbaikan penting: jangan jadikan h1 sebagai flex container.
+         biarkan text-wrap normal sehingga cursor ikut turun ke baris berikutnya --- */
     .main-header h1 {
-      font-size: 3rem;
-      font-weight: bold;
+      font-size: clamp(2.6rem, 6vw, 4.2rem); /* diperbesar dan responsif */
+      font-weight: 800;
       color: white;
       text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.8);
       margin-bottom: 0.5rem;
-      min-height: 4.5rem;
-      /* Memberikan tinggi minimum agar tidak 'lompat' saat teks berubah */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: opacity 0.5s ease-in-out;
-      /* Transisi untuk efek fade */
+      min-height: 5.0rem; /* sedikit dinaikkan agar tidak lompat saat animasi */
+      display: block; /* penting: biar teks bisa wrap normal */
+      text-align: center;
+      transition: opacity 0.35s ease-in-out;
+      white-space: pre-wrap; /* tetap mempertahankan line-break jika ada */
+      word-break: break-word;
+      overflow-wrap: anywhere;
+      line-height: 1.05;
+      padding-inline: 6px;
+    }
+
+    /* Cursor berkedip untuk typing effect — akan ikut berpindah saat teks wrap */
+    .cursor {
+      display: inline-block; /* inline so it flows with text and wraps naturally */
+      width: 1px;
+      height: 1em;
+      background: rgba(255,255,255,0.95);
+      margin-left: 6px;
+      vertical-align: text-bottom;
+      animation: blink 0.7s steps(1) infinite;
+    }
+    @keyframes blink {
+      50% { opacity: 0; }
     }
 
     .container {
       background-color: white;
-      padding: 40px;
+      padding: 20px; /* DIPERKECIL seperti diminta agar area terasa lebih luas */
       border-radius: 0;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-      margin-top: 2rem;
+      margin-top: 1.5rem;
       width: 100%;
       /* Agar formulir menyesuaikan lebar .main-content */
     }
@@ -246,6 +266,13 @@
     .ts-wrapper.single .ts-control {
       padding-right: 0.75rem;
     }
+
+    /* kecilkan jarak vertikal pada layar kecil agar lebih luas */
+    @media (max-width: 576px) {
+      .main-header { padding-top: 40px; padding-bottom: 40px; height: auto; }
+      .container { padding: 14px; }
+      .main-header h1 { font-size: clamp(1.8rem, 7vw, 3.2rem); min-height: 4rem; }
+    }
   </style>
 </head>
 
@@ -320,6 +347,7 @@
       </div>
     </div>
   </div>
+
   <div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
@@ -335,6 +363,7 @@
       </div>
     </div>
   </div>
+
   <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
@@ -351,6 +380,7 @@
       </div>
     </div>
   </div>
+
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -375,9 +405,14 @@
       judul_buku: []
     };
 
-    // Array untuk menyimpan kata-kata motivasi
+    // Array untuk menyimpan kata-kata motivasi (akan diisi dari Firebase jika ada)
     let motivationQuotes = [];
     let currentQuoteIndex = 0;
+
+    // flag untuk mencegah animasi bertumpuk
+    let isAnimatingQuote = false;
+    let deleteIntervalRef = null;
+    let typingIntervalRef = null;
 
     document.addEventListener('DOMContentLoaded', () => {
       new TomSelect("#jenjang-select", {
@@ -404,7 +439,11 @@
 
       // Memuat dan menampilkan kata-kata motivasi
       loadMotivationQuotes();
-      setInterval(displayNextQuote, 15000); // Ganti kutipan setiap 5 detik
+      // interval tambahan: supaya jika firebase tetap ada, periode pergantian juga jalan
+      setInterval(() => {
+        // jangan panggil jika sedang animasi
+        if (!isAnimatingQuote) displayNextQuote();
+      }, 15000); // Ganti kutipan setiap 15 detik
     });
 
     // Fungsi untuk memuat kata-kata motivasi dari Firebase
@@ -418,25 +457,75 @@
         if (motivationQuotes.length === 0) {
           motivationQuotes = ["Buku adalah jendela dunia.", "Membaca adalah petualangan tanpa batas.", "Hari ini membaca, esok memimpin."];
         }
-        displayNextQuote(); // Tampilkan kutipan pertama setelah dimuat
+        // Tampilkan kutipan pertama setelah dimuat (jika belum sedang animasi)
+        if (!isAnimatingQuote) displayNextQuote();
       });
     }
 
-    // Fungsi untuk menampilkan kutipan motivasi berikutnya
+    // Fungsi mengetik + hapus dengan cursor yang ikut maju/mundur
     function displayNextQuote() {
+      if (isAnimatingQuote) return; // cegah tumpukan
       const quoteElement = document.getElementById('motivation-quote');
-      if (motivationQuotes.length > 0) {
-        // Tambahkan efek fade-out sebelum mengubah teks
-        quoteElement.style.opacity = 0;
-        setTimeout(() => {
-          quoteElement.textContent = motivationQuotes[currentQuoteIndex];
-          currentQuoteIndex = (currentQuoteIndex + 1) % motivationQuotes.length;
-          // Tambahkan efek fade-in setelah teks berubah
-          quoteElement.style.opacity = 1;
-        }, 500); // Sesuaikan durasi fade-out
-      } else {
-        quoteElement.textContent = "Selamat datang di perpustakaan!";
+      if (!quoteElement) return;
+      if (!motivationQuotes || motivationQuotes.length === 0) {
+        quoteElement.innerHTML = "Selamat datang di perpustakaan! <span class='cursor'></span>";
+        return;
       }
+
+      isAnimatingQuote = true;
+      // ambil teks lama (hilangkan karakter '|' jika ada)
+      let oldText = quoteElement.textContent.replace(/\|/g, '');
+      // gunakan quote yang akan ditampilkan
+      let quote = motivationQuotes[currentQuoteIndex] || "";
+
+      // Step 1: hapus teks lama -> kursor ikut mundur
+      let i = oldText.length;
+
+      // bersihkan interval sebelumnya jika ada
+      if (deleteIntervalRef) clearInterval(deleteIntervalRef);
+      if (typingIntervalRef) clearInterval(typingIntervalRef);
+
+      deleteIntervalRef = setInterval(() => {
+        if (i > 0) {
+          i--;
+          // tampilkan potongan lama + cursor
+          // gunakan textContent untuk potongan dan innerHTML hanya untuk menambahkan cursor
+          // agar tidak menyuntikkan tag-lain dari quote
+          quoteElement.innerHTML = escapeHtml(oldText.substring(0, i)) + `<span class="cursor"></span>`;
+        } else {
+          clearInterval(deleteIntervalRef);
+          deleteIntervalRef = null;
+
+          // Step 2: ketik teks baru -> kursor ikut maju
+          let j = 0;
+          typingIntervalRef = setInterval(() => {
+            if (j < quote.length) {
+              quoteElement.innerHTML = escapeHtml(quote.substring(0, j + 1)) + `<span class="cursor"></span>`;
+              j++;
+            } else {
+              clearInterval(typingIntervalRef);
+              typingIntervalRef = null;
+              // biarkan cursor tetap kedip di akhir teks
+              quoteElement.innerHTML = escapeHtml(quote) + `<span class="cursor"></span>`;
+              // selesai animasi
+              isAnimatingQuote = false;
+            }
+          }, 70); // kecepatan mengetik (ms per huruf)
+        }
+      }, 40); // kecepatan menghapus (ms per huruf)
+
+      // pindah ke index berikutnya
+      currentQuoteIndex = (currentQuoteIndex + 1) % motivationQuotes.length;
+    }
+
+    // helper kecil untuk escape text agar aman ketika dimasukkan innerHTML
+    function escapeHtml(unsafe) {
+      return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
 
     function capitalizeWords(str) {
