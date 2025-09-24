@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Basis Data & Inventaris Perpustakaan</title>
+  <link rel="icon" href="logo.png" type="image/png">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary-cyan: #17a2b8;
+      --secondary-cyan: #20c997;
+      --light-cyan: #e0f7fa;
+      --dark-cyan: #0a5c6a;
+    }
+
+    body {
+      background-color: var(--light-cyan);
+      font-family: sans-serif;
+    }
+
+    .header-container {
+      background-color: var(--primary-cyan);
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .main-header-content {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .main-title {
+      margin: 0;
+      font-size: 1.75rem;
+      font-weight: bold;
+    }
+
+    .logo {
+      width: 60px;
+      height: auto;
+    }
+
+    .container-content {
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      margin-top: 2rem;
+    }
+
+    .card {
+      border: none;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .card-header {
+      background-color: var(--primary-cyan);
+      color: white;
+      border-bottom: 2px solid var(--dark-cyan);
+      font-weight: bold;
+      padding: 0.75rem 1.25rem;
+      border-radius: 8px 8px 0 0;
+    }
+
+    .nav-tabs {
+      border-bottom: 3px solid var(--primary-cyan);
+    }
+
+    .nav-tabs .nav-link {
+      color: var(--primary-cyan);
+      font-weight: 500;
+      border: none;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -3px;
+    }
+
+    .nav-tabs .nav-link:hover {
+      border-bottom: 3px solid var(--secondary-cyan);
+      color: var(--secondary-cyan);
+    }
+
+    .nav-tabs .nav-link.active {
+      color: white;
+      background-color: var(--primary-cyan);
+      border-color: var(--primary-cyan) var(--primary-cyan) white;
+      border-radius: 5px 5px 0 0;
+    }
+
+    .btn-primary {
+      background-color: var(--primary-cyan);
+      border-color: var(--primary-cyan);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--dark-cyan);
+      border-color: var(--dark-cyan);
+    }
+
+    /* Tombol Hapus: Mengubah teks dan garis menjadi hitam */
+    .btn-outline-danger {
+      color: black;
+      border-color: black;
+    }
+
+    .btn-outline-danger:hover {
+      background-color: #dc3545;
+      border-color: #dc3545;
+      color: white;
+    }
+
+    .btn-danger {
+      background-color: #dc3545;
+      border-color: #dc3545;
+    }
+
+    .btn-danger:hover {
+      background-color: #c82333;
+      border-color: #c82333;
+    }
+
+    .unselectable {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    .list-group-item {
+      border-left: 5px solid var(--primary-cyan);
+      margin-bottom: 0.5rem;
+      border-radius: 0.25rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .list-group-item .btn-hapus {
+      visibility: hidden;
+      transition: opacity 0.2s ease;
+      opacity: 0;
+    }
+
+    .list-group-item:hover .btn-hapus {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .table thead th {
+      background-color: var(--secondary-cyan);
+      color: white;
+      border-bottom: 2px solid var(--dark-cyan);
+    }
+
+    .modal-content {
+      border: 1px solid var(--primary-cyan);
+      border-radius: 10px;
+    }
+
+    .modal-header {
+      background-color: var(--primary-cyan);
+      color: white;
+      border-bottom: 1px solid var(--dark-cyan);
+      border-radius: 10px 10px 0 0;
+    }
+
+    .modal-footer .btn-secondary {
+      background-color: #6c757d;
+      border-color: #6c757d;
+    }
+
+    .modal-footer .btn-secondary:hover {
+      background-color: #5a6268;
+      border-color: #5a6268;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="header-container">
+    <div class="main-header-content">
+      <img src="logo.png" alt="Logo" class="logo">
+      <h1 class="main-title">Basis Data & Inventaris Perpustakaan</h1>
+    </div>
+    <a href="index.html" class="btn btn-outline-danger">Logout</a>
+  </div>
+
+  <div class="container container-content my-5">
+
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="pengunjung-tab" data-bs-toggle="tab" data-bs-target="#pengunjung" type="button" role="tab" aria-controls="pengunjung" aria-selected="true">Data Pengunjung</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="master-nama-tab" data-bs-toggle="tab" data-bs-target="#master-nama" type="button" role="tab" aria-controls="master-nama" aria-selected="false">Data Nama</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="master-blok-tab" data-bs-toggle="tab" data-bs-target="#master-blok" type="button" role="tab" aria-controls="master-blok" aria-selected="false">Data Blok/Kamar</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="master-buku-tab" data-bs-toggle="tab" data-bs-target="#master-buku" type="button" role="tab" aria-controls="master-buku" aria-selected="false">Data Buku</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="sampah-tab" data-bs-toggle="tab" data-bs-target="#sampah" type="button" role="tab" aria-controls="sampah" aria-selected="false">Sampah</button>
+      </li>
+    </ul>
+
+    <div class="tab-content" id="myTabContent">
+      <div class="tab-pane fade show active" id="pengunjung" role="tabpanel" aria-labelledby="pengunjung-tab">
+        <div class="card mt-4">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            Data Kunjungan
+            <button class="btn btn-outline-danger btn-sm" id="btn-hapus-semua-pengunjung">Hapus Semua Data</button>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th class="unselectable" style="width: 50px;">No</th>
+                    <th>Tanggal</th>
+                    <th>Nama Lengkap</th>
+                    <th>Blok/Kamar</th>
+                    <th>Jenjang</th>
+                    <th>Judul Buku</th>
+                    <th>Kategori</th>
+                    <th>Keterangan</th>
+                  </tr>
+                </thead>
+                <tbody id="data-pengunjung-body">
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="master-nama" role="tabpanel" aria-labelledby="master-nama-tab">
+        <div class="card mt-4">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            Kelola Nama Pengunjung
+            <button class="btn btn-outline-danger btn-sm" id="btn-hapus-nama">Hapus Semua Data</button>
+          </div>
+          <div class="card-body">
+            <form id="form-tambah-nama" class="mb-3">
+              <textarea id="input-nama" class="form-control mb-2" rows="5" placeholder="Masukkan Nama Lengkap (satu nama per baris)" required></textarea>
+              <button type="submit" class="btn btn-primary">Tambah Data</button>
+            </form>
+            <ul class="list-group" id="list-nama"></ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="master-blok" role="tabpanel" aria-labelledby="master-blok-tab">
+        <div class="card mt-4">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            Kelola Blok/Kamar
+            <button class="btn btn-outline-danger btn-sm" id="btn-hapus-blok">Hapus Semua Data</button>
+          </div>
+          <div class="card-body">
+            <form id="form-tambah-blok" class="mb-3">
+              <textarea id="input-blok" class="form-control mb-2" rows="5" placeholder="Masukkan Blok atau Kamar (satu per baris)" required></textarea>
+              <button type="submit" class="btn btn-primary">Tambah Data</button>
+            </form>
+            <ul class="list-group" id="list-blok"></ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="master-buku" role="tabpanel" aria-labelledby="master-buku-tab">
+        <div class="card mt-4">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            Kelola Judul Buku
+            <button class="btn btn-outline-danger btn-sm" id="btn-hapus-buku">Hapus Semua Data</button>
+          </div>
+          <div class="card-body">
+            <form id="form-tambah-buku" class="mb-3">
+              <textarea id="input-buku" class="form-control mb-2" rows="5" placeholder="Masukkan Judul Buku (satu judul per baris)" required></textarea>
+              <button type="submit" class="btn btn-primary">Tambah Data</button>
+            </form>
+            <ul class="list-group" id="list-buku"></ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="sampah" role="tabpanel" aria-labelledby="sampah-tab">
+        <div class="card mt-4">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            Tempat Sampah
+            <button class="btn btn-outline-danger btn-sm" id="btn-hapus-semua-sampah">Hapus Permanen Semua Data</button>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th class="unselectable" style="width: 50px;">No</th>
+                    <th>Tanggal Hapus</th>
+                    <th>Nama Lengkap</th>
+                    <th>Blok/Kamar</th>
+                    <th>Jenjang</th>
+                    <th>Judul Buku</th>
+                    <th>Kategori</th>
+                    <th>Keterangan</th>
+                  </tr>
+                </thead>
+                <tbody id="data-sampah-body">
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-info text-white">
+          <h5 class="modal-title" id="notificationModalLabel">Pemberitahuan</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="notificationMessage">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Konfigurasi Firebase Anda
+    const firebaseConfig = {
+      apiKey: "AIzaSyB3CAEuWjRjoRESevIvrPDfaGV7DfonNvY",
+      authDomain: "pustakawan2-520ab.firebaseapp.com",
+      databaseURL: "https://pustakawan2-520ab-default-rtdb.firebaseio.com",
+      projectId: "pustakawan2-520ab",
+      storageBucket: "pustakawan2-520ab.firebasestorage.app",
+      messagingSenderId: "178060973033",
+      appId: "1:178060973033:web:9e5207f0acb9e9fba8b178"
+    };
+
+    // Inisialisasi Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // Fungsi untuk menampilkan notifikasi modal
+    function showModalNotification(message) {
+      const myModal = new bootstrap.Modal(document.getElementById('notificationModal'));
+      document.getElementById('notificationMessage').textContent = message;
+      myModal.show();
+    }
+
+    function formatDate(timestamp) {
+      const date = new Date(timestamp);
+      const options = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      };
+      return date.toLocaleDateString('id-ID', options);
+    }
+
+    // Fungsi untuk menghapus data lama dari Sampah (otomatis 2 hari)
+    function autoDeleteTrash() {
+      const sampahRef = database.ref('data_sampah');
+      const twoDaysAgo = Date.now() - (2 * 24 * 60 * 60 * 1000);
+
+      sampahRef.once('value', (snapshot) => {
+        snapshot.forEach((childSnapshot) => {
+          const data = childSnapshot.val();
+          if (data.deletedTimestamp && data.deletedTimestamp < twoDaysAgo) {
+            sampahRef.child(childSnapshot.key).remove();
+          }
+        });
+      });
+    }
+
+    function loadDataPengunjung() {
+      const pengunjungRef = database.ref('pengunjung');
+      const dataPengunjungBody = document.getElementById('data-pengunjung-body');
+
+      pengunjungRef.on('value', (snapshot) => {
+        dataPengunjungBody.innerHTML = '';
+        let counter = 1;
+        snapshot.forEach((childSnapshot) => {
+          const data = childSnapshot.val();
+          const newRow = document.createElement('tr');
+          const tanggal = data.tanggal ? formatDate(data.tanggal) : 'N/A';
+
+          newRow.innerHTML = `
+                    <td class="unselectable" style="width: 50px;">${counter++}</td>
+                    <td>${tanggal}</td>
+                    <td>${data.nama}</td>
+                    <td>${data.blok_kamar}</td>
+                    <td>${data.jenjang}</td>
+                    <td>${data.judul_buku}</td>
+                    <td>${data.kategori || ''}</td>
+                    <td>${data.keterangan}</td>
+                `;
+          dataPengunjungBody.prepend(newRow);
+        });
+      });
+    }
+
+    function loadDataSampah() {
+      const sampahRef = database.ref('data_sampah');
+      const dataSampahBody = document.getElementById('data-sampah-body');
+
+      sampahRef.on('value', (snapshot) => {
+        dataSampahBody.innerHTML = '';
+        let counter = 1;
+        snapshot.forEach((childSnapshot) => {
+          const data = childSnapshot.val();
+          const newRow = document.createElement('tr');
+          const tanggalHapus = data.deletedTimestamp ? formatDate(data.deletedTimestamp) : 'N/A';
+
+          newRow.innerHTML = `
+                    <td class="unselectable" style="width: 50px;">${counter++}</td>
+                    <td>${tanggalHapus}</td>
+                    <td>${data.nama}</td>
+                    <td>${data.blok_kamar}</td>
+                    <td>${data.jenjang}</td>
+                    <td>${data.judul_buku}</td>
+                    <td>${data.kategori || ''}</td>
+                    <td>${data.keterangan}</td>
+                `;
+          dataSampahBody.prepend(newRow);
+        });
+      });
+    }
+
+    // Fungsi baru untuk menghapus data duplikat
+    function autoRemoveDuplicates(ref, dataName) {
+      ref.once('value', (snapshot) => {
+        const data = snapshot.val();
+        if (!data) return;
+
+        const seen = new Set();
+        const updates = {};
+        let duplicatesFound = 0;
+
+        for (const key in data) {
+          const value = data[key];
+          if (seen.has(value)) {
+            updates[key] = null; // Menghapus data duplikat
+            duplicatesFound++;
+          } else {
+            seen.add(value);
+          }
+        }
+
+        if (duplicatesFound > 0) {
+          ref.update(updates)
+            .then(() => {
+              console.log(`Pembersihan otomatis: ${duplicatesFound} duplikat di '${dataName}' dihapus.`);
+              showModalNotification(`Pembersihan otomatis selesai. Ditemukan dan dihapus ${duplicatesFound} data duplikat di daftar **${dataName}**.`);
+            })
+            .catch((error) => {
+              console.error("Gagal menghapus duplikat:", error);
+              showModalNotification(`Terjadi kesalahan saat menghapus duplikat di daftar **${dataName}**: ${error.message}`);
+            });
+        } else {
+          console.log(`Tidak ada duplikat ditemukan di '${dataName}'.`);
+        }
+      });
+    }
+
+    // Fungsi untuk menambahkan data master
+    function tambahDataMaster(ref, inputId) {
+      const form = document.getElementById(`form-tambah-${inputId}`);
+      const input = document.getElementById(`input-${inputId}`);
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const nilai = input.value.trim();
+        if (nilai) {
+          const nilaiArray = nilai.split('\n').map(item => item.trim()).filter(item => item !== '');
+
+          ref.once('value').then(snapshot => {
+            const existingData = snapshot.val() || {};
+            const existingValues = new Set(Object.values(existingData));
+            const newItemsToAdd = nilaiArray.filter(item => !existingValues.has(item));
+            const duplicatesFound = nilaiArray.length - newItemsToAdd.length;
+
+            if (newItemsToAdd.length > 0) {
+              const updates = {};
+              newItemsToAdd.forEach(item => {
+                updates[ref.push().key] = item;
+              });
+
+              ref.update(updates)
+                .then(() => {
+                  let message = `${newItemsToAdd.length} data berhasil ditambahkan.`;
+                  if (duplicatesFound > 0) {
+                    message += ` ${duplicatesFound} data duplikat tidak ditambahkan.`;
+                  }
+                  showModalNotification(message);
+                  input.value = '';
+                })
+                .catch((error) => {
+                  showModalNotification(`Gagal menambahkan data: ${error.message}`);
+                });
+            } else {
+              showModalNotification(`Semua data yang Anda masukkan sudah ada (duplikat). Tidak ada data baru yang ditambahkan.`);
+            }
+          });
+        }
+      });
+    }
+
+    function loadDataMaster(ref, listElementId, dataName) {
+      const listElement = document.getElementById(listElementId);
+
+      // Memastikan duplikat dihapus sebelum memuat data
+      autoRemoveDuplicates(ref, dataName);
+
+      ref.on('value', (snapshot) => {
+        listElement.innerHTML = '';
+        snapshot.forEach((childSnapshot) => {
+          const key = childSnapshot.key;
+          const value = childSnapshot.val();
+
+          const listItem = document.createElement('li');
+          listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+          listItem.innerHTML = `
+                    <span>${value}</span>
+                    <button class="btn btn-danger btn-sm btn-hapus" data-key="${key}">Hapus</button>
+                `;
+          listElement.appendChild(listItem);
+        });
+
+        listElement.querySelectorAll('.btn-hapus').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const key = btn.dataset.key;
+            const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+            document.getElementById('confirmModalMessage').textContent = 'Apakah Anda yakin ingin menghapus data ini?';
+            document.getElementById('confirmBtn').onclick = () => {
+              ref.child(key).remove()
+                .then(() => {
+                  showModalNotification('Data berhasil dihapus.');
+                  confirmModal.hide();
+                })
+                .catch((error) => {
+                  showModalNotification(`Gagal menghapus data: ${error.message}`);
+                  confirmModal.hide();
+                });
+            };
+            confirmModal.show();
+          });
+        });
+      });
+    }
+
+    function setupHapusSemuaData(ref, buttonId) {
+      const button = document.getElementById(buttonId);
+      button.addEventListener('click', () => {
+        const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+        document.getElementById('confirmModalMessage').textContent = 'Apakah Anda yakin ingin menghapus SEMUA data ini? Tindakan ini tidak bisa dibatalkan.';
+        document.getElementById('confirmBtn').onclick = () => {
+          ref.remove()
+            .then(() => {
+              showModalNotification('Semua data berhasil dihapus.');
+              confirmModal.hide();
+            })
+            .catch((error) => {
+              showModalNotification(`Gagal menghapus data: ${error.message}`);
+              confirmModal.hide();
+            });
+        };
+        confirmModal.show();
+      });
+    }
+
+    function setupHapusPengunjungKeSampah() {
+      const button = document.getElementById('btn-hapus-semua-pengunjung');
+      button.addEventListener('click', () => {
+        const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+        document.getElementById('confirmModalMessage').textContent = 'Apakah Anda yakin ingin memindahkan SEMUA data pengunjung ke sampah?';
+        document.getElementById('confirmBtn').onclick = () => {
+          const pengunjungRef = database.ref('pengunjung');
+          const sampahRef = database.ref('data_sampah');
+
+          pengunjungRef.once('value', (snapshot) => {
+            const updates = {};
+            snapshot.forEach((childSnapshot) => {
+              const data = childSnapshot.val();
+              const newKey = sampahRef.push().key;
+              updates[newKey] = {
+                ...data,
+                deletedTimestamp: Date.now()
+              };
+            });
+
+            sampahRef.update(updates)
+              .then(() => pengunjungRef.remove())
+              .then(() => {
+                showModalNotification('Semua data pengunjung berhasil dipindahkan ke sampah.');
+                confirmModal.hide();
+              })
+              .catch((error) => {
+                showModalNotification(`Gagal memindahkan data: ${error.message}`);
+                confirmModal.hide();
+              });
+          });
+        };
+        confirmModal.show();
+      });
+    }
+
+    function setupHapusSemuaSampah() {
+      const button = document.getElementById('btn-hapus-semua-sampah');
+      button.addEventListener('click', () => {
+        const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+        document.getElementById('confirmModalMessage').textContent = 'Apakah Anda yakin ingin menghapus SEMUA data di sampah secara PERMANEN? Tindakan ini tidak bisa dibatalkan.';
+        document.getElementById('confirmBtn').onclick = () => {
+          const sampahRef = database.ref('data_sampah');
+          sampahRef.remove()
+            .then(() => {
+              showModalNotification('Semua data di sampah berhasil dihapus secara permanen.');
+              confirmModal.hide();
+            })
+            .catch((error) => {
+              showModalNotification(`Gagal menghapus data: ${error.message}`);
+              confirmModal.hide();
+            });
+        };
+        confirmModal.show();
+      });
+    }
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+      autoDeleteTrash();
+      loadDataPengunjung();
+      loadDataSampah();
+
+      const namaRef = database.ref('data_master/nama');
+      const blokRef = database.ref('data_master/blok');
+      const bukuRef = database.ref('data_master/buku');
+
+      tambahDataMaster(namaRef, 'nama');
+      tambahDataMaster(blokRef, 'blok');
+      tambahDataMaster(bukuRef, 'buku');
+
+      loadDataMaster(namaRef, 'list-nama', 'Nama');
+      loadDataMaster(blokRef, 'list-blok', 'Blok/Kamar');
+      loadDataMaster(bukuRef, 'list-buku', 'Buku');
+
+      setupHapusSemuaData(namaRef, 'btn-hapus-nama');
+      setupHapusSemuaData(blokRef, 'btn-hapus-blok');
+      setupHapusSemuaData(bukuRef, 'btn-hapus-buku');
+
+      setupHapusPengunjungKeSampah();
+      setupHapusSemuaSampah();
+    });
+  </script>
+
+  <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title" id="confirmModalLabel">Konfirmasi Penghapusan</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="confirmModalMessage">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+          <button type="button" class="btn btn-danger" id="confirmBtn">Hapus</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+
+</html>

@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistem Perpustakaan Annuqayah</title>
+  <link rel="icon" href="logo.png" type="image/png">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary-cyan: #17a2b8;
+      --secondary-cyan: #20c997;
+      --dark-cyan: #0a5c6a;
+    }
+
+    /* Menyembunyikan scrollbar untuk Webkit (Chrome, Safari, Edge) */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Menyembunyikan scrollbar untuk Firefox */
+    html {
+      scrollbar-width: none;
+      /* Firefox */
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(to right, #7fcac8, #0a5c6a, #20c997);
+      background-size: 400% 400%;
+      animation: gradientAnimation 15s ease infinite;
+      -ms-overflow-style: none;
+      /* IE dan Edge */
+      overflow: -moz-scrollbars-none;
+      /* Firefox */
+    }
+
+    @keyframes gradientAnimation {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    /* Container utama untuk membatasi lebar judul dan formulir */
+    .main-content {
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .main-header {
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .main-header h1 {
+      font-size: 3rem;
+      font-weight: bold;
+      color: white;
+      text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.8);
+      margin-bottom: 0.5rem;
+      min-height: 4.5rem;
+      /* Memberikan tinggi minimum agar tidak 'lompat' saat teks berubah */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.5s ease-in-out;
+      /* Transisi untuk efek fade */
+    }
+
+    .container {
+      background-color: white;
+      padding: 40px;
+      border-radius: 0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      margin-top: 2rem;
+      width: 100%;
+      /* Agar formulir menyesuaikan lebar .main-content */
+    }
+
+    .form-label {
+      font-weight: bold;
+      color: var(--dark-cyan);
+    }
+
+    .form-control {
+      border: none;
+      border-bottom: 2px solid var(--primary-cyan);
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      transition: border-bottom-color 0.3s ease-in-out;
+      padding-left: 0;
+    }
+
+    .form-control:focus {
+      background: transparent;
+      box-shadow: none;
+      border-bottom-color: var(--dark-cyan);
+    }
+
+    .form-control::placeholder {
+      color: #999;
+    }
+
+    .btn-primary {
+      background-color: var(--primary-cyan);
+      border-color: var(--primary-cyan);
+      width: 100%;
+      padding: 10px;
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--dark-cyan);
+      border-color: var(--dark-cyan);
+    }
+
+    .modal-content {
+      border: none;
+      border-radius: 0;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-header {
+      background-color: var(--primary-cyan);
+      color: white;
+      border-bottom: none;
+      border-radius: 0;
+      padding: 1.5rem;
+      position: relative;
+      text-align: center;
+    }
+
+    .modal-header.bg-info {
+      background-color: var(--primary-cyan) !important;
+    }
+
+    .modal-header h5 {
+      font-weight: 700;
+      width: 100%;
+    }
+
+    .modal-header .btn-close {
+      filter: brightness(0) invert(1);
+    }
+
+    .modal-body {
+      font-size: 1rem;
+      color: #495057;
+      padding: 2rem 1.5rem;
+    }
+
+    .modal-footer {
+      border-top: none;
+      padding: 1rem 1.5rem 1.5rem;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .modal-footer .btn {
+      width: auto !important;
+      flex-grow: 0 !important;
+    }
+
+    .modal-footer .btn-secondary {
+      background-color: #e9ecef;
+      color: #495057;
+      border: none;
+      border-radius: 0;
+      font-weight: 600;
+    }
+
+    .modal-footer .btn-primary {
+      background-color: var(--primary-cyan);
+      border: none;
+      border-radius: 0;
+      font-weight: 600;
+    }
+
+    .search-container {
+      position: relative;
+    }
+
+    .search-results-dropdown {
+      position: absolute;
+      z-index: 1000;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background-color: white;
+      border: 1px solid #ccc;
+      border-top: none;
+      max-height: 200px;
+      overflow-y: auto;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      display: none;
+    }
+
+    .search-results-dropdown li {
+      padding: 10px 15px;
+      cursor: pointer;
+      border-bottom: 1px solid #eee;
+    }
+
+    .search-results-dropdown li:last-child {
+      border-bottom: none;
+    }
+
+    .search-results-dropdown li:hover,
+    .search-results-dropdown li.focused {
+      background-color: #f8f9fa;
+    }
+
+    .ts-wrapper .ts-control {
+      border-radius: 0;
+      border: 1px solid #ced4da;
+    }
+
+    .ts-wrapper.single .ts-control {
+      padding-right: 0.75rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="main-content">
+    <div class="main-header">
+      <!-- Judul akan diisi oleh JavaScript dengan kata-kata motivasi -->
+      <h1 id="motivation-quote"></h1>
+    </div>
+
+    <div class="container" id="form-container">
+      <form id="pengunjung-form">
+        <div class="mb-3">
+          <label for="nama" class="form-label">Nama Lengkap</label>
+          <div class="search-container">
+            <input type="text" class="form-control" id="nama" placeholder="Ketik atau pilih nama" required autocomplete="off">
+            <ul id="nama-results" class="search-results-dropdown"></ul>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label for="blok_kamar" class="form-label">Blok/Kamar</label>
+          <div class="search-container">
+            <input type="text" class="form-control" id="blok_kamar" placeholder="Ketik atau pilih blok/kamar" required autocomplete="off">
+            <ul id="blok_kamar-results" class="search-results-dropdown"></ul>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label for="jenjang-select" class="form-label">Jenjang</label>
+          <select class="form-select" id="jenjang-select" name="jenjang" required>
+            <option value="">Pilih Jenjang</option>
+            <option value="SLTP">SLTP</option>
+            <option value="SLTA">SLTA</option>
+            <option value="PT">PT</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="judul_buku" class="form-label">Judul Buku</label>
+          <div class="search-container">
+            <input type="text" class="form-control" id="judul_buku" placeholder="Ketik atau pilih judul buku" required autocomplete="off">
+            <ul id="judul_buku-results" class="search-results-dropdown"></ul>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label for="kategori-select" class="form-label">Kategori</label>
+          <select class="form-select" id="kategori-select" name="kategori" required>
+            <option value="">Pilih Kategori</option>
+            <option value="Sejarah dan Geografi">Sejarah dan Geografi</option>
+            <option value="Kesusastraan">Kesusastraan</option>
+            <option value="Komik">Komik</option>
+            <option value="Agama">Agama</option>
+            <option value="Filsafat dan Psikologi">Filsafat dan Psikologi</option>
+            <option value="Ilmu Murni">Ilmu Murni</option>
+            <option value="Ilmu Sosial">Ilmu Sosial</option>
+            <option value="Ilmu Bahasa">Ilmu Bahasa</option>
+            <option value="Berita">Berita</option>
+            <option value="Karya Umum">Karya Umum</option>
+            <option value="Majalah">Majalah</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="keterangan-select" class="form-label">Keterangan</label>
+          <select class="form-select" id="keterangan-select" name="keterangan" required>
+            <option value="">Pilih Keterangan</option>
+            <option value="Baca">Baca</option>
+            <option value="Pinjam">Pinjam</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3" id="submit-btn">Konfirmasi</button>
+      </form>
+      <div class="text-center mt-3">
+        <a href="admin.html" class="btn btn-sm" style="color: #6c757d;">Klik Konfirmasi di Atas</a>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-info text-white">
+          <h5 class="modal-title" id="notificationModalLabel">Peringatan</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="notificationMessage">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-info text-white">
+          <h5 class="modal-title" id="confirmationModalLabel">Konfirmasi Penambahan Nama</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="confirmationMessage">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+          <button type="button" class="btn btn-primary" id="confirmAddNameBtn">Tambah</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyB3CAEuWjRjoRESevIvrPDfaGV7DfonNvY",
+      authDomain: "pustakawan2-520ab.firebaseapp.com",
+      databaseURL: "https://pustakawan2-520ab-default-rtdb.firebaseio.com",
+      projectId: "pustakawan2-520ab",
+      storageBucket: "pustakawan2-520ab.firebasestorage.app",
+      messagingSenderId: "178060973033",
+      appId: "1:178060973033:web:9e5207f0acb9e9fba8b178"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    let masterData = {
+      nama: [],
+      blok_kamar: [],
+      judul_buku: []
+    };
+
+    // Array untuk menyimpan kata-kata motivasi
+    let motivationQuotes = [];
+    let currentQuoteIndex = 0;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      new TomSelect("#jenjang-select", {
+        create: false,
+        sortField: {
+          field: "text",
+          direction: "asc"
+        }
+      });
+      new TomSelect("#kategori-select", {
+        create: false,
+        sortField: {
+          field: "text",
+          direction: "asc"
+        }
+      });
+      new TomSelect("#keterangan-select", {
+        create: false,
+        sortField: {
+          field: "text",
+          direction: "asc"
+        }
+      });
+
+      // Memuat dan menampilkan kata-kata motivasi
+      loadMotivationQuotes();
+      setInterval(displayNextQuote, 15000); // Ganti kutipan setiap 5 detik
+    });
+
+    // Fungsi untuk memuat kata-kata motivasi dari Firebase
+    function loadMotivationQuotes() {
+      database.ref('motivation_quotes').on('value', (snapshot) => {
+        motivationQuotes = [];
+        snapshot.forEach((childSnapshot) => {
+          motivationQuotes.push(childSnapshot.val());
+        });
+        // Jika tidak ada kutipan, gunakan default
+        if (motivationQuotes.length === 0) {
+          motivationQuotes = ["Buku adalah jendela dunia.", "Membaca adalah petualangan tanpa batas.", "Hari ini membaca, esok memimpin."];
+        }
+        displayNextQuote(); // Tampilkan kutipan pertama setelah dimuat
+      });
+    }
+
+    // Fungsi untuk menampilkan kutipan motivasi berikutnya
+    function displayNextQuote() {
+      const quoteElement = document.getElementById('motivation-quote');
+      if (motivationQuotes.length > 0) {
+        // Tambahkan efek fade-out sebelum mengubah teks
+        quoteElement.style.opacity = 0;
+        setTimeout(() => {
+          quoteElement.textContent = motivationQuotes[currentQuoteIndex];
+          currentQuoteIndex = (currentQuoteIndex + 1) % motivationQuotes.length;
+          // Tambahkan efek fade-in setelah teks berubah
+          quoteElement.style.opacity = 1;
+        }, 500); // Sesuaikan durasi fade-out
+      } else {
+        quoteElement.textContent = "Selamat datang di perpustakaan!";
+      }
+    }
+
+    function capitalizeWords(str) {
+      if (!str) return '';
+      return str.toLowerCase().split(' ').map(word => {
+        if (word.length === 0) return '';
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      }).join(' ');
+    }
+
+    function showModalNotification(message, title = 'Peringatan') {
+      const myModal = new bootstrap.Modal(document.getElementById('notificationModal'));
+      document.getElementById('notificationModalLabel').textContent = title;
+      document.getElementById('notificationMessage').textContent = message;
+      myModal.show();
+    }
+
+    function loadDataMaster() {
+      const refs = {
+        nama: database.ref('data_master/nama'),
+        blok_kamar: database.ref('data_master/blok'),
+        judul_buku: database.ref('data_master/buku')
+      };
+
+      for (const key in refs) {
+        refs[key].on('value', (snapshot) => {
+          const dataArray = [];
+          snapshot.forEach((childSnapshot) => {
+            dataArray.push(childSnapshot.val());
+          });
+          masterData[key] = dataArray.sort((a, b) => a.localeCompare(b));
+        });
+      }
+    }
+
+    let isClickingDropdown = false;
+
+    function showResults(inputId, resultsId, data) {
+      const input = document.getElementById(inputId);
+      const resultsDropdown = document.getElementById(resultsId);
+      const inputValue = input.value.toLowerCase();
+      resultsDropdown.innerHTML = '';
+      if (inputValue === '') {
+        resultsDropdown.style.display = 'none';
+        return;
+      }
+      const filteredData = data.filter(item => item.toLowerCase().includes(inputValue));
+      if (filteredData.length > 0) {
+        filteredData.forEach((item, index) => {
+          const li = document.createElement('li');
+          li.textContent = item;
+          if (index === 0) li.classList.add('focused');
+          resultsDropdown.appendChild(li);
+        });
+        setupDropdownItemListeners(resultsDropdown, input);
+        resultsDropdown.style.display = 'block';
+      } else {
+        resultsDropdown.style.display = 'none';
+      }
+    }
+
+    function setupDropdownItemListeners(resultsDropdown, input) {
+      resultsDropdown.querySelectorAll('li').forEach(li => {
+        li.addEventListener('click', () => {
+          input.value = li.textContent;
+          resultsDropdown.style.display = 'none';
+          input.focus();
+          isClickingDropdown = false;
+        });
+      });
+    }
+
+    // ===== Tambahan: generalisasi konfirmasi untuk nama, blok/kamar, dan judul buku =====
+    const fieldMeta = {
+      nama: {
+        path: 'data_master/nama',
+        title: 'Konfirmasi Penambahan Nama',
+        message: (v) => `Nama Anda "${v}" Tidak Terdaftar Di Akun Perpustakaan. Apakah ini Benar-Benar Nama Lengkap Anda? Jika Iya, kami Akan Menambahkan Nama Anda di Master Data.`,
+        success: (v) => `Nama "${v}" berhasil ditambahkan!`
+      },
+      blok_kamar: {
+        path: 'data_master/blok',
+        title: 'Konfirmasi Penambahan Blok/Kamar',
+        message: (v) => `Blok/Kamar "${v}" Tidak Terdaftar Di Akun Perpustakaan. Apakah ini Benar? Jika Iya, kami Akan Menambahkan Blok/Kamar ini di Master Data.`,
+        success: (v) => `Blok/Kamar "${v}" berhasil ditambahkan!`
+      },
+      judul_buku: {
+        path: 'data_master/buku',
+        title: 'Konfirmasi Penambahan Judul Buku',
+        message: (v) => `Judul Buku "${v}" Tidak Terdaftar Di Akun Perpustakaan. Apakah ini Benar? Jika Iya, kami Akan Menambahkan Judul Buku ini di Master Data.`,
+        success: (v) => `Judul Buku "${v}" berhasil ditambahkan!`
+      }
+    };
+
+    function promptAddToMaster(fieldKey, value) {
+      const meta = fieldMeta[fieldKey];
+      if (!meta) return;
+
+      // set judul modal dinamis TANPA mengubah struktur HTML
+      document.getElementById('confirmationModalLabel').textContent = meta.title;
+      document.getElementById('confirmationMessage').textContent = meta.message(value);
+
+      const confirmModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+
+      // reset handler agar tidak dobel
+      const btn = document.getElementById('confirmAddNameBtn');
+      btn.onclick = null;
+      btn.onclick = () => {
+        database.ref(meta.path).push(value)
+          .then(() => {
+            masterData[fieldKey].push(value);
+            masterData[fieldKey].sort((a, b) => a.localeCompare(b));
+            showModalNotification(meta.success(value), 'Berhasil');
+            confirmModal.hide();
+          })
+          .catch(error => {
+            showModalNotification(`Gagal menambahkan data: ${error.message}`);
+            confirmModal.hide();
+          });
+      };
+
+      confirmModal.show();
+    }
+    // ===== Akhir tambahan =====
+
+    function setupSearchInput(inputId, resultsId, dataKey) {
+      const input = document.getElementById(inputId);
+      const resultsDropdown = document.getElementById(resultsId);
+
+      input.addEventListener('input', () => {
+        const cursorPosition = input.selectionStart;
+        const originalValue = input.value;
+        const formattedValue = capitalizeWords(originalValue);
+        input.value = formattedValue;
+        input.setSelectionRange(cursorPosition, cursorPosition);
+        showResults(inputId, resultsId, masterData[dataKey]);
+      });
+
+      resultsDropdown.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        isClickingDropdown = true;
+      });
+
+      // Ubah: cek & tawarkan tambah untuk tiga field ini
+      if (['nama', 'blok_kamar', 'judul_buku'].includes(dataKey)) {
+        input.addEventListener('blur', () => {
+          setTimeout(() => {
+            if (!isClickingDropdown) {
+              resultsDropdown.style.display = 'none';
+              const entered = input.value.trim();
+              if (entered && !masterData[dataKey].includes(entered)) {
+                promptAddToMaster(dataKey, entered);
+              }
+            }
+            isClickingDropdown = false;
+          }, 100);
+        });
+      } else {
+        input.addEventListener('blur', () => {
+          setTimeout(() => {
+            if (!isClickingDropdown) {
+              resultsDropdown.style.display = 'none';
+            }
+            isClickingDropdown = false;
+          }, 100);
+        });
+      }
+
+      input.addEventListener('keydown', (e) => {
+        const focusedItem = resultsDropdown.querySelector('.focused');
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          if (focusedItem && focusedItem.nextElementSibling) {
+            focusedItem.classList.remove('focused');
+            focusedItem.nextElementSibling.classList.add('focused');
+          } else if (!focusedItem && resultsDropdown.firstElementChild) {
+            resultsDropdown.firstElementChild.classList.add('focused');
+          }
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          if (focusedItem && focusedItem.previousElementSibling) {
+            focusedItem.classList.remove('focused');
+            focusedItem.previousElementSibling.classList.add('focused');
+          } else if (focusedItem) {
+            focusedItem.classList.remove('focused');
+            resultsDropdown.lastElementChild.classList.add('focused');
+          }
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          if (focusedItem) {
+            focusedItem.click();
+          }
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadDataMaster();
+      setupSearchInput('nama', 'nama-results', 'nama');
+      setupSearchInput('blok_kamar', 'blok_kamar-results', 'blok_kamar');
+      setupSearchInput('judul_buku', 'judul_buku-results', 'judul_buku');
+
+      const form = document.getElementById('pengunjung-form');
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const jenjangSelect = document.getElementById('jenjang-select');
+        const kategoriSelect = document.getElementById('kategori-select');
+        const keteranganSelect = document.getElementById('keterangan-select');
+
+        if (!jenjangSelect.value || !kategoriSelect.value || !keteranganSelect.value) {
+          showModalNotification('Mohon lengkapi semua pilihan yang ada.');
+          return;
+        }
+
+        const formData = {
+          tanggal: Date.now(),
+          nama: document.getElementById('nama').value,
+          blok_kamar: document.getElementById('blok_kamar').value,
+          jenjang: jenjangSelect.value,
+          judul_buku: document.getElementById('judul_buku').value,
+          kategori: kategoriSelect.value,
+          keterangan: keteranganSelect.value,
+        };
+
+        const newPengunjungRef = database.ref('pengunjung').push();
+        newPengunjungRef.set(formData)
+          .then(() => {
+            window.location.href = `terimakasih.html?nama=${encodeURIComponent(formData.nama)}`;
+          })
+          .catch((error) => {
+            // Mengganti alert dengan modal notifikasi
+            showModalNotification(`Gagal menyimpan data: ${error.message}`);
+          });
+      });
+    });
+  </script>
+</body>
+
+</html>
