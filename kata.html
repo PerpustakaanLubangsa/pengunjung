@@ -1,374 +1,157 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kelola Kata-Kata Motivasi</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --primary-cyan: #17a2b8;
-      --secondary-cyan: #20c997;
-      --dark-cyan: #0a5c6a;
-    }
-
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(to right, #7fcac8, #0a5c6a, #20c997);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
-
-    .container {
-      background-color: white;
-      padding: 40px;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 800px;
-    }
-
-    h2 {
-      color: var(--dark-cyan);
-      margin-bottom: 30px;
-      text-align: center;
-      font-weight: 700;
-    }
-
-    .form-label {
-      font-weight: bold;
-      color: var(--dark-cyan);
-    }
-
-    .form-control {
-      border: 1px solid #ced4da;
-      border-radius: 4px;
-      padding: 10px;
-      transition: border-color 0.3s ease-in-out;
-    }
-
-    .form-control:focus {
-      border-color: var(--primary-cyan);
-      box-shadow: 0 0 0 0.25rem rgba(23, 162, 184, 0.25);
-    }
-
-    .btn-primary {
-      background-color: var(--primary-cyan);
-      border-color: var(--primary-cyan);
-      padding: 10px 20px;
-      font-weight: bold;
-      width: auto;
-    }
-
-    .btn-primary:hover {
-      background-color: var(--dark-cyan);
-      border-color: var(--dark-cyan);
-    }
-
-    .list-group-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border: 1px solid #e0e0e0;
-      margin-bottom: 10px;
-      border-radius: 4px;
-      padding: 15px;
-    }
-
-    .list-group-item:last-child {
-      margin-bottom: 0;
-    }
-
-    .list-group-item span {
-      flex-grow: 1;
-      margin-right: 15px;
-      color: #343a40;
-    }
-
-    .list-group-item .btn {
-      margin-left: 5px;
-    }
-
-    .btn-warning {
-      background-color: #ffc107;
-      border-color: #ffc107;
-      color: #212529;
-    }
-
-    .btn-warning:hover {
-      background-color: #e0a800;
-      border-color: #e0a800;
-    }
-
-    .btn-danger {
-      background-color: #dc3545;
-      border-color: #dc3545;
-    }
-
-    .btn-danger:hover {
-      background-color: #c82333;
-      border-color: #c82333;
-    }
-
-    .modal-content {
-      border: none;
-      border-radius: 8px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    }
-
-    .modal-header {
-      background-color: var(--primary-cyan);
-      color: white;
-      border-bottom: none;
-      border-radius: 8px 8px 0 0;
-      padding: 1.5rem;
-      text-align: center;
-    }
-
-    .modal-header h5 {
-      font-weight: 700;
-      width: 100%;
-    }
-
-    .modal-header .btn-close {
-      filter: brightness(0) invert(1);
-    }
-
-    .modal-body {
-      font-size: 1rem;
-      color: #495057;
-      padding: 2rem 1.5rem;
-    }
-
-    .modal-footer {
-      border-top: none;
-      padding: 1rem 1.5rem 1.5rem;
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-    }
-
-    .modal-footer .btn {
-      width: auto !important;
-      flex-grow: 0 !important;
-    }
-
-    .modal-footer .btn-secondary {
-      background-color: #e9ecef;
-      color: #495057;
-      border: none;
-      border-radius: 4px;
-      font-weight: 600;
-    }
-
-    .modal-footer .btn-primary {
-      background-color: var(--primary-cyan);
-      border: none;
-      border-radius: 4px;
-      font-weight: 600;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kelola Kata-Kata Motivasi</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary-cyan: #17a2b8;
+  --dark-cyan: #0a5c6a;
+}
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(to right, #7fcac8, #0a5c6a, #20c997);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+.container {
+  background-color: white;
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 800px;
+}
+h2 { color: var(--dark-cyan); margin-bottom:30px; text-align:center; font-weight:700; }
+.form-label { font-weight:bold; color: var(--dark-cyan);}
+.form-control { border:1px solid #ced4da; border-radius:4px; padding:10px; transition: border-color 0.3s ease-in-out;}
+.form-control:focus { border-color: var(--primary-cyan); box-shadow:0 0 0 0.25rem rgba(23,162,184,0.25);}
+.btn-primary { background-color: var(--primary-cyan); border-color: var(--primary-cyan); padding:10px 20px; font-weight:bold; width:auto; transition:0.2s;}
+.btn-primary:hover { background-color: var(--dark-cyan); border-color: var(--dark-cyan);}
+.list-group-item { display:flex; justify-content:space-between; align-items:center; border:1px solid #e0e0e0; margin-bottom:10px; border-radius:4px; padding:15px; transition: all 0.15s ease-in-out; opacity:0; transform: translateY(-5px);}
+.list-group-item.show { opacity:1; transform: translateY(0);}
+.list-group-item span { flex-grow:1; margin-right:15px; color:#343a40; word-break:break-word; }
+.btn-warning { background-color:#ffc107; border-color:#ffc107; color:#212529; }
+.btn-warning:hover { background-color:#e0a800; border-color:#e0a800; }
+.btn-danger { background-color:#dc3545; border-color:#dc3545; }
+.btn-danger:hover { background-color:#c82333; border-color:#c82333; }
+</style>
 </head>
-
 <body>
-  <div class="container">
-    <h2>Kelola Kata-Kata Motivasi Baca</h2>
-
-    <form id="motivation-form" class="mb-4">
-      <div class="mb-3">
-        <label for="motivation-input" class="form-label">Kata Motivasi Baru:</label>
-        <textarea class="form-control" id="motivation-input" rows="3" placeholder="Masukkan kata-kata motivasi baru..." required></textarea>
-      </div>
-      <button type="submit" class="btn btn-primary" id="add-edit-btn">Tambah Motivasi</button>
-      <button type="button" class="btn btn-secondary d-none" id="cancel-edit-btn">Batal Edit</button>
-    </form>
-
-    <h3>Daftar Kata Motivasi</h3>
-    <div class="list-group" id="motivation-list">
-      <!-- Kutipan akan dimuat di sini oleh JavaScript -->
+<div class="container">
+  <h2>Kelola Kata-Kata Motivasi Baca</h2>
+  <form id="motivation-form" class="mb-4">
+    <div class="mb-3">
+      <label for="motivation-input" class="form-label">Kata Motivasi Baru:</label>
+      <textarea class="form-control" id="motivation-input" rows="3" placeholder="Masukkan kata-kata motivasi baru..." required></textarea>
     </div>
-  </div>
+    <button type="submit" class="btn btn-primary" id="add-edit-btn">Tambah Motivasi</button>
+    <button type="button" class="btn btn-secondary d-none" id="cancel-edit-btn">Batal Edit</button>
+  </form>
+  <h3>Daftar Kata Motivasi</h3>
+  <div class="list-group" id="motivation-list"></div>
+</div>
 
-  <!-- Modals (sama seperti di p.html) -->
-  <div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header bg-info text-white">
-          <h5 class="modal-title" id="notificationModalLabel">Peringatan</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body" id="notificationMessage">
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-        </div>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyB3CAEuWjRjoRESevIvrPDfaGV7DfonNvY",
+  authDomain: "pustakawan2-520ab.firebaseapp.com",
+  databaseURL: "https://pustakawan2-520ab-default-rtdb.firebaseio.com",
+  projectId: "pustakawan2-520ab",
+  storageBucket: "pustakawan2-520ab.firebasestorage.app",
+  messagingSenderId: "178060973033",
+  appId: "1:178060973033:web:9e5207f0acb9e9fba8b178"
+};
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+const motivationRef = database.ref('motivation_quotes');
+
+const motivationInput = document.getElementById('motivation-input');
+const motivationForm = document.getElementById('motivation-form');
+const motivationList = document.getElementById('motivation-list');
+const addEditBtn = document.getElementById('add-edit-btn');
+const cancelEditBtn = document.getElementById('cancel-edit-btn');
+let editingKey = null;
+
+// Load daftar
+motivationRef.on('value', snapshot=>{
+  motivationList.innerHTML='';
+  snapshot.forEach(child=>{
+    const key = child.key;
+    const quote = child.val();
+    const listItem = document.createElement('div');
+    listItem.className='list-group-item';
+    listItem.innerHTML=`
+      <span>${quote}</span>
+      <div>
+        <button class="btn btn-warning btn-sm me-2" data-key="${key}" data-quote="${quote}">Edit</button>
+        <button class="btn btn-danger btn-sm" data-key="${key}">Hapus</button>
       </div>
-    </div>
-  </div>
+    `;
+    motivationList.appendChild(listItem);
+    setTimeout(()=>listItem.classList.add('show'),50);
+  });
+});
 
-  <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header bg-info text-white">
-          <h5 class="modal-title" id="confirmationModalLabel">Konfirmasi</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body" id="confirmationMessage">
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-          <button type="button" class="btn btn-danger" id="confirmActionBtn">Hapus</button>
-        </div>
-      </div>
-    </div>
-  </div>
+// Event delegation Edit/Hapus
+motivationList.addEventListener('click', e=>{
+  const editBtn = e.target.closest('.btn-warning');
+  const deleteBtn = e.target.closest('.btn-danger');
+  if(editBtn){
+    editingKey = editBtn.dataset.key;
+    motivationInput.value = editBtn.dataset.quote;
+    addEditBtn.textContent = 'Simpan Perubahan';
+    cancelEditBtn.classList.remove('d-none');
+    motivationInput.focus();
+  }
+  if(deleteBtn){
+    const keyToDelete = deleteBtn.dataset.key;
+    motivationRef.child(keyToDelete).remove();
+  }
+});
 
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    // Konfigurasi Firebase (gunakan yang sama dengan p.html)
-    const firebaseConfig = {
-      apiKey: "AIzaSyB3CAEuWjRjoRESevIvrPDfaGV7DfonNvY",
-      authDomain: "pustakawan2-520ab.firebaseapp.com",
-      databaseURL: "https://pustakawan2-520ab-default-rtdb.firebaseio.com",
-      projectId: "pustakawan2-520ab",
-      storageBucket: "pustakawan2-520ab.firebasestorage.app",
-      messagingSenderId: "178060973033",
-      appId: "1:178060973033:web:9e5207f0acb9e9fba8b178"
-    };
+// Tambah/Edit
+motivationForm.addEventListener('submit', e=>{
+  e.preventDefault();
+  const quote = motivationInput.value.trim();
+  if(!quote) return;
+  if(editingKey){
+    motivationRef.child(editingKey).set(quote);
+    resetForm();
+  }else{
+    motivationRef.push(quote);
+    resetForm();
+  }
+});
 
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
-    const motivationRef = database.ref('motivation_quotes');
+function resetForm(){
+  motivationInput.value='';
+  motivationInput.focus();
+  editingKey=null;
+  addEditBtn.textContent='Tambah Motivasi';
+  cancelEditBtn.classList.add('d-none');
+}
 
-    const motivationInput = document.getElementById('motivation-input');
-    const motivationForm = document.getElementById('motivation-form');
-    const motivationList = document.getElementById('motivation-list');
-    const addEditBtn = document.getElementById('add-edit-btn');
-    const cancelEditBtn = document.getElementById('cancel-edit-btn');
-
-    let editingKey = null; // Menyimpan kunci (key) kutipan yang sedang diedit
-
-    // Fungsi untuk menampilkan modal notifikasi
-    function showModalNotification(message, title = 'Peringatan') {
-      const myModal = new bootstrap.Modal(document.getElementById('notificationModal'));
-      document.getElementById('notificationModalLabel').textContent = title;
-      document.getElementById('notificationMessage').textContent = message;
-      myModal.show();
-    }
-
-    // Fungsi untuk menampilkan modal konfirmasi (untuk hapus)
-    function showConfirmationModal(message, actionCallback) {
-      const myModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
-      document.getElementById('confirmationModalLabel').textContent = 'Konfirmasi Penghapusan';
-      document.getElementById('confirmationMessage').textContent = message;
-      const confirmBtn = document.getElementById('confirmActionBtn');
-      confirmBtn.textContent = 'Hapus';
-      confirmBtn.classList.remove('btn-primary');
-      confirmBtn.classList.add('btn-danger');
-      confirmBtn.onclick = actionCallback; // Set callback untuk tombol "Hapus"
-      myModal.show();
-    }
-
-
-    // Memuat dan menampilkan daftar kata-kata motivasi
-    motivationRef.on('value', (snapshot) => {
-      motivationList.innerHTML = ''; // Kosongkan daftar sebelum mengisi ulang
-      snapshot.forEach((childSnapshot) => {
-        const key = childSnapshot.key;
-        const quote = childSnapshot.val();
-
-        const listItem = document.createElement('div');
-        listItem.classList.add('list-group-item');
-        listItem.innerHTML = `
-                    <span>${quote}</span>
-                    <div>
-                        <button class="btn btn-warning btn-sm me-2" data-key="${key}" data-quote="${quote}">Edit</button>
-                        <button class="btn btn-danger btn-sm" data-key="${key}">Hapus</button>
-                    </div>
-                `;
-        motivationList.appendChild(listItem);
-      });
-
-      // Tambahkan event listener untuk tombol Edit dan Hapus
-      motivationList.querySelectorAll('.btn-warning').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          editingKey = e.target.dataset.key;
-          motivationInput.value = e.target.dataset.quote;
-          addEditBtn.textContent = 'Simpan Perubahan';
-          cancelEditBtn.classList.remove('d-none');
-        });
-      });
-
-      motivationList.querySelectorAll('.btn-danger').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const keyToDelete = e.target.dataset.key;
-          showConfirmationModal('Apakah Anda yakin ingin menghapus kutipan ini?', () => {
-            motivationRef.child(keyToDelete).remove()
-              .then(() => {
-                showModalNotification('Kutipan berhasil dihapus!', 'Berhasil');
-                bootstrap.Modal.getInstance(document.getElementById('confirmationModal')).hide(); // Tutup modal konfirmasi
-              })
-              .catch(error => {
-                showModalNotification(`Gagal menghapus kutipan: ${error.message}`);
-              });
-          });
-        });
-      });
-    });
-
-    // Menambahkan atau mengedit kata motivasi
-    motivationForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const quote = motivationInput.value.trim();
-
-      if (quote === '') {
-        showModalNotification('Kata motivasi tidak boleh kosong.');
-        return;
-      }
-
-      if (editingKey) {
-        // Mode edit
-        motivationRef.child(editingKey).set(quote)
-          .then(() => {
-            showModalNotification('Kutipan berhasil diperbarui!', 'Berhasil');
-            motivationInput.value = '';
-            editingKey = null;
-            addEditBtn.textContent = 'Tambah Motivasi';
-            cancelEditBtn.classList.add('d-none');
-          })
-          .catch(error => {
-            showModalNotification(`Gagal memperbarui kutipan: ${error.message}`);
-          });
-      } else {
-        // Mode tambah baru
-        motivationRef.push(quote)
-          .then(() => {
-            showModalNotification('Kutipan berhasil ditambahkan!', 'Berhasil');
-            motivationInput.value = '';
-          })
-          .catch(error => {
-            showModalNotification(`Gagal menambahkan kutipan: ${error.message}`);
-          });
-      }
-    });
-
-    // Membatalkan mode edit
-    cancelEditBtn.addEventListener('click', () => {
-      motivationInput.value = '';
-      editingKey = null;
-      addEditBtn.textContent = 'Tambah Motivasi';
-      cancelEditBtn.classList.add('d-none');
-    });
-  </script>
+// Enter = submit, Shift+Enter = newline
+motivationInput.addEventListener('keydown', e=>{
+  if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); addEditBtn.click(); }
+});
+// Esc = batal edit
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape' && !cancelEditBtn.classList.contains('d-none')) cancelEditBtn.click();
+});
+</script>
 </body>
-
 </html>
