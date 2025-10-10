@@ -261,7 +261,7 @@
       showLog('Buku dipilih. Silakan ubah data di kotak review jika perlu.', false);
     });
 
-    // --- LOGIKA SUBMIT PENGUNJUNG YANG TELAH DIPERBAIKI (Mengambil data dari input yang sudah diedit) ---
+    // --- LOGIKA SUBMIT PENGUNJUNG DAN UPDATE MASTER DATA ---
     btnSubmit.addEventListener('click', async ()=>{
       const keterangan = keteranganSelect.value;
       
@@ -277,7 +277,6 @@
         return;
       }
       
-      // Tampilkan pesan "Mengirim"
       showLog('⏳ Mengirim data...', false);
 
       const now = new Date();
@@ -289,6 +288,7 @@
       const finalJudulBuku = judulBukuInput.value.trim();
       const finalKategoriBuku = kategoriBukuInput.value.trim();
       
+      // Payload for PENGUNJUNG
       const payload = {
         // Data Santri (NIS diambil dari Autocomplete, data lain dari input yang sudah diedit)
         nis: selectedSantri.nis, 
@@ -311,23 +311,50 @@
       };
         
       try{
-        // Menggunakan 'push' untuk membuat kunci unik
+        // =========================================================
+        // 1. UPDATE DATA MASTER SANTRI (jika NIS tersedia)
+        // Menggunakan set() akan menimpa data lama dengan data baru/yang telah diedit.
+        // =========================================================
+        if (selectedSantri.nis) {
+             const santriUpdatePayload = { 
+                 nama: finalNama, 
+                 blok: finalBlok, 
+                 jenjang: finalJenjang 
+             };
+             await set(ref(db, `siswa/${selectedSantri.nis}`), santriUpdatePayload);
+        }
+
+        // =========================================================
+        // 2. UPDATE DATA MASTER BUKU (jika Kode tersedia)
+        // Menggunakan set() akan menimpa data lama dengan data baru/yang telah diedit.
+        // =========================================================
+        if (selectedBuku.kode) {
+             const bukuUpdatePayload = { 
+                 judul: finalJudulBuku, 
+                 kategori: finalKategoriBuku 
+             };
+             await set(ref(db, `buku/${selectedBuku.kode}`), bukuUpdatePayload);
+        }
+
+        // =========================================================
+        // 3. MENGIRIM DATA KUNJUNGAN BARU ke /pengunjung (menggunakan 'push')
+        // =========================================================
         await push(ref(db, `pengunjung`), payload); 
         
-        // 1. Log Success
-        showLog('✅ Data berhasil dikirim!', false);
+        // Log Success
+        showLog('✅ Data berhasil dikirim dan master data diperbarui!', false);
         
-        // 2. Reset KIRI (Input Pencarian & Keterangan)
+        // Reset KIRI (Input Pencarian & Keterangan)
         nisSearch.value = ''; 
         kodeBukuSearch.value = ''; 
         keteranganSelect.value = '';
         
-        // 3. Reset KANAN (Data Pengunjung/Preview)
+        // Reset KANAN (Data Pengunjung/Preview)
         resetPreview();
         
       } catch(e){ 
         console.error("Firebase Submit Error:", e); 
-        showLog('❌ Gagal kirim data. Cek Firebase Rules atau Konsol.', true);
+        showLog('❌ Gagal kirim data atau perbarui master. Cek Firebase Rules atau Konsol.', true);
       }
     });
 
