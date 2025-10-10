@@ -42,6 +42,12 @@
         @apply border-b-2 border-cyan-400/50 rounded-lg shadow-sm bg-white;
     }
     
+    /* BARU: Styling untuk error */
+    .input-error {
+        border-color: #EF4444 !important; /* Tailwind red-500 */
+        border-width: 2px !important;
+        box-shadow: 0 0 0 2px #FECACA; /* Ring merah muda */
+    }
   </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
@@ -77,7 +83,7 @@
       </div>
 
       <div class="space-y-6 bg-blue-50 p-6 rounded-xl shadow-inner border border-blue-100">
-        <h3 class="font-semibold text-xl border-b pb-2 border-blue-200 text-blue-800">Review Data Pilihan (Bisa Diedit)</h3>
+        <h3 class="font-semibold text-xl border-b pb-2 border-blue-800 text-blue-800">Review Data Pilihan (Wajib Isi)</h3>
         
         <div>
           <label class="block mb-1 font-medium text-gray-700">Nama Santri</label>
@@ -125,17 +131,26 @@
     // Elements
     const nisSearch = document.getElementById('nisSearch');
     const nisSuggestions = document.getElementById('nisSuggestions');
+    const keteranganSelect = document.getElementById('keterangan');
+
     // Input Review yang sekarang Editable
-    const namaInput = document.getElementById('nama');
-    const blokInput = document.getElementById('blok');
-    const jenjangInput = document.getElementById('jenjang');
+    const inputReview = [
+      document.getElementById('nama'),
+      document.getElementById('blok'),
+      document.getElementById('jenjang'),
+      document.getElementById('judulBuku'),
+      document.getElementById('kategoriBuku'),
+    ];
+    const namaInput = inputReview[0];
+    const blokInput = inputReview[1];
+    const jenjangInput = inputReview[2];
+    const judulBukuInput = inputReview[3];
+    const kategoriBukuInput = inputReview[4];
+
 
     const kodeBukuSearch = document.getElementById('kodeBukuSearch');
     const bukuSuggestions = document.getElementById('bukuSuggestions');
-    const judulBukuInput = document.getElementById('judulBuku');
-    const kategoriBukuInput = document.getElementById('kategoriBuku');
-
-    const keteranganSelect = document.getElementById('keterangan');
+    
     const btnSubmit = document.getElementById('btnSubmit');
     const logEl = document.getElementById('log');
 
@@ -153,6 +168,41 @@
         logEl.innerText = message;
     }
     
+    // --- Penanda Error Baru ---
+    function clearErrorMarks() {
+        document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+    }
+
+    function markEmptyFields() {
+        clearErrorMarks(); // Hapus penanda error lama
+
+        let errorCount = 0;
+        
+        // 1. Validasi NIS/Nama
+        if (!selectedSantri.nis) {
+            nisSearch.classList.add('input-error');
+            errorCount++;
+        }
+
+        // 2. Validasi Keterangan
+        if (!keteranganSelect.value) {
+            keteranganSelect.classList.add('input-error');
+            errorCount++;
+        }
+
+        // 3. Validasi Review Data (semua input)
+        inputReview.forEach(input => {
+            if (input.value.trim() === '') {
+                input.classList.add('input-error');
+                errorCount++;
+            }
+        });
+        
+        return errorCount > 0;
+    }
+    // --- End Penanda Error Baru ---
+
+
     // --- Muat Data Awal menggunakan onValue (lebih realtime) ---
     onValue(ref(db,'siswa'), (snap)=>{
         const data = snap.val();
@@ -183,9 +233,12 @@
         kategoriBukuInput.value = '';
         selectedSantri = {}; // Reset state key
         selectedBuku = {};   // Reset state key
+        
+        // Bersihkan penanda error saat preview direset
+        clearErrorMarks();
     }
-
-    // --- Autocomplete NIS (Santri) ---
+    
+    // --- Event Listeners untuk NIS (Santri) ---
     nisSearch.addEventListener('input', ()=>{
       resetPreview(); // Reset preview setiap kali mengetik ulang
       const val = nisSearch.value.toLowerCase();
@@ -193,7 +246,6 @@
       
       const matches = santriList.filter(s=> s.nama.toLowerCase().includes(val) || s.nis.includes(val)).slice(0,10);
       
-      // Menampilkan Nama, NIS, Blok, dan Jenjang
       nisSuggestions.innerHTML = matches.map(s=>`
         <li class="px-3 py-1 hover:bg-blue-100 cursor-pointer" data-nis="${s.nis}" data-nama="${s.nama}" data-blok="${s.blok}" data-jenjang="${s.jenjang}">
           <div class="font-semibold">${s.nama} (${s.nis})</div> 
@@ -201,17 +253,16 @@
         </li>`).join('');
         
       nisSuggestions.classList.toggle('hidden', matches.length === 0);
+      
+      // Hapus penanda error pada nisSearch saat mulai mengetik
+      nisSearch.classList.remove('input-error');
     });
 
     nisSuggestions.addEventListener('click', e=>{
       const li = e.target.closest('li'); if(!li) return;
       
-      // Simpan hanya NIS sebagai kunci. Data lain diisi ke input editable.
-      selectedSantri = {
-        nis: li.dataset.nis
-      };
+      selectedSantri = { nis: li.dataset.nis };
       
-      // Isi form KANAN yang kini editable
       namaInput.value = li.dataset.nama;
       blokInput.value = li.dataset.blok;
       jenjangInput.value = li.dataset.jenjang;
@@ -219,10 +270,11 @@
       
       nisSuggestions.innerHTML=''; 
       nisSuggestions.classList.add('hidden');
+      nisSearch.classList.remove('input-error'); // Hapus error setelah terpilih
       showLog('Santri dipilih. Silakan ubah data di kotak review jika perlu.', false);
     });
     
-    // --- Autocomplete Buku ---
+    // --- Event Listeners untuk Buku ---
     kodeBukuSearch.addEventListener('input', ()=>{
       judulBukuInput.value = '';
       kategoriBukuInput.value = '';
@@ -233,7 +285,6 @@
       
       const matches = bukuList.filter(b=> b.kode.toLowerCase().includes(val) || b.judul.toLowerCase().includes(val)).slice(0,10);
       
-      // Menampilkan Judul, Kode, dan Kategori
       bukuSuggestions.innerHTML = matches.map(b=>`
         <li class="px-3 py-1 hover:bg-blue-100 cursor-pointer" data-kode="${b.kode}" data-judul="${b.judul}" data-kategori="${b.kategori}">
           <div class="font-semibold">${b.judul} (${b.kode})</div>
@@ -246,12 +297,8 @@
     bukuSuggestions.addEventListener('click', e=>{
       const li = e.target.closest('li'); if(!li) return;
       
-      // Simpan hanya Kode sebagai kunci. Data lain diisi ke input editable.
-      selectedBuku = {
-        kode: li.dataset.kode
-      };
+      selectedBuku = { kode: li.dataset.kode };
       
-      // Isi form KANAN yang kini editable
       judulBukuInput.value = li.dataset.judul;
       kategoriBukuInput.value = li.dataset.kategori;
       kodeBukuSearch.value = `${li.dataset.judul} (${li.dataset.kode})`;
@@ -261,19 +308,19 @@
       showLog('Buku dipilih. Silakan ubah data di kotak review jika perlu.', false);
     });
 
-    // --- LOGIKA SUBMIT PENGUNJUNG DAN UPDATE MASTER DATA ---
+    // Hapus penanda error pada input Review dan Keterangan saat mulai diketik/dipilih
+    inputReview.forEach(input => input.addEventListener('input', () => input.classList.remove('input-error')));
+    keteranganSelect.addEventListener('change', () => keteranganSelect.classList.remove('input-error'));
+
+
+    // --- LOGIKA SUBMIT PENGUNJUNG DAN UPDATE MASTER DATA DENGAN VALIDASI BARU ---
     btnSubmit.addEventListener('click', async ()=>{
-      const keterangan = keteranganSelect.value;
       
-      // Validasi Santri wajib
-      if(!selectedSantri.nis) {
-        showLog('⚠️ Harap pilih Santri dari daftar Autocomplete!', true);
-        return;
-      }
+      // Lakukan penandaan visual pada kolom yang kosong
+      const hasErrors = markEmptyFields();
       
-      // Validasi Keterangan wajib
-      if(!keterangan) {
-        showLog('⚠️ Harap pilih Keterangan (Baca/Pinjam)!', true);
+      if(hasErrors) {
+        showLog('⚠️ Harap lengkapi semua kolom yang ditandai merah!', true);
         return;
       }
       
@@ -281,27 +328,25 @@
 
       const now = new Date();
       
-      // Ambil nilai terbaru dari input yang sudah diedit
+      // Ambil nilai terbaru (kini dipastikan tidak kosong)
       const finalNama = namaInput.value.trim();
       const finalBlok = blokInput.value.trim();
       const finalJenjang = jenjangInput.value.trim();
       const finalJudulBuku = judulBukuInput.value.trim();
       const finalKategoriBuku = kategoriBukuInput.value.trim();
+      const keterangan = keteranganSelect.value;
       
       // Payload for PENGUNJUNG
       const payload = {
-        // Data Santri (NIS diambil dari Autocomplete, data lain dari input yang sudah diedit)
         nis: selectedSantri.nis, 
-        nama: finalNama || '-',
-        blok: finalBlok || '-',
-        jenjang: finalJenjang || '-',
+        nama: finalNama,
+        blok: finalBlok,
+        jenjang: finalJenjang,
         
-        // Data Buku (Kode diambil dari Autocomplete jika dipilih, Judul/Kategori dari input yang sudah diedit)
         kodeBuku: selectedBuku.kode || (!kodeBukuSearch.value.trim() ? '-' : kodeBukuSearch.value.trim()),
-        judulBuku: finalJudulBuku || '-',
-        kategoriBuku: finalKategoriBuku || '-',
+        judulBuku: finalJudulBuku,
+        kategoriBuku: finalKategoriBuku,
         
-        // Data Kunjungan
         keterangan: keterangan,
         timestamp: now.getTime(),
         tanggal: String(now.getDate()).padStart(2,'0'),
@@ -311,45 +356,26 @@
       };
         
       try{
-        // =========================================================
-        // 1. UPDATE DATA MASTER SANTRI (jika NIS tersedia)
-        // Menggunakan set() akan menimpa data lama dengan data baru/yang telah diedit.
-        // =========================================================
+        // 1. UPDATE DATA MASTER SANTRI
         if (selectedSantri.nis) {
-             const santriUpdatePayload = { 
-                 nama: finalNama, 
-                 blok: finalBlok, 
-                 jenjang: finalJenjang 
-             };
+             const santriUpdatePayload = { nama: finalNama, blok: finalBlok, jenjang: finalJenjang };
              await set(ref(db, `siswa/${selectedSantri.nis}`), santriUpdatePayload);
         }
 
-        // =========================================================
-        // 2. UPDATE DATA MASTER BUKU (jika Kode tersedia)
-        // Menggunakan set() akan menimpa data lama dengan data baru/yang telah diedit.
-        // =========================================================
+        // 2. UPDATE DATA MASTER BUKU
         if (selectedBuku.kode) {
-             const bukuUpdatePayload = { 
-                 judul: finalJudulBuku, 
-                 kategori: finalKategoriBuku 
-             };
+             const bukuUpdatePayload = { judul: finalJudulBuku, kategori: finalKategoriBuku };
              await set(ref(db, `buku/${selectedBuku.kode}`), bukuUpdatePayload);
         }
 
-        // =========================================================
-        // 3. MENGIRIM DATA KUNJUNGAN BARU ke /pengunjung (menggunakan 'push')
-        // =========================================================
+        // 3. MENGIRIM DATA KUNJUNGAN BARU
         await push(ref(db, `pengunjung`), payload); 
         
-        // Log Success
+        // Log Success dan Reset
         showLog('✅ Data berhasil dikirim dan master data diperbarui!', false);
-        
-        // Reset KIRI (Input Pencarian & Keterangan)
         nisSearch.value = ''; 
         kodeBukuSearch.value = ''; 
         keteranganSelect.value = '';
-        
-        // Reset KANAN (Data Pengunjung/Preview)
         resetPreview();
         
       } catch(e){ 
