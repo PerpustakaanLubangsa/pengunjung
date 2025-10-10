@@ -36,11 +36,12 @@
       /* Border 0, hanya border-bawah 4px tebal berwarna CYAN */
       @apply w-full px-4 py-2 border-0 border-b-4 border-cyan-500 rounded-none text-gray-800 placeholder-gray-400 focus:ring-0 focus:border-cyan-700 transition duration-300 ease-in-out;
     }
-    /* GAYA KOTAK DISPLAY READONLY */
-    .readonly-input {
-      /* Tanpa border, rounded-lg, dengan background abu-abu terang */
-      @apply w-full px-4 py-2 border-none rounded-lg bg-gray-100 text-gray-800 font-medium shadow-sm;
+    
+    /* Input di bagian Review/Editable */
+    #nama, #blok, #jenjang, #judulBuku, #kategoriBuku {
+        @apply border-b-2 border-cyan-400/50 rounded-lg shadow-sm bg-white;
     }
+    
   </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
@@ -76,27 +77,27 @@
       </div>
 
       <div class="space-y-6 bg-blue-50 p-6 rounded-xl shadow-inner border border-blue-100">
-        <h3 class="font-semibold text-xl border-b pb-2 border-blue-200 text-blue-800">Review Data Pilihan</h3>
+        <h3 class="font-semibold text-xl border-b pb-2 border-blue-200 text-blue-800">Review Data Pilihan (Bisa Diedit)</h3>
         
         <div>
           <label class="block mb-1 font-medium text-gray-700">Nama Santri</label>
-          <input type="text" id="nama" class="readonly-input" readonly>
+          <input type="text" id="nama" class="form-element" placeholder="Nama Santri">
         </div>
         <div>
           <label class="block mb-1 font-medium text-gray-700">Blok / Kamar</label>
-          <input type="text" id="blok" class="readonly-input" readonly>
+          <input type="text" id="blok" class="form-element" placeholder="Blok / Kamar">
         </div>
         <div>
           <label class="block mb-1 font-medium text-gray-700">Jenjang</label>
-          <input type="text" id="jenjang" class="readonly-input" readonly>
+          <input type="text" id="jenjang" class="form-element" placeholder="Jenjang">
         </div>
         <div>
           <label class="block mb-1 font-medium text-gray-700">Judul Buku</label>
-          <input type="text" id="judulBuku" class="readonly-input" readonly>
+          <input type="text" id="judulBuku" class="form-element" placeholder="Judul Buku">
         </div>
         <div>
           <label class="block mb-1 font-medium text-gray-700">Kategori Buku</label>
-          <input type="text" id="kategoriBuku" class="readonly-input" readonly>
+          <input type="text" id="kategoriBuku" class="form-element" placeholder="Kategori Buku">
         </div>
       </div>
 
@@ -124,6 +125,7 @@
     // Elements
     const nisSearch = document.getElementById('nisSearch');
     const nisSuggestions = document.getElementById('nisSuggestions');
+    // Input Review yang sekarang Editable
     const namaInput = document.getElementById('nama');
     const blokInput = document.getElementById('blok');
     const jenjangInput = document.getElementById('jenjang');
@@ -141,7 +143,7 @@
     let santriList = [];
     let bukuList = [];
     
-    // Variabel untuk menyimpan data Santri/Buku yang terpilih
+    // Variabel untuk menyimpan data Santri/Buku yang terpilih (hanya kunci utama: NIS, Kode)
     let selectedSantri = {}; 
     let selectedBuku = {};
     
@@ -179,8 +181,8 @@
         jenjangInput.value = '';
         judulBukuInput.value = '';
         kategoriBukuInput.value = '';
-        selectedSantri = {};
-        selectedBuku = {};
+        selectedSantri = {}; // Reset state key
+        selectedBuku = {};   // Reset state key
     }
 
     // --- Autocomplete NIS (Santri) ---
@@ -204,22 +206,20 @@
     nisSuggestions.addEventListener('click', e=>{
       const li = e.target.closest('li'); if(!li) return;
       
+      // Simpan hanya NIS sebagai kunci. Data lain diisi ke input editable.
       selectedSantri = {
-        nis: li.dataset.nis,
-        nama: li.dataset.nama,
-        blok: li.dataset.blok,
-        jenjang: li.dataset.jenjang
+        nis: li.dataset.nis
       };
       
-      // Isi form KANAN
-      namaInput.value = selectedSantri.nama;
-      blokInput.value = selectedSantri.blok;
-      jenjangInput.value = selectedSantri.jenjang;
-      nisSearch.value = `${selectedSantri.nama} (${selectedSantri.nis})`;
+      // Isi form KANAN yang kini editable
+      namaInput.value = li.dataset.nama;
+      blokInput.value = li.dataset.blok;
+      jenjangInput.value = li.dataset.jenjang;
+      nisSearch.value = `${li.dataset.nama} (${li.dataset.nis})`;
       
       nisSuggestions.innerHTML=''; 
       nisSuggestions.classList.add('hidden');
-      showLog('Santri dipilih. Lanjutkan ke input Buku.', false);
+      showLog('Santri dipilih. Silakan ubah data di kotak review jika perlu.', false);
     });
     
     // --- Autocomplete Buku ---
@@ -246,23 +246,22 @@
     bukuSuggestions.addEventListener('click', e=>{
       const li = e.target.closest('li'); if(!li) return;
       
+      // Simpan hanya Kode sebagai kunci. Data lain diisi ke input editable.
       selectedBuku = {
-        kode: li.dataset.kode,
-        judul: li.dataset.judul,
-        kategori: li.dataset.kategori
+        kode: li.dataset.kode
       };
       
-      // Isi form KANAN
-      judulBukuInput.value = selectedBuku.judul;
-      kategoriBukuInput.value = selectedBuku.kategori;
-      kodeBukuSearch.value = `${selectedBuku.judul} (${selectedBuku.kode})`;
+      // Isi form KANAN yang kini editable
+      judulBukuInput.value = li.dataset.judul;
+      kategoriBukuInput.value = li.dataset.kategori;
+      kodeBukuSearch.value = `${li.dataset.judul} (${li.dataset.kode})`;
       
       bukuSuggestions.innerHTML=''; 
       bukuSuggestions.classList.add('hidden');
-      showLog('Buku dipilih.', false);
+      showLog('Buku dipilih. Silakan ubah data di kotak review jika perlu.', false);
     });
 
-    // --- LOGIKA SUBMIT PENGUNJUNG YANG DIPERBAIKI ---
+    // --- LOGIKA SUBMIT PENGUNJUNG YANG TELAH DIPERBAIKI (Mengambil data dari input yang sudah diedit) ---
     btnSubmit.addEventListener('click', async ()=>{
       const keterangan = keteranganSelect.value;
       
@@ -282,18 +281,25 @@
       showLog('⏳ Mengirim data...', false);
 
       const now = new Date();
+      
+      // Ambil nilai terbaru dari input yang sudah diedit
+      const finalNama = namaInput.value.trim();
+      const finalBlok = blokInput.value.trim();
+      const finalJenjang = jenjangInput.value.trim();
+      const finalJudulBuku = judulBukuInput.value.trim();
+      const finalKategoriBuku = kategoriBukuInput.value.trim();
+      
       const payload = {
-        // Data Santri (Terpilih)
-        nis: selectedSantri.nis,
-        nama: selectedSantri.nama,
-        blok: selectedSantri.blok,
-        jenjang: selectedSantri.jenjang,
+        // Data Santri (NIS diambil dari Autocomplete, data lain dari input yang sudah diedit)
+        nis: selectedSantri.nis, 
+        nama: finalNama || '-',
+        blok: finalBlok || '-',
+        jenjang: finalJenjang || '-',
         
-        // Data Buku (Opsional/Terpilih)
-        // Jika Buku tidak terpilih, gunakan nilai dari input jika ada, jika tidak pakai '-'
+        // Data Buku (Kode diambil dari Autocomplete jika dipilih, Judul/Kategori dari input yang sudah diedit)
         kodeBuku: selectedBuku.kode || (!kodeBukuSearch.value.trim() ? '-' : kodeBukuSearch.value.trim()),
-        judulBuku: selectedBuku.judul || (!kodeBukuSearch.value.trim() ? '-' : kodeBukuSearch.value.trim()),
-        kategoriBuku: selectedBuku.kategori || '-',
+        judulBuku: finalJudulBuku || '-',
+        kategoriBuku: finalKategoriBuku || '-',
         
         // Data Kunjungan
         keterangan: keterangan,
@@ -305,7 +311,7 @@
       };
         
       try{
-        // PENTING: Menggunakan 'push' untuk membuat kunci unik
+        // Menggunakan 'push' untuk membuat kunci unik
         await push(ref(db, `pengunjung`), payload); 
         
         // 1. Log Success
