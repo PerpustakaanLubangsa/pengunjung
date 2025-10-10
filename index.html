@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Form Pengunjung Perpustakaan</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* 1. FONT LEMBUT DAN Latar Belakang Gradasi Dark & Cyan */
+    body {
+        font-family: 'Poppins', sans-serif; /* Menggunakan Poppins */
+        background-image: linear-gradient(135deg, #0F172A, #06B6D4); 
+    }
+    
+    /* Styling for suggestions list */
+    #nisSuggestions, #bukuSuggestions {
+      list-style: none;
+      padding: 0;
+      margin-top: 2px;
+      @apply rounded-lg; 
+    }
+    #nisSuggestions li, #bukuSuggestions li {
+      padding: 8px 12px;
+      border-bottom: 1px solid #eee;
+    }
+    #nisSuggestions li:last-child, #bukuSuggestions li:last-child {
+      border-bottom: none;
+    }
+    .text-xs { font-size: 0.75rem; }
+    .text-gray-500 { color: #6B7280; }
+
+    /* GAYA INPUT WAJIB ISI (GARIS BAWAH CYAN SAJA) */
+    .form-element {
+      /* Border 0, hanya border-bawah 4px tebal berwarna CYAN */
+      @apply w-full px-4 py-2 border-0 border-b-4 border-cyan-500 rounded-none text-gray-800 placeholder-gray-400 focus:ring-0 focus:border-cyan-700 transition duration-300 ease-in-out;
+    }
+    /* GAYA KOTAK DISPLAY READONLY */
+    .readonly-input {
+      /* Tanpa border, rounded-lg, dengan background abu-abu terang */
+      @apply w-full px-4 py-2 border-none rounded-lg bg-gray-100 text-gray-800 font-medium shadow-sm;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+  <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-5xl">
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+      <div class="space-y-6">
+        
+        <div class="relative">
+          <label class="block mb-2 font-medium text-lg">NIS / Nama</label>
+          <input type="text" id="nisSearch" placeholder="Ketik NIS atau Nama Santri..." class="form-element" autocomplete="off" autofocus>
+          <ul id="nisSuggestions" class="border bg-white max-h-40 overflow-auto hidden absolute z-10 w-full shadow-lg"></ul>
+        </div>
+
+        <div class="relative">
+          <label class="block mb-2 font-medium text-lg">Kode / Judul Buku</label>
+          <input type="text" id="kodeBukuSearch" placeholder="Ketik Kode atau Judul Buku..." class="form-element" autocomplete="off">
+          <ul id="bukuSuggestions" class="border bg-white max-h-40 overflow-auto hidden absolute z-10 w-full shadow-lg"></ul>
+        </div>
+
+        <div>
+          <label class="block mb-2 font-medium text-lg">Keterangan</label>
+          <select id="keterangan" class="form-element">
+            <option value="">Pilih...</option>
+            <option value="Baca">Baca</option>
+            <option value="Pinjam">Pinjam</option>
+          </select>
+        </div>
+
+        <button type="button" id="btnSubmit" class="w-full py-3 mt-4 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition duration-200 shadow-md hover:shadow-lg">Kirim Data Kunjungan</button>
+        <div id="log" class="text-sm mt-2 text-gray-600 font-medium text-center">Memuat data Santri dan Buku...</div>
+      </div>
+
+      <div class="space-y-6 bg-blue-50 p-6 rounded-xl shadow-inner border border-blue-100">
+        <h3 class="font-semibold text-xl border-b pb-2 border-blue-200 text-blue-800">Review Data Pilihan</h3>
+        
+        <div>
+          <label class="block mb-1 font-medium text-gray-700">Nama Santri</label>
+          <input type="text" id="nama" class="readonly-input" readonly>
+        </div>
+        <div>
+          <label class="block mb-1 font-medium text-gray-700">Blok / Kamar</label>
+          <input type="text" id="blok" class="readonly-input" readonly>
+        </div>
+        <div>
+          <label class="block mb-1 font-medium text-gray-700">Jenjang</label>
+          <input type="text" id="jenjang" class="readonly-input" readonly>
+        </div>
+        <div>
+          <label class="block mb-1 font-medium text-gray-700">Judul Buku</label>
+          <input type="text" id="judulBuku" class="readonly-input" readonly>
+        </div>
+        <div>
+          <label class="block mb-1 font-medium text-gray-700">Kategori Buku</label>
+          <input type="text" id="kategoriBuku" class="readonly-input" readonly>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script type="module">
+    // PENTING: Import fungsi 'push' untuk membuat kunci unik
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
+    import { getDatabase, ref, set, get, onValue, push } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB6gaVW3ye680YylqzSebZugmQepYRA4g4",
+      authDomain: "pengunjung-4489b.firebaseapp.com",
+      projectId: "pengunjung-4489b",
+      storageBucket: "pengunjung-4489b.firebasestorage.app",
+      messagingSenderId: "233634425303",
+      appId: "1:233634425303:web:9d45d775e703b94843c392",
+      databaseURL: "https://pengunjung-4489b-default-rtdb.firebaseio.com" 
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // Elements
+    const nisSearch = document.getElementById('nisSearch');
+    const nisSuggestions = document.getElementById('nisSuggestions');
+    const namaInput = document.getElementById('nama');
+    const blokInput = document.getElementById('blok');
+    const jenjangInput = document.getElementById('jenjang');
+
+    const kodeBukuSearch = document.getElementById('kodeBukuSearch');
+    const bukuSuggestions = document.getElementById('bukuSuggestions');
+    const judulBukuInput = document.getElementById('judulBuku');
+    const kategoriBukuInput = document.getElementById('kategoriBuku');
+
+    const keteranganSelect = document.getElementById('keterangan');
+    const btnSubmit = document.getElementById('btnSubmit');
+    const logEl = document.getElementById('log');
+
+    // State Data
+    let santriList = [];
+    let bukuList = [];
+    
+    // Variabel untuk menyimpan data Santri/Buku yang terpilih
+    let selectedSantri = {}; 
+    let selectedBuku = {};
+    
+    function showLog(message, isError = false) {
+        logEl.classList.remove('text-green-600', 'text-red-600', 'text-gray-600');
+        logEl.classList.add(isError ? 'text-red-600' : 'text-green-600');
+        logEl.innerText = message;
+    }
+    
+    // --- Muat Data Awal menggunakan onValue (lebih realtime) ---
+    onValue(ref(db,'siswa'), (snap)=>{
+        const data = snap.val();
+        if(data) {
+            santriList = Object.entries(data).map(([nis,val])=>({nis, nama: val.nama, blok: val.blok, jenjang: val.jenjang}));
+            showLog(`Data Santri (${santriList.length}) dimuat.`, false);
+        } else {
+             showLog(`Data Santri kosong.`, true);
+        }
+    });
+    
+    onValue(ref(db,'buku'), (snap)=>{
+        const data = snap.val();
+        if(data) {
+            bukuList = Object.entries(data).map(([kode,val])=>({kode, judul: val.judul, kategori: val.kategori}));
+            showLog(`Data Buku (${bukuList.length}) dimuat.`, false);
+        } else {
+             showLog(`Data Buku kosong.`, true);
+        }
+    });
+    
+    // --- Helper function untuk mereset form Kanan ---
+    function resetPreview() {
+        namaInput.value = '';
+        blokInput.value = '';
+        jenjangInput.value = '';
+        judulBukuInput.value = '';
+        kategoriBukuInput.value = '';
+        selectedSantri = {};
+        selectedBuku = {};
+    }
+
+    // --- Autocomplete NIS (Santri) ---
+    nisSearch.addEventListener('input', ()=>{
+      resetPreview(); // Reset preview setiap kali mengetik ulang
+      const val = nisSearch.value.toLowerCase();
+      if(!val){ nisSuggestions.innerHTML=''; nisSuggestions.classList.add('hidden'); return; }
+      
+      const matches = santriList.filter(s=> s.nama.toLowerCase().includes(val) || s.nis.includes(val)).slice(0,10);
+      
+      // Menampilkan Nama, NIS, Blok, dan Jenjang
+      nisSuggestions.innerHTML = matches.map(s=>`
+        <li class="px-3 py-1 hover:bg-blue-100 cursor-pointer" data-nis="${s.nis}" data-nama="${s.nama}" data-blok="${s.blok}" data-jenjang="${s.jenjang}">
+          <div class="font-semibold">${s.nama} (${s.nis})</div> 
+          <div class="text-xs text-gray-500">Blok: ${s.blok || '-'} | Jenjang: ${s.jenjang || '-'}</div>
+        </li>`).join('');
+        
+      nisSuggestions.classList.toggle('hidden', matches.length === 0);
+    });
+
+    nisSuggestions.addEventListener('click', e=>{
+      const li = e.target.closest('li'); if(!li) return;
+      
+      selectedSantri = {
+        nis: li.dataset.nis,
+        nama: li.dataset.nama,
+        blok: li.dataset.blok,
+        jenjang: li.dataset.jenjang
+      };
+      
+      // Isi form KANAN
+      namaInput.value = selectedSantri.nama;
+      blokInput.value = selectedSantri.blok;
+      jenjangInput.value = selectedSantri.jenjang;
+      nisSearch.value = `${selectedSantri.nama} (${selectedSantri.nis})`;
+      
+      nisSuggestions.innerHTML=''; 
+      nisSuggestions.classList.add('hidden');
+      showLog('Santri dipilih. Lanjutkan ke input Buku.', false);
+    });
+    
+    // --- Autocomplete Buku ---
+    kodeBukuSearch.addEventListener('input', ()=>{
+      judulBukuInput.value = '';
+      kategoriBukuInput.value = '';
+      selectedBuku = {}; // Reset buku yang dipilih
+      
+      const val = kodeBukuSearch.value.toLowerCase();
+      if(!val){ bukuSuggestions.innerHTML=''; bukuSuggestions.classList.add('hidden'); return; }
+      
+      const matches = bukuList.filter(b=> b.kode.toLowerCase().includes(val) || b.judul.toLowerCase().includes(val)).slice(0,10);
+      
+      // Menampilkan Judul, Kode, dan Kategori
+      bukuSuggestions.innerHTML = matches.map(b=>`
+        <li class="px-3 py-1 hover:bg-blue-100 cursor-pointer" data-kode="${b.kode}" data-judul="${b.judul}" data-kategori="${b.kategori}">
+          <div class="font-semibold">${b.judul} (${b.kode})</div>
+          <div class="text-xs text-gray-500">Kategori: ${b.kategori || '-'}</div>
+        </li>`).join('');
+        
+      bukuSuggestions.classList.toggle('hidden', matches.length === 0);
+    });
+
+    bukuSuggestions.addEventListener('click', e=>{
+      const li = e.target.closest('li'); if(!li) return;
+      
+      selectedBuku = {
+        kode: li.dataset.kode,
+        judul: li.dataset.judul,
+        kategori: li.dataset.kategori
+      };
+      
+      // Isi form KANAN
+      judulBukuInput.value = selectedBuku.judul;
+      kategoriBukuInput.value = selectedBuku.kategori;
+      kodeBukuSearch.value = `${selectedBuku.judul} (${selectedBuku.kode})`;
+      
+      bukuSuggestions.innerHTML=''; 
+      bukuSuggestions.classList.add('hidden');
+      showLog('Buku dipilih.', false);
+    });
+
+    // --- LOGIKA SUBMIT PENGUNJUNG YANG DIPERBAIKI ---
+    btnSubmit.addEventListener('click', async ()=>{
+      const keterangan = keteranganSelect.value;
+      
+      // Validasi Santri wajib
+      if(!selectedSantri.nis) {
+        showLog('⚠️ Harap pilih Santri dari daftar Autocomplete!', true);
+        return;
+      }
+      
+      // Validasi Keterangan wajib
+      if(!keterangan) {
+        showLog('⚠️ Harap pilih Keterangan (Baca/Pinjam)!', true);
+        return;
+      }
+      
+      // Tampilkan pesan "Mengirim"
+      showLog('⏳ Mengirim data...', false);
+
+      const now = new Date();
+      const payload = {
+        // Data Santri (Terpilih)
+        nis: selectedSantri.nis,
+        nama: selectedSantri.nama,
+        blok: selectedSantri.blok,
+        jenjang: selectedSantri.jenjang,
+        
+        // Data Buku (Opsional/Terpilih)
+        // Jika Buku tidak terpilih, gunakan nilai dari input jika ada, jika tidak pakai '-'
+        kodeBuku: selectedBuku.kode || (!kodeBukuSearch.value.trim() ? '-' : kodeBukuSearch.value.trim()),
+        judulBuku: selectedBuku.judul || (!kodeBukuSearch.value.trim() ? '-' : kodeBukuSearch.value.trim()),
+        kategoriBuku: selectedBuku.kategori || '-',
+        
+        // Data Kunjungan
+        keterangan: keterangan,
+        timestamp: now.getTime(),
+        tanggal: String(now.getDate()).padStart(2,'0'),
+        bulan: String(now.getMonth()+1).padStart(2,'0'),
+        tahun: now.getFullYear(),
+        jam: now.toTimeString().substring(0, 5) // Format HH:MM
+      };
+        
+      try{
+        // PENTING: Menggunakan 'push' untuk membuat kunci unik
+        await push(ref(db, `pengunjung`), payload); 
+        
+        // 1. Log Success
+        showLog('✅ Data berhasil dikirim!', false);
+        
+        // 2. Reset KIRI (Input Pencarian & Keterangan)
+        nisSearch.value = ''; 
+        kodeBukuSearch.value = ''; 
+        keteranganSelect.value = '';
+        
+        // 3. Reset KANAN (Data Pengunjung/Preview)
+        resetPreview();
+        
+      } catch(e){ 
+        console.error("Firebase Submit Error:", e); 
+        showLog('❌ Gagal kirim data. Cek Firebase Rules atau Konsol.', true);
+      }
+    });
+
+    // Event listener untuk menghilangkan suggestions saat klik di luar
+    document.addEventListener('click', (e) => {
+        if (!nisSearch.contains(e.target) && !nisSuggestions.contains(e.target)) {
+            nisSuggestions.classList.add('hidden');
+        }
+        if (!kodeBukuSearch.contains(e.target) && !bukuSuggestions.contains(e.target)) {
+            bukuSuggestions.classList.add('hidden');
+        }
+    });
+
+  </script>
+</body>
+</html>
