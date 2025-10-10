@@ -75,6 +75,10 @@
       <section id="sectionPengunjung" class="text-gray-100">
         <h3 class="font-semibold text-xl mb-3 text-white">Data Pengunjung</h3>
         <p class="text-sm text-cyan-200 opacity-80 mb-4">Data kunjungan dengan Tanggal diformat menjadi DD/MM/YYYY.</p>
+
+        <div class="mb-4">
+            <input type="text" id="searchPengunjung" placeholder="Cari Nama/Judul Buku/Blok Pengunjung..." class="w-full px-4 py-2 bg-white/20 border border-cyan-700/50 rounded-lg text-white placeholder-gray-300 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition" />
+        </div>
         
         <div class="overflow-auto max-h-[520px] rounded-xl border border-cyan-700/30 bg-white p-2 shadow-inner">
           <table id="tablePengunjung" class="min-w-full text-sm text-gray-800">
@@ -128,6 +132,10 @@
 
           <div>
             <h3 class="font-semibold text-xl mb-3 text-white">Daftar Santri</h3>
+            <div class="mb-3">
+                <input type="text" id="searchSantri" placeholder="Cari NIS, Nama, Blok, atau Jenjang..." class="w-full px-4 py-2 bg-white/20 border border-cyan-700/50 rounded-lg text-white placeholder-gray-300 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition" />
+            </div>
+
             <div class="overflow-auto max-h-[480px] rounded-xl border border-cyan-700/30 bg-white shadow-inner">
               <table id="tableSantri" class="min-w-full text-sm text-gray-800"></table>
             </div>
@@ -170,6 +178,10 @@
 
           <div>
             <h3 class="font-semibold text-xl mb-3 text-white">Daftar Buku</h3>
+            <div class="mb-3">
+                <input type="text" id="searchBuku" placeholder="Cari Kode, Judul, atau Kategori..." class="w-full px-4 py-2 bg-white/20 border border-cyan-700/50 rounded-lg text-white placeholder-gray-300 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition" />
+            </div>
+
             <div class="overflow-auto max-h-[480px] rounded-xl border border-cyan-700/30 bg-white shadow-inner">
               <table id="tableBuku" class="min-w-full text-sm text-gray-800"></table>
             </div>
@@ -205,6 +217,16 @@
     const db = getDatabase(app);
 
     const logEl = document.getElementById('log');
+
+    // Global Data Storage for Search
+    let allSantriData = null;
+    let allBukuData = null;
+    let allPengunjungData = null;
+    
+    // Search Inputs
+    const searchSantri = document.getElementById('searchSantri');
+    const searchBuku = document.getElementById('searchBuku');
+    const searchPengunjung = document.getElementById('searchPengunjung');
 
     function showLog(message, isError = false) {
         logEl.classList.remove('text-green-400', 'text-red-400', 'text-gray-300');
@@ -409,22 +431,42 @@
     // Memastikan Event Listener terpasang
     btnAddSantri.addEventListener('click', addOrUpdateSantri);
     btnClearSantri.addEventListener('click', clearSantriForm);
+    // LISTENER PENCARIAN SANTRI
+    searchSantri.addEventListener('input', () => {
+        renderSantriTable(allSantriData, searchSantri.value);
+    });
 
-    function renderSantriTable(dataObj) {
+    function renderSantriTable(dataObj, query = '') {
         if (!dataObj) { tableSantri.innerHTML = '<thead><tr><th class="p-3 text-gray-800" colspan="5">Belum ada data.</th></tr></thead>'; return; }
-        const rows = Object.entries(dataObj);
-        let html = '<thead><tr>' + ['NIS','Nama','Blok','Jenjang','Aksi'].map(h=>`<th class="px-3 py-2 text-left">${h}</th>`).join('') + '</tr></thead><tbody>';
-        const allSantri = {};
         
-        for (const [nis, val] of rows) {
-            allSantri[nis] = val;
-            html += `<tr class="odd:bg-gray-50 even:bg-white text-gray-800" data-nis="${nis}">`;
-            html += `<td class="border-b border-gray-200 px-3 py-2">${nis}</td>`;
-            html += `<td class="border-b border-gray-200 px-3 py-2">${val.nama||'-'}</td>`;
-            html += `<td class="border-b border-gray-200 px-3 py-2">${val.blok||'-'}</td>`;
-            html += `<td class="border-b border-gray-200 px-3 py-2">${val.jenjang||'-'}</td>`;
-            html += `<td class="border-b border-gray-200 px-3 py-2 space-x-2"><button data-action="edit" class="px-3 py-1 text-xs bg-yellow-500 text-gray-900 rounded-md hover:bg-yellow-600 transition">Edit</button> <button data-action="delete" class="px-3 py-1 text-xs bg-red-600 text-white rounded-md hover:bg-red-700 transition">Hapus</button></td>`;
-            html += `</tr>`;
+        let filteredRows = Object.entries(dataObj);
+        const lowerQuery = query.toLowerCase().trim();
+
+        if (lowerQuery) {
+            filteredRows = filteredRows.filter(([nis, val]) => {
+                // Search across NIS, Nama, Blok, Jenjang
+                return nis.toLowerCase().includes(lowerQuery) ||
+                       (val.nama || '').toLowerCase().includes(lowerQuery) ||
+                       (val.blok || '').toLowerCase().includes(lowerQuery) ||
+                       (val.jenjang || '').toLowerCase().includes(lowerQuery);
+            });
+        }
+
+        let html = '<thead><tr>' + ['NIS','Nama','Blok','Jenjang','Aksi'].map(h=>`<th class="px-3 py-2 text-left">${h}</th>`).join('') + '</tr></thead><tbody>';
+        
+        if (filteredRows.length === 0) {
+             html += `<tr><td colspan="5" class="text-center p-4 text-gray-500">Tidak ada hasil ditemukan untuk "${query}".</td></tr>`;
+        } else {
+            for (const [nis, val] of filteredRows) { 
+                // We use allSantriData[nis] in the click listener below
+                html += `<tr class="odd:bg-gray-50 even:bg-white text-gray-800" data-nis="${nis}">`;
+                html += `<td class="border-b border-gray-200 px-3 py-2">${nis}</td>`;
+                html += `<td class="border-b border-gray-200 px-3 py-2">${val.nama||'-'}</td>`;
+                html += `<td class="border-b border-gray-200 px-3 py-2">${val.blok||'-'}</td>`;
+                html += `<td class="border-b border-gray-200 px-3 py-2">${val.jenjang||'-'}</td>`;
+                html += `<td class="border-b border-gray-200 px-3 py-2 space-x-2"><button data-action="edit" class="px-3 py-1 text-xs bg-yellow-500 text-gray-900 rounded-md hover:bg-yellow-600 transition">Edit</button> <button data-action="delete" class="px-3 py-1 text-xs bg-red-600 text-white rounded-md hover:bg-red-700 transition">Hapus</button></td>`;
+                html += `</tr>`;
+            }
         }
         html += '</tbody>';
         tableSantri.innerHTML = html;
@@ -436,14 +478,15 @@
                 const act = e.target.dataset.action;
                 
                 if (act==='delete') deleteSantri(nis);
-                if (act==='edit') startEditSantri(nis, allSantri[nis]);
+                if (act==='edit') startEditSantri(nis, allSantriData[nis]);
             });
         });
     }
 
     function loadSiswa(){
       onValue(ref(db,'siswa'), (snap)=>{ 
-        renderSantriTable(snap.val()); 
+        allSantriData = snap.val(); // Store full data
+        renderSantriTable(allSantriData, searchSantri.value); // Render with current search query
         showLog('Data Santri diperbarui.', false);
       }, (error) => {
         showLog('Gagal memuat data Santri: '+error.message, true);
@@ -510,8 +553,12 @@
     // Event Listener Buku
     btnAddBuku.addEventListener('click', addOrUpdateBuku);
     btnClearBuku.addEventListener('click', clearBukuForm);
+    // LISTENER PENCARIAN BUKU
+    searchBuku.addEventListener('input', () => {
+        renderBukuTable(allBukuData, searchBuku.value);
+    });
 
-    // Logika Upload Buku DENGAN Progress Bar (Diperbarui)
+    // Logika Upload Buku DENGAN Progress Bar
     document.getElementById('uploadBuku').addEventListener('click', async ()=>{
       const fileInput = document.getElementById('fileBuku');
       const file = fileInput.files[0];
@@ -585,20 +632,34 @@
     });
 
     
-    function renderBukuTable(dataObj){
+    function renderBukuTable(dataObj, query = ''){
         if(!dataObj){ tableBuku.innerHTML = '<thead><tr><th class="p-3 text-gray-800" colspan="4">Belum ada data.</th></tr></thead>'; return; }
-        const rows = Object.entries(dataObj);
-        let html = '<thead><tr>' + ['Kode','Judul','Kategori','Aksi'].map(h=>`<th class="px-3 py-2 text-left">${h}</th>`).join('') + '</tr></thead><tbody>';
-        const allBuku = {};
+        
+        let filteredRows = Object.entries(dataObj);
+        const lowerQuery = query.toLowerCase().trim();
 
-        for(const [kode, val] of rows){
-            allBuku[kode] = val;
-            html += `<tr class="odd:bg-gray-50 even:bg-white text-gray-800" data-kode="${kode}">`;
-            html += `<td class="border-b border-gray-200 px-3 py-2">${kode}</td>`;
-            html += `<td class="border-b border-gray-200 px-3 py-2">${val.judul||'-'}</td>`;
-            html += `<td class="border-b border-gray-200 px-3 py-2">${val.kategori||'-'}</td>`;
-            html += `<td class="border-b border-gray-200 px-3 py-2 space-x-2"><button data-action="edit" class="px-3 py-1 text-xs bg-yellow-500 text-gray-900 rounded-md hover:bg-yellow-600 transition">Edit</button> <button data-action="delete" class="px-3 py-1 text-xs bg-red-600 text-white rounded-md hover:bg-red-700 transition">Hapus</button></td>`;
-            html += `</tr>`;
+        if (lowerQuery) {
+            filteredRows = filteredRows.filter(([kode, val]) => {
+                // Search across Kode, Judul, Kategori
+                return kode.toLowerCase().includes(lowerQuery) ||
+                       (val.judul || '').toLowerCase().includes(lowerQuery) ||
+                       (val.kategori || '').toLowerCase().includes(lowerQuery);
+            });
+        }
+
+        let html = '<thead><tr>' + ['Kode','Judul','Kategori','Aksi'].map(h=>`<th class="px-3 py-2 text-left">${h}</th>`).join('') + '</tr></thead><tbody>';
+        
+        if (filteredRows.length === 0) {
+             html += `<tr><td colspan="4" class="text-center p-4 text-gray-500">Tidak ada hasil ditemukan untuk "${query}".</td></tr>`;
+        } else {
+            for(const [kode, val] of filteredRows){
+                html += `<tr class="odd:bg-gray-50 even:bg-white text-gray-800" data-kode="${kode}">`;
+                html += `<td class="border-b border-gray-200 px-3 py-2">${kode}</td>`;
+                html += `<td class="border-b border-gray-200 px-3 py-2">${val.judul||'-'}</td>`;
+                html += `<td class="border-b border-gray-200 px-3 py-2">${val.kategori||'-'}</td>`;
+                html += `<td class="border-b border-gray-200 px-3 py-2 space-x-2"><button data-action="edit" class="px-3 py-1 text-xs bg-yellow-500 text-gray-900 rounded-md hover:bg-yellow-600 transition">Edit</button> <button data-action="delete" class="px-3 py-1 text-xs bg-red-600 text-white rounded-md hover:bg-red-700 transition">Hapus</button></td>`;
+                html += `</tr>`;
+            }
         }
         html += '</tbody>';
         tableBuku.innerHTML = html;
@@ -609,7 +670,7 @@
                 const kode = tr.dataset.kode; 
                 const act = e.target.dataset.action;
                 if(act==='delete') deleteBuku(kode); 
-                if(act==='edit') startEditBuku(kode, allBuku[kode]);
+                if(act==='edit') startEditBuku(kode, allBukuData[kode]);
             });
         });
     }
@@ -628,7 +689,8 @@
 
     function loadBuku(){ 
         onValue(ref(db,'buku'), (snap)=>{ 
-            renderBukuTable(snap.val()); 
+            allBukuData = snap.val(); // Store full data
+            renderBukuTable(allBukuData, searchBuku.value); // Render with current search query
             showLog('Data Buku diperbarui.', false);
         }, (error) => {
             showLog('Gagal memuat data Buku: '+error.message, true);
@@ -642,40 +704,61 @@
     const tablePengunjung = document.getElementById('tablePengunjung');
     const tablePengunjungHeader = `<thead><tr><th class="text-left">Tanggal</th><th class="text-left">Nama Lengkap</th><th class="text-left">Blok</th><th class="text-left">Jenjang</th><th class="text-left">Judul Buku</th><th class="text-left">Kategori</th><th class="text-left">Keterangan</th><th class="text-left">Aksi</th></tr></thead>`;
 
-    function renderPengunjungTable(dataObj){
+    // LISTENER PENCARIAN PENGUNJUNG
+    searchPengunjung.addEventListener('input', () => {
+        renderPengunjungTable(allPengunjungData, searchPengunjung.value);
+    });
+
+    function renderPengunjungTable(dataObj, query = ''){
         if(!dataObj){ 
             tablePengunjung.innerHTML = tablePengunjungHeader + '<tbody><tr><td colspan="8" class="text-center p-4 text-gray-500">Belum ada data pengunjung.</td></tr></tbody>'; 
             return; 
         }
         
-        const rows = Object.entries(dataObj); 
-        let html = '';
+        let filteredRows = Object.entries(dataObj); 
+        const lowerQuery = query.toLowerCase().trim();
         
         const dataKeys = [
             'nama', 'blok', 'jenjang', 
             'judulBuku', 'kategoriBuku', 'keterangan'
         ];
         
-        for(const [key, val] of rows){
-            const tanggal = val.tanggal || '??';
-            const bulan = val.bulan || '??';
-            const tahun = val.tahun || '????';
-            const tanggalStr = `${tanggal}/${bulan}/${tahun}`;
-
-            html += `<tr class="odd:bg-gray-50 even:bg-white text-gray-800" data-key="${key}">`;
-            
-            // KOLOM 1: Tanggal
-            html += `<td class="border-b border-gray-200 px-3 py-2 font-semibold">${tanggalStr}</td>`;
-            
-            // Kolom Data Lain
-            dataKeys.forEach(k => {
-                const data = val[k] || '-';
-                html += `<td class="border-b border-gray-200 px-3 py-2">${data}</td>`; 
+        if (lowerQuery) {
+            filteredRows = filteredRows.filter(([key, val]) => {
+                // Search date format DD/MM/YYYY
+                const dateStr = `${val.tanggal||''}/${val.bulan||''}/${val.tahun||''}`;
+                
+                return dateStr.includes(lowerQuery) || // Search date
+                       dataKeys.some(k => (val[k] || '').toLowerCase().includes(lowerQuery)); // Search other fields
             });
-            
-            // Kolom Aksi
-            html += `<td class="border-b border-gray-200 px-3 py-2"><button data-action="delete" class="px-3 py-1 text-xs bg-red-600 text-white rounded-md hover:bg-red-700 transition">Hapus</button></td>`;
-            html += `</tr>`;
+        }
+        
+        let html = '';
+        
+        if (filteredRows.length === 0) {
+             html += `<tr><td colspan="8" class="text-center p-4 text-gray-500">Tidak ada hasil ditemukan untuk "${query}".</td></tr>`;
+        } else {
+            for(const [key, val] of filteredRows){
+                const tanggal = val.tanggal || '??';
+                const bulan = val.bulan || '??';
+                const tahun = val.tahun || '????';
+                const tanggalStr = `${tanggal}/${bulan}/${tahun}`;
+
+                html += `<tr class="odd:bg-gray-50 even:bg-white text-gray-800" data-key="${key}">`;
+                
+                // KOLOM 1: Tanggal
+                html += `<td class="border-b border-gray-200 px-3 py-2 font-semibold">${tanggalStr}</td>`;
+                
+                // Kolom Data Lain
+                dataKeys.forEach(k => {
+                    const data = val[k] || '-';
+                    html += `<td class="border-b border-gray-200 px-3 py-2">${data}</td>`; 
+                });
+                
+                // Kolom Aksi
+                html += `<td class="border-b border-gray-200 px-3 py-2"><button data-action="delete" class="px-3 py-1 text-xs bg-red-600 text-white rounded-md hover:bg-red-700 transition">Hapus</button></td>`;
+                html += `</tr>`;
+            }
         }
         
         tablePengunjung.innerHTML = tablePengunjungHeader + `<tbody>${html}</tbody>`;
@@ -699,8 +782,9 @@
 
     function loadPengunjung(){ 
         onValue(ref(db,'pengunjung'), (snap)=>{ 
-            renderPengunjungTable(snap.val()); 
-            const count = snap.val() ? Object.keys(snap.val()).length : 0;
+            allPengunjungData = snap.val(); // Store full data
+            renderPengunjungTable(allPengunjungData, searchPengunjung.value); // Render with current search query
+            const count = allPengunjungData ? Object.keys(allPengunjungData).length : 0;
             showLog(`Data Pengunjung terbaru dimuat. (${count} entri)`);
         }, (error) => {
             showLog('Gagal memuat data Pengunjung: '+error.message, true);
