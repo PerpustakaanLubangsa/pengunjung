@@ -84,17 +84,9 @@
           </table>
         </div>
         
-        <div class="mt-4 flex flex-wrap gap-3">
-          <button type="button" id="copyPengunjung" class="px-5 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition duration-200">
-            <i class="fa-solid fa-copy mr-2"></i> Salin Semua Data
-          </button>
-
+        <div class="mt-4 flex gap-3">
           <button type="button" id="exportPengunjung" class="px-5 py-2 bg-cyan-600 text-white rounded-lg shadow-md hover:bg-cyan-700 transition duration-200">
             <i class="fa-solid fa-download mr-2"></i> Ekspor CSV
-          </button>
-          
-          <button type="button" id="deleteAllPengunjung" class="px-5 py-2 bg-red-600 text-white rounded-lg shadow-md hover:bg-red-700 transition duration-200 ml-auto">
-            <i class="fa-solid fa-trash-alt mr-2"></i> Hapus Semua Data
           </button>
         </div>
       </section>
@@ -139,6 +131,11 @@
             <div class="overflow-auto max-h-[480px] rounded-xl border border-cyan-700/30 bg-white shadow-inner">
               <table id="tableSantri" class="min-w-full text-sm text-gray-800"></table>
             </div>
+            <div class="mt-4 flex gap-3">
+              <button type="button" id="deleteAllSantri" class="px-5 py-2 bg-red-600 text-white rounded-lg shadow-md hover:bg-red-700 transition duration-200">
+                <i class="fa-solid fa-trash-can mr-2"></i> Hapus SEMUA Santri
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -182,6 +179,11 @@
             <div class="overflow-auto max-h-[480px] rounded-xl border border-cyan-700/30 bg-white shadow-inner">
               <table id="tableBuku" class="min-w-full text-sm text-gray-800"></table>
             </div>
+            <div class="mt-4 flex gap-3">
+              <button type="button" id="deleteAllBuku" class="px-5 py-2 bg-red-600 text-white rounded-lg shadow-md hover:bg-red-700 transition duration-200">
+                <i class="fa-solid fa-trash-can mr-2"></i> Hapus SEMUA Buku
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -192,20 +194,14 @@
 
     <footer class="mt-8 text-xs text-cyan-200 opacity-70 text-center">Admin Dashboard v1.0 | Pastikan Realtime Database mengizinkan akses/penulisan dari client untuk pengujian awal.</footer>
   </div>
-  
-  <div id="customModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden items-center justify-center z-50 transition-opacity duration-300">
-    <div class="bg-white rounded-xl shadow-2xl overflow-hidden w-full max-w-md m-4 transform transition-all duration-300 scale-95 opacity-0" id="modalContent">
-      <div class="p-6 text-gray-800">
-        <h4 id="modalTitle" class="text-xl font-bold mb-4">Konfirmasi Tindakan</h4>
-        <p id="modalMessage" class="text-gray-600 mb-6">Apakah Anda yakin ingin melanjutkan tindakan ini?</p>
-        <div class="flex justify-end space-x-3">
-          <button id="modalCancel" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition duration-200">
-            Tutup
-          </button>
-          <button id="modalConfirm" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-200">
-            Ya, Hapus
-          </button>
-        </div>
+
+  <div id="confirmModal" class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center z-50">
+    <div class="bg-white p-6 rounded-lg shadow-2xl w-full max-w-sm" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <h3 id="modalTitle" class="text-xl font-bold mb-4 text-red-700">⚠️ PERINGATAN KERAS!</h3>
+      <p id="modalMessage" class="mb-6 text-gray-700">Pesan akan diisi oleh JavaScript.</p>
+      <div class="flex justify-end gap-3">
+        <button id="modalCancel" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition" tabindex="0">Batal</button>
+        <button id="modalConfirm" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition" data-action="delete" tabindex="0">Hapus Permanen</button>
       </div>
     </div>
   </div>
@@ -230,7 +226,6 @@
     const db = getDatabase(app);
 
     const logEl = document.getElementById('log');
-    let currentPengunjungData = null; 
 
     function showLog(message, isError = false) {
         logEl.classList.remove('text-green-400', 'text-red-400', 'text-gray-300');
@@ -238,84 +233,8 @@
         logEl.innerText = message;
     }
     
-    // =========================================================
-    // MODAL LOGIC (PENGGANTI confirm() )
-    // =========================================================
-    const customModal = document.getElementById('customModal');
-    const modalContent = document.getElementById('modalContent');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalMessage = document.getElementById('modalMessage');
-    const modalCancel = document.getElementById('modalCancel');
-    const modalConfirm = document.getElementById('modalConfirm');
-
-    let confirmCallback = null;
-
-    function showCustomConfirm(title, message, callback) {
-        modalTitle.textContent = title;
-        // Gunakan innerHTML agar tag <strong> atau <b> bisa terbaca
-        modalMessage.innerHTML = message; 
-        confirmCallback = callback;
-        
-        // Setup confirmation button text and color based on title
-        if (title.toLowerCase().includes('hapus') || title.toLowerCase().includes('peringatan')) {
-            modalConfirm.textContent = 'Ya, Hapus';
-            modalConfirm.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-            modalConfirm.classList.add('bg-red-600', 'hover:bg-red-700');
-        } else {
-            modalConfirm.textContent = 'Ya, Lanjutkan';
-            modalConfirm.classList.remove('bg-red-600', 'hover:bg-red-700');
-            modalConfirm.classList.add('bg-blue-600', 'hover:bg-blue-700');
-        }
-        
-        // Show modal with animation
-        customModal.classList.remove('hidden');
-        customModal.classList.add('flex');
-        setTimeout(() => {
-            modalContent.classList.remove('scale-95', 'opacity-0');
-            modalContent.classList.add('scale-100', 'opacity-100');
-            modalConfirm.focus(); // Fokuskan ke tombol konfirmasi
-        }, 10);
-    }
-
-    function hideCustomConfirm() {
-        modalContent.classList.remove('scale-100', 'opacity-100');
-        modalContent.classList.add('scale-95', 'opacity-0');
-        setTimeout(() => {
-            customModal.classList.add('hidden');
-            customModal.classList.remove('flex');
-            confirmCallback = null;
-        }, 300);
-    }
-
-    // Modal listeners
-    modalCancel.addEventListener('click', hideCustomConfirm);
-    modalConfirm.addEventListener('click', () => {
-        if (confirmCallback) {
-            confirmCallback(true); // Panggil callback dengan true (dikonfirmasi)
-        }
-        hideCustomConfirm();
-    });
-    
-    // ======== Keydown Listener untuk ENTER dan ESCAPE (Perubahan Baru) ========
-    document.addEventListener('keydown', (e) => {
-        // Cek apakah modal terlihat
-        if (customModal.classList.contains('flex')) { 
-            if (e.key === 'Enter') {
-                e.preventDefault(); 
-                // Picu aksi konfirmasi (Ya, Hapus/Lanjutkan)
-                modalConfirm.click();
-            } else if (e.key === 'Escape') {
-                e.preventDefault();
-                // Picu aksi batal (Tutup)
-                modalCancel.click();
-            }
-        }
-    });
-    // =========================================================================
-
-
     // --- Excel Utilities (Dipertahankan) ---
-    function readExcelFile(file) { /* ... (fungsi sama) ... */
+    function readExcelFile(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -341,7 +260,7 @@
       });
     }
 
-    function getExcelValue(row, keys) { /* ... (fungsi sama) ... */
+    function getExcelValue(row, keys) {
         for (const key of keys) {
             if (row.hasOwnProperty(key)) {
                 return row[key] ? row[key].toString().trim() : '';
@@ -355,41 +274,66 @@
         }
         return '';
     }
-
-    function renderPreview(container, data, requiredCols){ /* ... (fungsi sama) ... */
-      if(!data || data.length===0){ container.innerHTML = '<p class="text-gray-500">Tidak ada data untuk ditampilkan.</p>'; return; }
-      
-      const cols = Object.keys(data[0]);
-      const table = document.createElement('table'); table.className='min-w-full text-sm';
-      
-      const thead = document.createElement('thead'); thead.innerHTML = '<tr>' + cols.map(c=>`<th class="px-3 py-2 text-left border-b border-cyan-500 bg-gray-200 text-gray-800">${c}</th>`).join('') + '</tr>';
-      table.appendChild(thead);
-      
-      const tbody = document.createElement('tbody'); 
-      data.slice(0, 5).forEach((row,idx)=>{ 
-          const tr=document.createElement('tr'); 
-          tr.className = idx%2===0?'bg-gray-50 text-gray-800':'bg-white text-gray-800'; 
-          tr.innerHTML = cols.map(c=>`<td class="px-3 py-2 border-b border-gray-200">${row[c]??'-'}</td>`).join(''); 
-          tbody.appendChild(tr); 
-      });
-      table.appendChild(tbody);
-      
-      const missing = requiredCols.filter(rc=>!cols.some(c=>c.toLowerCase() === rc.toLowerCase())); 
-      const note = document.createElement('div'); note.className='my-3 text-sm'; 
-      if(missing.length) {
-          note.innerHTML=`<div class="text-red-600 font-bold mb-2">⚠️ Kolom wajib TIDAK ditemukan: ${missing.join(', ')}</div>`;
-      } else {
-          note.innerHTML=`<div class="text-green-600 font-bold mb-2">✅ Semua kolom wajib ditemukan.</div>`;
-      }
-      container.innerHTML=''; 
-      container.appendChild(note); 
-      container.appendChild(document.createTextNode(`Menampilkan ${data.slice(0, 5).length} dari ${data.length} baris.`));
-      container.appendChild(table);
-    }
     // --- End Excel Utilities ---
+    
+    // =========================================================
+    // MODAL POP-UP UTILITIES (Diperbarui untuk semua confirm)
+    // =========================================================
+    const confirmModal = document.getElementById('confirmModal');
+    const modalMessage = document.getElementById('modalMessage');
+    const modalConfirm = document.getElementById('modalConfirm');
+    const modalCancel = document.getElementById('modalCancel');
+    
+    let currentDeleteAction = null; // Menyimpan fungsi eksekusi hapus
 
+    function hideConfirmModal() {
+        confirmModal.classList.add('hidden');
+        if (currentDeleteAction) {
+            // Hapus listener lama untuk menghindari duplikasi
+            modalConfirm.removeEventListener('click', currentDeleteAction);
+            currentDeleteAction = null;
+        }
+    }
 
-    // ======= SANTRI CRUD & LOGIC (Modified: deleteSantri) =======
+    // Fungsi utama untuk menampilkan modal konfirmasi kustom
+    function showConfirmModal(message, deleteFunction) {
+        hideConfirmModal(); // Pastikan modal tersembunyi dan action lama terhapus
+        
+        modalMessage.innerHTML = message; // Menggunakan innerHTML untuk mendukung bold tag
+        confirmModal.classList.remove('hidden');
+        
+        // Atur action baru
+        currentDeleteAction = async (e) => {
+            e.preventDefault();
+            hideConfirmModal();
+            await deleteFunction(); // Eksekusi fungsi hapus yang sebenarnya
+        };
+        
+        modalConfirm.addEventListener('click', currentDeleteAction);
+        
+        // Fokus tombol Hapus Permanen agar Enter bisa langsung diakses
+        modalConfirm.focus();
+    }
+    
+    modalCancel.addEventListener('click', hideConfirmModal);
+    
+    // Global Key Listener untuk Enter (Konfirmasi) dan Escape (Batal)
+    document.addEventListener('keydown', (e) => {
+        if (confirmModal.classList.contains('hidden')) return; 
+
+        if (e.key === 'Enter') {
+            e.preventDefault(); 
+            // Eksekusi klik tombol konfirmasi
+            modalConfirm.click();
+        } else if (e.key === 'Escape') {
+            e.preventDefault();
+            modalCancel.click(); 
+        }
+    });
+
+    // =========================================================
+    // SANTRI CRUD & LOGIC
+    // =========================================================
     const tableSantri = document.getElementById('tableSantri');
     const sNis = document.getElementById('s_nis');
     const sNama = document.getElementById('s_nama');
@@ -400,12 +344,13 @@
     const sEditStatus = document.getElementById('s_edit_status');
     const sectionSantri = document.getElementById('sectionSantri');
 
-    async function addOrUpdateSantri() { /* ... (fungsi sama) ... */
+    async function addOrUpdateSantri() {
       const nis = sNis.value.trim();
       const nama = sNama.value.trim();
       const blok = sBlok.value.trim();
       const jenjang = sJenjang.value.trim();
 
+      // **Validasi Wajib**
       if (!nis || !nama || !blok || !jenjang) {
           return showLog('Semua kolom Santri (NIS, Nama, Blok, Jenjang) wajib diisi!', true);
       }
@@ -422,7 +367,7 @@
       }
     }
 
-    function clearSantriForm() { /* ... (fungsi sama) ... */
+    function clearSantriForm() { 
       sNis.value=''; sNama.value=''; sBlok.value=''; sJenjang.value=''; 
       sNis.removeAttribute('disabled');
       sNis.dataset.mode = 'add';
@@ -431,7 +376,7 @@
       sNis.focus();
     }
 
-    function startEditSantri(nis, val) { /* ... (fungsi sama) ... */
+    function startEditSantri(nis, val) {
       clearSantriForm();
       sNis.value = nis;
       sNama.value = val.nama || '';
@@ -446,24 +391,54 @@
       showLog(`Mode Edit: Data Santri ${nis}`, false);
     }
     
+    // Helper untuk Eksekusi Hapus SEMUA Santri
+    async function executeDeleteAllSantri(){
+        showLog('⏳ Menghapus SEMUA data Santri...', false);
+        try { 
+            await set(ref(db, `siswa`), null); 
+            showLog(`✅ SEMUA data Santri berhasil dihapus.`, false); 
+            clearSantriForm();
+        } catch(e){ 
+            showLog(`❌ Gagal menghapus semua santri: ${e.message}`, true); 
+            console.error(e);
+        }
+    }
+
+    // Helper untuk Eksekusi Hapus Santri Tunggal
+    async function executeDeleteSantri(nis) {
+        showLog(`⏳ Menghapus Santri ${nis}...`, false);
+        try { 
+            await remove(ref(db, `siswa/${nis}`)); 
+            showLog(`✅ Santri ${nis} berhasil dihapus.`, false); 
+            clearSantriForm();
+        } catch(e){ 
+            showLog(`❌ Gagal menghapus santri ${nis}: ${e.message}`, true); 
+            console.error(e);
+        }
+    }
+
+    // Fungsi delete Santri (Memanggil Modal)
+    function deleteSantri(nis) {
+        showConfirmModal(
+            `Anda yakin ingin menghapus data Santri dengan **NIS ${nis}** secara permanen?`,
+            () => executeDeleteSantri(nis)
+        );
+    }
+    
+
+    // Memastikan Event Listener terpasang
     btnAddSantri.addEventListener('click', addOrUpdateSantri);
     btnClearSantri.addEventListener('click', clearSantriForm);
+    
+    // Memanggil modal saat tombol Hapus Semua Santri ditekan
+    document.getElementById('deleteAllSantri').addEventListener('click', () => {
+        showConfirmModal(
+            'Anda yakin ingin menghapus **SEMUA** data Santri? Tindakan ini tidak dapat dibatalkan.',
+            executeDeleteAllSantri
+        );
+    }); 
 
-    document.getElementById('previewSantri').addEventListener('click', async ()=>{ /* ... (fungsi sama) ... */
-      const file = document.getElementById('fileSantri').files[0];
-      if(!file) return showLog('Pilih file Excel terlebih dahulu.', true);
-      try{
-        const rows = await readExcelFile(file);
-        sectionSantri._previewRows = rows;
-        renderPreview(document.getElementById('previewAreaSantri'), rows, ['NIS', 'Nama', 'Blok', 'Jenjang']);
-        showLog(`Pratinjau data Santri dimuat. ${rows.length} baris.`, false);
-      } catch(e){
-        showLog(`Gagal membaca file Excel: ${e.message}`, true);
-        console.error(e);
-      }
-    });
-
-    document.getElementById('uploadSantri').addEventListener('click', async ()=>{ /* ... (fungsi sama) ... */
+    document.getElementById('uploadSantri').addEventListener('click', async ()=>{
       const rows = sectionSantri._previewRows || [];
       if (!rows.length) return showLog('Klik Pratinjau terlebih dahulu.', true);
       showLog(`Mengupload ${rows.length} baris...`, false);
@@ -490,8 +465,8 @@
       }
       showLog(`Upload selesai. Sukses: ${ok}, Gagal: ${fail}`, fail > 0);
     });
-
-    function renderSantriTable(dataObj) { /* ... (fungsi sama) ... */
+    
+    function renderSantriTable(dataObj) {
         if (!dataObj) { tableSantri.innerHTML = '<thead><tr><th class="p-3 text-gray-800" colspan="5">Belum ada data.</th></tr></thead>'; return; }
         const rows = Object.entries(dataObj);
         let html = '<thead><tr>' + ['NIS','Nama','Blok','Jenjang','Aksi'].map(h=>`<th class="px-3 py-2 text-left">${h}</th>`).join('') + '</tr></thead><tbody>';
@@ -516,28 +491,13 @@
                 const nis = tr.dataset.nis;
                 const act = e.target.dataset.action;
                 
-                if (act==='delete') deleteSantri(nis);
+                if (act==='delete') deleteSantri(nis); // Menggunakan fungsi deleteSantri yang baru
                 if (act==='edit') startEditSantri(nis, allSantri[nis]);
             });
         });
     }
 
-    async function deleteSantri(nis) {
-      // MENGGANTI confirm() DENGAN MODAL KUSTOM
-      showCustomConfirm('Konfirmasi Hapus Santri', `Yakin hapus data santri dengan **NIS ${nis}**?`, async (confirmed) => {
-          if (!confirmed) return;
-          try { 
-            await remove(ref(db, `siswa/${nis}`)); 
-            showLog(`Santri ${nis} berhasil dihapus.`, false); 
-            clearSantriForm();
-          } catch(e){ 
-            showLog(`Gagal menghapus santri ${nis}: ${e.message}`, true); 
-            console.error(e);
-          }
-      });
-    }
-
-    function loadSiswa(){ /* ... (fungsi sama) ... */
+    function loadSiswa(){
       onValue(ref(db,'siswa'), (snap)=>{ 
         renderSantriTable(snap.val()); 
         showLog('Data Santri diperbarui.', false);
@@ -547,7 +507,9 @@
     }
 
 
-    // ======= BUKU CRUD & LOGIC (Modified: deleteBuku) =======
+    // =========================================================
+    // BUKU CRUD & LOGIC
+    // =========================================================
     const tableBuku = document.getElementById('tableBuku');
     const bKode = document.getElementById('b_kode');
     const bJudul = document.getElementById('b_judul');
@@ -557,11 +519,12 @@
     const bEditStatus = document.getElementById('b_edit_status');
     const sectionBuku = document.getElementById('sectionBuku');
 
-    async function addOrUpdateBuku(){ /* ... (fungsi sama) ... */
+    async function addOrUpdateBuku(){
       const kode = bKode.value.trim(); 
       const judul = bJudul.value.trim();
       const kategori = bKategori.value.trim();
       
+      // **Validasi Wajib**
       if(!kode || !judul || !kategori) {
           return showLog('Semua kolom Buku (Kode, Judul, Kategori) wajib diisi!', true);
       }
@@ -578,7 +541,7 @@
       }
     }
 
-    function clearBukuForm(){ /* ... (fungsi sama) ... */
+    function clearBukuForm(){ 
       bKode.value=''; bJudul.value=''; bKategori.value=''; 
       bKode.removeAttribute('disabled');
       bKode.dataset.mode = 'add';
@@ -587,7 +550,7 @@
       bKode.focus();
     }
 
-    function startEditBuku(kode, val) { /* ... (fungsi sama) ... */
+    function startEditBuku(kode, val) {
       clearBukuForm();
       bKode.value = kode;
       bJudul.value = val.judul || '';
@@ -601,24 +564,54 @@
       showLog(`Mode Edit: Data Buku ${kode}`, false);
     }
 
-    btnAddBuku.addEventListener('click', addOrUpdateBuku);
-    btnClearBuku.addEventListener('click', clearBukuForm);
-
-    document.getElementById('previewBuku').addEventListener('click', async ()=>{ /* ... (fungsi sama) ... */
-      const file = document.getElementById('fileBuku').files[0];
-      if(!file) return showLog('Pilih file Excel terlebih dahulu.', true);
-      try{
-        const rows = await readExcelFile(file);
-        sectionBuku._previewRows = rows;
-        renderPreview(document.getElementById('previewAreaBuku'), rows, ['Kode', 'Judul', 'Kategori']);
-        showLog(`Pratinjau data Buku dimuat. ${rows.length} baris.`, false);
-      } catch(e){
-        showLog(`Gagal membaca file Excel: ${e.message}`, true);
+    // Helper untuk Eksekusi Hapus SEMUA Buku
+    async function executeDeleteAllBuku(){
+      showLog('⏳ Menghapus SEMUA data Buku...', false);
+      try { 
+        await set(ref(db, `buku`), null); 
+        showLog(`✅ SEMUA data Buku berhasil dihapus.`, false); 
+        clearBukuForm();
+      } catch(e){ 
+        showLog(`❌ Gagal menghapus semua buku: ${e.message}`, true); 
         console.error(e);
       }
+    }
+    
+    // Helper untuk Eksekusi Hapus Buku Tunggal
+    async function executeDeleteBuku(kode){ 
+        showLog(`⏳ Menghapus Buku ${kode}...`, false);
+        try{ 
+            await remove(ref(db, `buku/${kode}`)); 
+            showLog(`✅ Buku ${kode} berhasil dihapus.`, false); 
+            clearBukuForm();
+        } catch(e){ 
+            showLog(`❌ Gagal menghapus buku ${kode}: ${e.message}`, true); 
+            console.error(e);
+        } 
+    }
+
+    // Fungsi delete Buku (Memanggil Modal)
+    function deleteBuku(kode){ 
+        showConfirmModal(
+            `Anda yakin ingin menghapus data Buku dengan **Kode ${kode}** secara permanen?`,
+            () => executeDeleteBuku(kode)
+        );
+    }
+
+    // Event Listener Buku
+    btnAddBuku.addEventListener('click', addOrUpdateBuku);
+    btnClearBuku.addEventListener('click', clearBukuForm);
+    
+    // Memanggil modal saat tombol Hapus Semua Buku ditekan
+    document.getElementById('deleteAllBuku').addEventListener('click', () => {
+        showConfirmModal(
+            'Anda yakin ingin menghapus **SEMUA** data Buku? Tindakan ini tidak dapat dibatalkan.',
+            executeDeleteAllBuku
+        );
     });
 
-    document.getElementById('uploadBuku').addEventListener('click', async ()=>{ /* ... (fungsi sama) ... */
+
+    document.getElementById('uploadBuku').addEventListener('click', async ()=>{
       const rows = sectionBuku._previewRows || []; 
       if(!rows.length) return showLog('Klik Pratinjau terlebih dahulu.', true);
       showLog(`Mengupload ${rows.length} baris...`, false);
@@ -644,7 +637,8 @@
       showLog(`Upload selesai. Sukses: ${ok}, Gagal: ${fail}`, fail > 0);
     });
 
-    function renderBukuTable(dataObj){ /* ... (fungsi sama) ... */
+    
+    function renderBukuTable(dataObj){
         if(!dataObj){ tableBuku.innerHTML = '<thead><tr><th class="p-3 text-gray-800" colspan="4">Belum ada data.</th></tr></thead>'; return; }
         const rows = Object.entries(dataObj);
         let html = '<thead><tr>' + ['Kode','Judul','Kategori','Aksi'].map(h=>`<th class="px-3 py-2 text-left">${h}</th>`).join('') + '</tr></thead><tbody>';
@@ -667,28 +661,13 @@
                 const tr = e.target.closest('tr'); 
                 const kode = tr.dataset.kode; 
                 const act = e.target.dataset.action;
-                if(act==='delete') deleteBuku(kode); 
+                if(act==='delete') deleteBuku(kode); // Menggunakan fungsi deleteBuku yang baru
                 if(act==='edit') startEditBuku(kode, allBuku[kode]);
             });
         });
     }
 
-    async function deleteBuku(kode){ 
-      // MENGGANTI confirm() DENGAN MODAL KUSTOM
-      showCustomConfirm('Konfirmasi Hapus Buku', `Yakin hapus data buku dengan **Kode ${kode}**?`, async (confirmed) => {
-          if (!confirmed) return;
-          try{ 
-              await remove(ref(db, `buku/${kode}`)); 
-              showLog(`Buku ${kode} berhasil dihapus.`, false); 
-              clearBukuForm();
-          } catch(e){ 
-              showLog(`Gagal menghapus buku ${kode}: ${e.message}`, true); 
-              console.error(e);
-          } 
-      });
-    }
-
-    function loadBuku(){ /* ... (fungsi sama) ... */
+    function loadBuku(){ 
         onValue(ref(db,'buku'), (snap)=>{ 
             renderBukuTable(snap.val()); 
             showLog('Data Buku diperbarui.', false);
@@ -698,13 +677,26 @@
     }
 
 
-    // ======= PENGUNJUNG VIEW & LOGIC (Modified: renderPengunjungTable, deleteAllPengunjung) =======
+    // =========================================================
+    // PENGUNJUNG VIEW & LOGIC
+    // =========================================================
     const tablePengunjung = document.getElementById('tablePengunjung');
     const tablePengunjungHeader = `<thead><tr><th class="text-left">Tanggal</th><th class="text-left">Nama Lengkap</th><th class="text-left">Blok</th><th class="text-left">Jenjang</th><th class="text-left">Judul Buku</th><th class="text-left">Kategori</th><th class="text-left">Keterangan</th><th class="text-left">Aksi</th></tr></thead>`;
+    
+    // Helper untuk Eksekusi Hapus Pengunjung Tunggal
+    async function executeDeletePengunjung(key) {
+        const keyShort = key.substring(0, 8);
+        showLog(`⏳ Menghapus record pengunjung ${keyShort}...`, false);
+        try{ 
+            await remove(ref(db, `pengunjung/${key}`)); 
+            showLog(`✅ Record ${keyShort}... dihapus.`, false); 
+        } catch(e){ 
+            showLog(`❌ Gagal menghapus record ${keyShort}: ${e.message}`, true); 
+            console.error(e);
+        }
+    }
 
     function renderPengunjungTable(dataObj){
-        currentPengunjungData = dataObj; // Simpan data ke variabel global
-
         if(!dataObj){ 
             tablePengunjung.innerHTML = tablePengunjungHeader + '<tbody><tr><td colspan="8" class="text-center p-4 text-gray-500">Belum ada data pengunjung.</td></tr></tbody>'; 
             return; 
@@ -742,28 +734,21 @@
         
         tablePengunjung.innerHTML = tablePengunjungHeader + `<tbody>${html}</tbody>`;
         
-        // Logic Hapus Per Baris
+        // Logic Hapus (Mengganti confirm() dengan showConfirmModal)
         tablePengunjung.querySelectorAll('button[data-action="delete"]').forEach(btn=>{
-            btn.addEventListener('click', async (e)=>{
+            btn.addEventListener('click', (e)=>{
                 const tr = e.target.closest('tr'); 
                 const key = tr.dataset.key; 
                 
-                // MENGGANTI confirm() DENGAN MODAL KUSTOM
-                showCustomConfirm('Konfirmasi Hapus Pengunjung', `Yakin hapus record pengunjung dengan **ID ${key.substring(0, 8)}...**?`, async (confirmed) => {
-                    if (!confirmed) return;
-                    try{ 
-                        await remove(ref(db, `pengunjung/${key}`)); 
-                        showLog(`Record ${key.substring(0, 8)}... dihapus.`, false); 
-                    } catch(e){ 
-                        showLog(`Gagal menghapus record: ${e.message}`, true); 
-                        console.error(e);
-                    }
-                });
+                showConfirmModal(
+                    `Anda yakin ingin menghapus record pengunjung dengan **ID ${key.substring(0, 8)}...** secara permanen?`,
+                    () => executeDeletePengunjung(key)
+                );
             });
         });
     }
 
-    function loadPengunjung(){ /* ... (fungsi sama) ... */
+    function loadPengunjung(){ 
         onValue(ref(db,'pengunjung'), (snap)=>{ 
             renderPengunjungTable(snap.val()); 
             const count = snap.val() ? Object.keys(snap.val()).length : 0;
@@ -772,74 +757,8 @@
             showLog('Gagal memuat data Pengunjung: '+error.message, true);
         });
     }
-    
-    // --- FUNGSI HAPUS SEMUA (Modified: deleteAllPengunjung) ---
-    document.getElementById('deleteAllPengunjung').addEventListener('click', async () => {
-        if (!currentPengunjungData || Object.keys(currentPengunjungData).length === 0) {
-            return showLog('Tidak ada data pengunjung untuk dihapus.', true);
-        }
-        
-        const count = Object.keys(currentPengunjungData).length;
-        
-        // MENGGANTI confirm() DENGAN MODAL KUSTOM
-        showCustomConfirm('PERINGATAN KERAS: Hapus Semua Data Pengunjung', `Anda akan menghapus **SEMUA** data pengunjung (${count} entri). Tindakan ini **TIDAK DAPAT DIBATALKAN**. Lanjutkan?`, async (confirmed) => {
-            if (!confirmed) return;
-            
-            try {
-                await remove(ref(db, 'pengunjung'));
-                showLog('✅ Semua data pengunjung berhasil dihapus.', false);
-            } catch (e) {
-                showLog(`Gagal menghapus semua data: ${e.message}. Cek Firebase Rules /pengunjung/`, true);
-                console.error(e);
-            }
-        });
-    });
 
-    // --- FUNGSI SALIN DATA (Dipertahankan) ---
-    document.getElementById('copyPengunjung').addEventListener('click', async () => { /* ... (fungsi sama) ... */
-        if (!currentPengunjungData || Object.keys(currentPengunjungData).length === 0) {
-            return showLog('Tidak ada data pengunjung untuk disalin.', true);
-        }
-        
-        const rows = Object.entries(currentPengunjungData).map(([k,v])=> ({ id: k, ...v }));
-
-        // 1. Tentukan header yang SESUAI DENGAN TABEL
-        const headers = ['Tanggal', 'Nama Lengkap', 'Blok', 'Jenjang', 'Judul Buku', 'Kategori', 'Keterangan'];
-        
-        // 2. Format setiap baris agar sesuai dengan tampilan tabel
-        const formattedRows = rows.map(r => {
-            // Format Tanggal: DD/MM/YYYY
-            const tanggalStr = `${r.tanggal || '??'}/${r.bulan || '??'}/${r.tahun || '????'}`;
-            
-            return [
-                tanggalStr,
-                r.nama || '-',
-                r.blok || '-',
-                r.jenjang || '-',
-                r.judulBuku || '-',
-                r.kategoriBuku || '-',
-                r.keterangan || '-'
-            ];
-        });
-
-        // 3. Gabungkan menjadi string TSV (Tab-Separated Values)
-        const tsvString = [
-            headers.map(h => `"${h}"`).join('\t') // Header row
-        ].concat(formattedRows.map(row => 
-            row.map(cell => `"${(cell || '').toString().replace(/"/g,'""')}"`).join('\t')
-        )).join('\n');
-
-        try {
-            await navigator.clipboard.writeText(tsvString);
-            showLog('✅ Semua data pengunjung berhasil disalin ke clipboard, sesuai tampilan tabel.', false);
-        } catch (err) {
-            showLog('Gagal menyalin data ke clipboard. Coba fungsi "Ekspor CSV".', true);
-            console.error('Copy to clipboard failed:', err);
-        }
-    });
-
-    // --- FUNGSI EKSPOR CSV (Dipertahankan) ---
-    document.getElementById('exportPengunjung').addEventListener('click', ()=>{ /* ... (fungsi sama) ... */
+    document.getElementById('exportPengunjung').addEventListener('click', ()=>{
         get(child(ref(db), 'pengunjung')).then(snap=>{
             const data = snap.val(); 
             if(!data) return showLog('Tidak ada data pengunjung untuk diekspor.', true);
@@ -847,7 +766,6 @@
             const rows = Object.entries(data).map(([k,v])=> ({ id: k, ...v }));
             
             const colsSet = new Set(['id']); rows.forEach(r=> Object.keys(r).forEach(c=>colsSet.add(c)));
-            
             const cols = Array.from(colsSet).sort((a, b) => { 
                 if (a.toLowerCase() === 'tanggal') return -1;
                 if (b.toLowerCase() === 'bulan') return 1;
@@ -871,14 +789,47 @@
         });
     });
 
-    // ======= TAB LOGIC (Dipertahankan) =======
+    // =========================================================
+    // PREVIEW UTIL & TAB LOGIC
+    // =========================================================
+    function renderPreview(container, data, requiredCols){
+      if(!data || data.length===0){ container.innerHTML = '<p class="text-gray-500">Tidak ada data untuk ditampilkan.</p>'; return; }
+      
+      const cols = Object.keys(data[0]);
+      const table = document.createElement('table'); table.className='min-w-full text-sm';
+      
+      const thead = document.createElement('thead'); thead.innerHTML = '<tr>' + cols.map(c=>`<th class="px-3 py-2 text-left border-b border-cyan-500 bg-gray-200 text-gray-800">${c}</th>`).join('') + '</tr>';
+      table.appendChild(thead);
+      
+      const tbody = document.createElement('tbody'); 
+      data.slice(0, 5).forEach((row,idx)=>{ 
+          const tr=document.createElement('tr'); 
+          tr.className = idx%2===0?'bg-gray-50 text-gray-800':'bg-white text-gray-800'; 
+          tr.innerHTML = cols.map(c=>`<td class="px-3 py-2 border-b border-gray-200">${row[c]??'-'}</td>`).join(''); 
+          tbody.appendChild(tr); 
+      });
+      table.appendChild(tbody);
+      
+      const missing = requiredCols.filter(rc=>!cols.some(c=>c.toLowerCase() === rc.toLowerCase())); 
+      const note = document.createElement('div'); note.className='my-3 text-sm'; 
+      if(missing.length) {
+          note.innerHTML=`<div class="text-red-600 font-bold mb-2">⚠️ Kolom wajib TIDAK ditemukan: ${missing.join(', ')}</div>`;
+      } else {
+          note.innerHTML=`<div class="text-green-600 font-bold mb-2">✅ Semua kolom wajib ditemukan.</div>`;
+      }
+      container.innerHTML=''; 
+      container.appendChild(note); 
+      container.appendChild(document.createTextNode(`Menampilkan ${data.slice(0, 5).length} dari ${data.length} baris.`));
+      container.appendChild(table);
+    }
+
     const tabSantri = document.getElementById('tabSantri');
     const tabBuku = document.getElementById('tabBuku');
     const tabPengunjung = document.getElementById('tabPengunjung');
     
     const allTabs = [tabPengunjung, tabSantri, tabBuku];
 
-    function setActiveTabStyle(activeTab) { /* ... (fungsi sama) ... */
+    function setActiveTabStyle(activeTab) {
         allTabs.forEach(tab => {
             if (tab === activeTab) {
                 tab.classList.add('bg-cyan-500', 'text-white', 'shadow-lg');
@@ -890,11 +841,10 @@
         });
     }
 
-    function showTab(name){ /* ... (fungsi sama) ... */
-      const sectionSantri = document.getElementById('sectionSantri');
-      const sectionBuku = document.getElementById('sectionBuku');
-      const sectionPengunjung = document.getElementById('sectionPengunjung');
-
+    function showTab(name){
+      // Sembunyikan modal jika ada
+      hideConfirmModal(); 
+      
       sectionSantri.classList.toggle('hidden', name!=='Santri');
       sectionBuku.classList.toggle('hidden', name!=='Buku');
       sectionPengunjung.classList.toggle('hidden', name!=='Pengunjung');
