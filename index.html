@@ -3,10 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Form Kunjungan Perpustakaan | Garis Input Cyan Super Panjang</title>
+  <title>Form Kunjungan Perpustakaan | Tanpa Notifikasi Toast</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
-  
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   
   <script>
@@ -35,7 +34,7 @@
     
     /* Container Utama Form yang Terpusat */
     #single-form-container {
-        /* PERUBAHAN AGRESIF: Max-width 1024px di desktop untuk kelonggaran maksimal */
+        /* Lebar 1024px di desktop untuk kelonggaran maksimal */
         max-width: 600px; /* Default max-w untuk mobile/tablet */
         width: 100%;
         background-color: #ffffff; 
@@ -110,24 +109,7 @@
         box-shadow: 0 0 0 2px #FECACA !important;
     }
 
-    /* TOAST NOTIFICATION STYLES (Tidak Berubah) */
-    #toast-container {
-        position: fixed;
-        bottom: 20px;
-        left: 20px;
-        z-index: 50;
-    }
-    .toast {
-        @apply p-4 rounded-lg shadow-xl text-white font-semibold mb-3 transform transition-all duration-500;
-        opacity: 0;
-        transform: translateY(100px);
-    }
-    .toast.show {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    .toast.success { @apply bg-green-500; }
-    .toast.error { @apply bg-red-600; }
+    /* STYLES TOAST DIHAPUS */
   </style>
 </head>
 
@@ -148,7 +130,7 @@
         
         <div>
             <label for="blok" class="block mb-1 font-medium text-gray-700">Blok / Kamar</label>
-            <input type="text" id="blok" class="review-input" readonly>
+            <input type="text" id="blok" class="review-input uppercase" readonly>
         </div>
         <div>
             <label for="jenjang" class="block mb-1 font-medium text-gray-700">Jenjang Pendidikan</label>
@@ -198,8 +180,6 @@
         <button type="button" id="btnSubmit" class="w-full py-3 mt-8 bg-cyan-600 text-white rounded-xl font-bold text-xl hover:bg-cyan-700 transition duration-300 shadow-lg shadow-cyan-500/50 hover:shadow-xl">Kirim Data Kunjungan</button>
     </div>
   </div>
-
-  <div id="toast-container"></div>
 
   <script type="module">
     // --- FIREBASE IMPORTS & CONFIG ---
@@ -252,22 +232,10 @@
         "Ilmu Bahasa", "Berita", "Karya Umum", "Majalah"
     ];
 
-    function showToast(message, type = 'success', duration = 4000) {
-        const container = $('toast-container');
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        toast.innerHTML = `<div class="flex items-center space-x-2">
-                            <span>${message}</span>
-                           </div>`;
-        container.appendChild(toast);
-        
-        setTimeout(() => toast.classList.add('show'), 10);
-
-        setTimeout(() => {
-            toast.classList.remove('show');
-            setTimeout(() => toast.remove(), 500); 
-        }, duration);
-    }
+    /**
+     * Fungsi showToast telah dihapus.
+     * Untuk memberikan feedback saat ini, kita bisa menggunakan console.log atau alert (jika diperlukan).
+     */
 
     // Toggle Readonly/Disabled pada input review (memungkinkan koreksi)
     function setReviewEditable(isEditable = false) {
@@ -366,14 +334,14 @@
         const data = snap.val();
         // Pastikan jenjang yang diambil dari master data sudah uppercase
         santriList = data ? Object.entries(data).map(([nis, val]) => ({ nis, nama: val.nama, blok: val.blok, jenjang: val.jenjang ? val.jenjang.toUpperCase() : '' })) : [];
-        if(santriList.length === 0) showToast('⚠️ Data Santri kosong, tidak bisa mencari data.', 'error');
+        if(santriList.length === 0) console.warn('Data Santri kosong, tidak bisa mencari data.');
     });
     
     onValue(ref(db, 'buku'), (snap) => {
         const data = snap.val();
         // Pastikan kategori yang diambil dari master data sudah sesuai casing
         bukuList = data ? Object.entries(data).map(([kode, val]) => ({ kode, judul: val.judul, kategori: val.kategori || '' })) : [];
-        if(bukuList.length === 0) showToast('⚠️ Data Buku kosong, tidak bisa mencari data.', 'error');
+        if(bukuList.length === 0) console.warn('Data Buku kosong, tidak bisa mencari data.');
     });
     
     // --- KEYBOARD NAVIGATION LOGIC ---
@@ -385,7 +353,9 @@
             selectedSantri.nis = li.dataset.nis;
             selectedSantri.nama = li.dataset.nama; 
             
-            blokInput.value = li.dataset.blok || '';
+            // NOTE: Data blok dari master disetel apa adanya, JS input listener akan mengonversi
+            blokInput.value = li.dataset.blok || ''; 
+            
             let jenjangVal = li.dataset.jenjang || '';
             
             // Set nilai ke Jenjang Select
@@ -394,7 +364,8 @@
             } else {
                  jenjangSelect.value = ''; // Set ke opsi kosong
                  if (jenjangVal) {
-                    showToast('⚠️ Jenjang dari master tidak valid. Harap pilih yang benar.', 'error', 7000);
+                    // Feedback tanpa toast
+                    console.warn('Jenjang dari master tidak valid. Harap pilih yang benar.');
                  }
             }
             jenjangSelect.classList.remove('input-error');
@@ -407,7 +378,8 @@
             jenjangSelect.disabled = false;
             setReviewEditable(true); 
             
-            showToast('✅ Santri dipilih. Harap cek dan lengkapi detail.', 'success');
+            // Feedback tanpa toast
+            console.log('Santri berhasil dipilih. Harap cek dan lengkapi detail.');
             
             // Tentukan fokus setelah pemilihan
             if (!blokInput.value) {
@@ -430,7 +402,8 @@
             } else {
                  kategoriBukuSelect.value = ''; // Set ke opsi kosong
                  if (kategoriVal) {
-                    showToast('⚠️ Kategori dari master tidak valid. Harap pilih yang benar.', 'error', 7000);
+                    // Feedback tanpa toast
+                    console.warn('Kategori dari master tidak valid. Harap pilih yang benar.');
                  }
             }
             kategoriBukuSelect.classList.remove('input-error');
@@ -442,7 +415,8 @@
             kategoriBukuSelect.disabled = false; // Gunakan disabled karena ini select
             setReviewEditable(true); 
             
-            showToast('✅ Buku dipilih. Harap cek dan lengkapi detail.', 'success');
+            // Feedback tanpa toast
+            console.log('Buku berhasil dipilih. Harap cek dan lengkapi detail.');
             
              // Tentukan fokus setelah pemilihan
             if (!kategoriBukuSelect.value) {
@@ -485,8 +459,13 @@
             items[currentIndex].scrollIntoView({ block: "nearest" });
         }
     }
-
-    // --- EVENT LISTENERS TAMBAHAN UNTUK VALIDASI KETAT ---
+    
+    // --- EVENT LISTENER: ENFORCE UPPERCASE PADA BLOK / KAMAR ---
+    blokInput.addEventListener('input', () => {
+        // Konversi nilai input secara real-time ke huruf kapital
+        blokInput.value = blokInput.value.toUpperCase();
+    });
+    // --- END EVENT LISTENER BARU ---
 
     // Listener untuk Select Jenjang
     jenjangSelect.addEventListener('change', () => {
@@ -601,17 +580,19 @@
       
       const hasErrors = markEmptyFields();
       if(hasErrors) {
-        showToast('❌ GAGAL: Harap lengkapi semua kolom yang bergaris merah.', 'error', 5000);
+        // Feedback kegagalan tanpa toast
+        alert('GAGAL: Harap lengkapi semua kolom yang wajib diisi (bergaris merah).');
         return;
       }
       
-      showToast('⏳ Mengirim data...', 'success');
+      console.log('Sedang memproses data...');
 
       const now = new Date();
       
+      // Ambil nilai blok yang sudah pasti UPPERCASE dari JS listener
       const finalData = {
         nama: selectedSantri.nama, 
-        blok: blokInput.value.trim(),
+        blok: blokInput.value.trim(), 
         jenjang: jenjangSelect.value, 
         judulBuku: selectedBuku.judul, 
         kategoriBuku: kategoriBukuSelect.value, // Ambil nilai dari select
@@ -639,12 +620,14 @@
         // 3. MENGIRIM DATA KUNJUNGAN BARU
         await push(ref(db, `pengunjung`), payload); 
         
-        showToast('🎉 SUKSES! Data kunjungan dikirim. Form direset.', 'success', 5000);
+        // Feedback sukses tanpa toast
+        alert('SUKSES! Data kunjungan berhasil dikirim. Form direset.');
         resetForm();
         
       } catch(e){ 
         console.error("Firebase Submit Error:", e); 
-        showToast('❌ GAGAL TOTAL: Kesalahan sistem saat kirim data/perbarui master. Cek Konsol.', 'error', 7000);
+        // Feedback error tanpa toast
+        alert('GAGAL TOTAL: Kesalahan sistem saat kirim data/perbarui master. Cek Konsol.');
       }
     });
 
