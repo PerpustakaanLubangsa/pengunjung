@@ -1,730 +1,796 @@
 <!doctype html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Form Kunjungan Perpustakaan | Black Body & Manual Pop-up</title>
-  
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Poppins', 'sans-serif'],
-          },
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Form Kunjungan Perpustakaan | Full Page White</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Poppins', 'sans-serif'],
+            },
+          }
         }
       }
-    }
-  </script>
+    </script>
 
-  <style>
-    /* ---------------------------------------------------- */
-    /* BLACK BODY & SOFT CONTAINER STYLES */
-    /* ---------------------------------------------------- */
-    
-    body {
-        font-family: 'Poppins', sans-serif;
-        /* Background Hitam Penuh */
-        background-color: #000000; 
-        color: #333333; /* Warna teks gelap */
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        min-height: 80vh;
-        padding: 40px 20px;
-    }
-    
-    #single-form-container { 
-        max-width: 500px; 
-        padding: 30px;
-        margin: 20px auto;
-        /* Container tetap putih lembut (Light Mode) */
-        background: #ffffff; 
-        border-radius: 12px; 
-        box-shadow: 0 5px 20px rgba(255, 255, 255, 0.1); /* Shadow terang karena background gelap */
-        width: 100%;
-    }
-    
-    label {
-        display: block;
-        margin-top: 20px;
-        font-weight: 600; 
-        color: #444444; 
-    }
-    
-    /* ---------------------------------------------------- */
-    /* GARIS BAWAH CYAN INPUT & DROPDOWN STYLES */
-    /* ---------------------------------------------------- */
+    <style>
+      /* ---------------------------------------------------- */
+      /* WHITE BODY & FULL PAGE STYLES (DIUBAH) */
+      /* ---------------------------------------------------- */
 
-    .form-group {
-        position: relative; 
-    }
-    
-    .input-line-style { 
-        width: 100%;
-        padding: 10px 0; 
-        margin-top: 5px;
-        margin-bottom: 15px;
-        border: none; 
-        outline: none; 
-        border-bottom: 2px solid #00BCD4; 
-        background-color: transparent; 
-        color: #333333; 
-        transition: border-bottom-color 0.3s, border-bottom-width 0.3s; 
-        font-size: 17px; 
-        box-sizing: border-box; 
-        appearance: none; 
-        
-        @apply shadow-none !important; 
-        border-radius: 0 !important;
-    }
+      body {
+          font-family: 'Poppins', sans-serif;
+          /* Background diubah menjadi #DCEEFF */
+          background-color: #DCEEFF; 
+          color: #333333;
+          display: flex;
+          justify-content: center;
+          align-items: flex-start;
+          min-height: 100vh; 
+          padding: 40px 20px;
+      }
 
-    .input-line-style:focus { 
-        border-bottom: 3px solid #00AABF; 
-    }
-    
-    /* GAYA ERROR: Garis Merah */
-    .input-line-style.input-error {
-        border-bottom-color: #EF4444 !important; 
-        border-bottom-width: 3px !important;
-        box-shadow: none !important;
-    }
+      #single-form-container {
+          max-width: 600px;
+          padding: 30px;
+          margin: 0 auto;
+          /* Container tetap putih untuk kontras */
+          background: #DCEEFF; 
+          border-radius: 0; 
+          box-shadow: none;
+          width: 100%;
+      }
 
-    /* Override Select Box */
-    #jenjang, #kategoriBuku, #keterangan {
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%236B7280'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd' /%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 0px center; 
-        background-size: 1.5em;
-        padding-right: 2.5rem; 
-        background-color: transparent; 
-    }
+      label {
+          display: block;
+          margin-top: 20px;
+          font-weight: 600;
+          color: #444444;
+      }
 
-    /* DROPDOWN KUSTOM */
-    .custom-dropdown {
-        position: absolute;
-        top: 100%; 
-        left: 0;
-        right: 0; 
-        /* Warna light mode */
-        border: 1px solid #e0e0e0; 
-        background-color: #ffffff; 
-        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); 
-        list-style: none;
-        padding: 0; 
-        margin: 0;
-        display: none; 
-        border-radius: 0 0 8px 8px; 
-        z-index: 20; 
-    }
-    
-    .custom-dropdown-item {
-        color: #333333; 
-    }
+      /* ---------------------------------------------------- */
+      /* GARIS BAWAH CYAN INPUT & DROPDOWN STYLES */
+      /* ---------------------------------------------------- */
 
-    .custom-dropdown-item:hover,
-    .custom-dropdown-item.selected { 
-        background-color: #e3f2fd; 
-        color: #00AABF; 
-    }
+      .form-group {
+          position: relative;
+      }
 
-    .custom-dropdown-item span.highlight {
-        color: #007bb6; 
-        background-color: #fffde7; 
-    }
+      .input-line-style {
+          width: 100%;
+          padding: 10px 0;
+          margin-top: 5px;
+          margin-bottom: 15px;
+          border: none;
+          outline: none;
+          border-bottom: 2px solid #00BCD4;
+          background-color: transparent;
+          color: #333333;
+          transition: border-bottom-color 0.3s, border-bottom-width 0.3s;
+          font-size: 17px;
+          box-sizing: border-box;
+          appearance: none;
 
-    /* Tombol Submit */
-    #btnSubmit {
-        background-color: #00BCD4; 
-        color: white;
-        padding: 12px 25px; 
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        margin-top: 30px;
-        font-size: 17px;
-        font-weight: bold;
-        transition: background-color 0.3s, transform 0.1s;
-        width: 100%; 
-        @apply shadow-none hover:shadow-none;
-    }
-    #btnSubmit:hover {
-        background-color: #00AABF;
-        transform: translateY(-1px); 
-    }
-    
-    /* ---------------------------------------------------- */
-    /* MODAL (Pop-up Sukses) */
-    /* ---------------------------------------------------- */
-    .modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.7); 
-        display: none; 
-        justify-content: center;
-        align-items: center;
-        z-index: 50; 
-        opacity: 0;
-        transition: opacity 0.3s ease-out;
-    }
+          @apply shadow-none !important;
+          border-radius: 0 !important;
+      }
 
-    .modal-overlay.active {
-        display: flex;
-        opacity: 1;
-    }
+      .input-line-style:focus {
+          border-bottom: 3px solid #00AABF;
+      }
 
-    .modal-content {
-        background: #ffffff; 
-        padding: 30px;
-        border-radius: 12px;
-        max-width: 400px;
-        width: 90%;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-        transform: translateY(-50px);
-        transition: transform 0.3s ease-out;
-    }
-    
-    /* GAYA TEXT */
-    .text-gray-800 { color: #1f2937; } 
-    .text-gray-600 { color: #4b5563; } 
-    .border-cyan-500 { border-color: #06b6d4; } 
-    
-  </style>
+      /* GAYA ERROR: Garis Merah */
+      .input-line-style.input-error {
+          border-bottom-color: #EF4444 !important;
+          border-bottom-width: 3px !important;
+          box-shadow: none !important;
+      }
+
+      /* Override Select Box (Tetap) */
+      #jenjang, #kategoriBuku, #keterangan {
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%236B7280'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd' /%3E%3C/svg%3E");
+          background-repeat: no-repeat;
+          background-position: right 0px center;
+          background-size: 1.5em;
+          padding-right: 2.5rem;
+          background-color: transparent;
+      }
+
+      /* ---------------------------------------------------- */
+      /* DROPDOWN KUSTOM (FULL COLOR FOCUS) */
+      /* ---------------------------------------------------- */
+      .custom-dropdown {
+          position: absolute;
+          top: calc(100% + 5px);
+          left: 0;
+          right: 0;
+          
+          border: 1px solid #d1d5db;
+          background-color: #ffffff;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          border-radius: 8px;
+          
+          list-style: none;
+          padding: 5px 0;
+          margin: 0;
+          display: none;
+          z-index: 20;
+          overflow: hidden;
+      }
+
+      .custom-dropdown-item {
+          color: #333333;
+          padding: 10px 15px;
+          cursor: pointer;
+          transition: background-color 0.2s, color 0.2s;
+          font-size: 16px;
+      }
+
+      .custom-dropdown-item:hover,
+      .custom-dropdown-item.selected {
+          /* GAYA FULL COLOR FOCUS */
+          background-color: #00BCD4; 
+          color: #FFFFFF; 
+      }
+
+      .custom-dropdown-item span.highlight {
+          /* Highlight pada state normal */
+          color: #007bb6;
+          background-color: #f0f0f0;
+          font-weight: 600;
+          padding: 1px 3px;
+          border-radius: 4px;
+      }
+
+      .custom-dropdown-item.selected span.highlight,
+      .custom-dropdown-item:hover span.highlight {
+          /* Highlight pada state focus/selected */
+          color: #FFFFFF; 
+          background-color: #007bb6; 
+      }
+
+
+      /* GAYA TEXT TAMBAHAN DI DROPDOWN ITEM */
+      .custom-dropdown-item .text-xs {
+          color: #6b7280;
+          margin-top: 2px;
+          font-size: 13px;
+      }
+
+      .custom-dropdown-item.selected .text-xs,
+      .custom-dropdown-item:hover .text-xs {
+          /* Teks deskripsi diubah menjadi putih juga saat focus */
+          color: #e0f7fa; 
+      }
+
+      /* Tombol Submit (Tetap) */
+      #btnSubmit {
+          background-color: #00BCD4;
+          color: white;
+          padding: 12px 25px;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          margin-top: 30px;
+          font-size: 17px;
+          font-weight: bold;
+          transition: background-color 0.3s, transform 0.1s;
+          width: 100%;
+          @apply shadow-none hover:shadow-none;
+      }
+      #btnSubmit:hover {
+          background-color: #00AABF;
+          transform: translateY(-1px);
+      }
+
+      /* ---------------------------------------------------- */
+      /* MODAL (Pop-up Sukses) (Tetap) */
+      /* ---------------------------------------------------- */
+      .modal-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.7);
+          display: none;
+          justify-content: center;
+          align-items: center;
+          z-index: 50;
+          opacity: 0;
+          transition: opacity 0.3s ease-out;
+      }
+
+      .modal-overlay.active {
+          display: flex;
+          opacity: 1;
+      }
+
+      .modal-content {
+          background: #ffffff;
+          padding: 30px;
+          border-radius: 12px;
+          max-width: 400px;
+          width: 90%;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+          transform: translateY(-50px);
+          transition: transform 0.3s ease-out;
+      }
+
+      /* GAYA TEXT (Tetap) */
+      .text-gray-800 { color: #1f2937; }
+      .text-gray-600 { color: #4b5563; }
+      .border-cyan-500 { border-color: #06b6d4; }
+
+    </style>
 </head>
 
 <body>
-  
-  <div id="single-form-container">
-    <h1 class="text-3xl font-bold text-gray-800 mb-8 border-b-4 border-cyan-500 pb-2">Form Kunjungan Perpustakaan</h1>
-    
-    <div class="space-y-6">
-        
-        <h3 class="font-bold text-2xl border-b pb-2 text-gray-800 pt-4 mb-4" style="border-color: #e0e0e0;">Data Santri</h3>
 
-        <div class="form-group visible" id="group-santri"> 
-            <label for="nisSearch">Nama & NISN Santri</label>
-            <input type="text" id="nisSearch" placeholder="Ketik Nama atau NISN..." class="input-line-style" autocomplete="off" autofocus aria-autocomplete="list" aria-controls="dd-nisSearch" data-next-group="group-blok">
-            <ul id="dd-nisSearch" class="custom-dropdown" role="listbox"></ul>
-        </div>
-        
-        <div class="form-group visible" id="group-blok">
-            <label for="blok">Blok / Kamar</label>
-            <input type="text" id="blok" class="input-line-style uppercase" data-next-group="group-jenjang" placeholder="Diisi Otomatis atau Koreksi"> 
-        </div>
-        
-        <div class="form-group visible" id="group-jenjang">
-            <label for="jenjang">Jenjang Pendidikan</label>
-            <select id="jenjang" class="input-line-style" data-next-group="group-bukuSearch">
-                <option value="" selected>-- Pilih Jenjang --</option>
-                <option value="SLTP">SLTP (MTS Sederajat)</option>
-                <option value="SLTA">SLTA (MA Sederajat)</option>
-                <option value="PT">PT (Mahasiswa Sederajat)</option>
-            </select>
-        </div>
+    <div id="single-form-container">
+      <h1 class="text-3xl font-bold text-gray-800 mb-8 border-b-4 border-cyan-500 pb-2">Form Kunjungan Perpustakaan</h1>
 
-        <h3 class="font-bold text-2xl border-b pb-2 text-gray-800 pt-8 mb-4" style="border-color: #e0e0e0;">Data Buku</h3>
+      <div class="space-y-6">
 
-        <div class="form-group visible" id="group-bukuSearch">
-            <label for="kodeBukuSearch">Judul & Kode Buku</label>
-            <input type="text" id="kodeBukuSearch" placeholder="Ketik Judul atau Kode Buku..." class="input-line-style" autocomplete="off" aria-autocomplete="list" aria-controls="dd-kodeBukuSearch" data-next-group="group-kategoriBuku">
-            <ul id="dd-kodeBukuSearch" class="custom-dropdown" role="listbox"></ul>
-        </div>
-        
-        <div class="form-group visible" id="group-kategoriBuku">
-            <label for="kategoriBuku">Kategori Buku</label>
-            <select id="kategoriBuku" class="input-line-style" data-next-group="group-keterangan">
-                <option value="" selected>-- Pilih Kategori --</option>
-                <option value="Sejarah dan Geografi">Sejarah dan Geografi</option>
-                <option value="Kesusastraan">Kesusastraan</option>
-                <option value="Komik">Komik</option>
-                <option value="Agama">Agama</option>
-                <option value="Filsafat dan Psikologi">Filsafat dan Psikologi</option>
-                <option value="Ilmu Murni">Ilmu Murni</option>
-                <option value="Ilmu Sosial">Ilmu Sosial</option>
-                <option value="Ilmu Bahasa">Ilmu Bahasa</option>
-                <option value="Berita">Berita</option>
-                <option value="Karya Umum">Karya Umum</option>
-                <option value="Majalah">Majalah</option>
-            </select>
-        </div>
-        
-        <div class="form-group visible" id="group-keterangan">
-            <label for="keterangan">Keterangan Aktivitas</label>
-            <select id="keterangan" class="input-line-style" data-next-group="group-submit">
-                <option value="">-- Pilih --</option>
-                <option value="Baca">Baca</option>
-                <option value="Pinjam">Pinjam</option>
-            </select>
-        </div>
+          <h3 class="font-bold text-2xl border-b pb-2 text-gray-800 pt-4 mb-4" style="border-color: #e0e0e0;">Data Santri</h3>
 
-        <div class="form-group visible" id="group-submit">
-             <button type="button" id="btnSubmit">Kirim Data Kunjungan</button>
-        </div>
-       
-    </div>
-  </div>
+          <div class="form-group visible" id="group-santri">
+              <label for="nisSearch">Nama & NISN Santri</label>
+              <input type="text" id="nisSearch" placeholder="Ketik Nama atau NISN..." class="input-line-style" autocomplete="off" autofocus aria-autocomplete="list" aria-controls="dd-nisSearch" data-next-group="group-blok">
+              <ul id="dd-nisSearch" class="custom-dropdown" role="listbox"></ul>
+          </div>
 
-  <div id="successModal" class="modal-overlay">
-    <div class="modal-content text-center">
-      <div class="text-6xl text-cyan-600 mb-4">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
+          <div class="form-group visible" id="group-blok">
+              <label for="blok">Blok / Kamar</label>
+              <input type="text" id="blok" class="input-line-style" data-next-group="group-jenjang" placeholder="Diisi Otomatis atau Koreksi">
+          </div>
+
+          <div class="form-group visible" id="group-jenjang">
+              <label for="jenjang">Jenjang Pendidikan</label>
+              <select id="jenjang" class="input-line-style" data-next-group="group-bukuSearch">
+                  <option value="" selected>-- Pilih Jenjang --</option>
+                  <option value="SLTP">SLTP (MTS Sederajat)</option>
+                  <option value="SLTA">SLTA (MA Sederajat)</option>
+                  <option value="PT">PT (Mahasiswa Sederajat)</option>
+              </select>
+          </div>
+
+          <h3 class="font-bold text-2xl border-b pb-2 text-gray-800 pt-8 mb-4" style="border-color: #e0e0e0;">Data Buku</h3>
+
+          <div class="form-group visible" id="group-bukuSearch">
+              <label for="kodeBukuSearch">Judul & Kode Buku</label>
+              <input type="text" id="kodeBukuSearch" placeholder="Ketik Judul atau Kode Buku..." class="input-line-style" autocomplete="off" aria-autocomplete="list" aria-controls="dd-kodeBukuSearch" data-next-group="group-kategoriBuku">
+              <ul id="dd-kodeBukuSearch" class="custom-dropdown" role="listbox"></ul>
+          </div>
+
+          <div class="form-group visible" id="group-kategoriBuku">
+              <label for="kategoriBuku">Kategori Buku</label>
+              <select id="kategoriBuku" class="input-line-style" data-next-group="group-keterangan">
+                  <option value="" selected>-- Pilih Kategori --</option>
+                  <option value="Sejarah dan Geografi">Sejarah dan Geografi</option>
+                  <option value="Kesusastraan">Kesusastraan</option>
+                  <option value="Komik">Komik</option>
+                  <option value="Agama">Agama</option>
+                  <option value="Filsafat dan Psikologi">Filsafat dan Psikologi</option>
+                  <option value="Ilmu Murni">Ilmu Murni</option>
+                  <option value="Ilmu Sosial">Ilmu Sosial</option>
+                  <option value="Ilmu Bahasa">Ilmu Bahasa</option>
+                  <option value="Berita">Berita</option>
+                  <option value="Karya Umum">Karya Umum</option>
+                  <option value="Majalah">Majalah</option>
+              </select>
+          </div>
+
+          <div class="form-group visible" id="group-keterangan">
+              <label for="keterangan">Keterangan Aktivitas</label>
+              <select id="keterangan" class="input-line-style" data-next-group="group-submit">
+                  <option value="">-- Pilih --</option>
+                  <option value="Baca">Baca</option>
+                  <option value="Pinjam">Pinjam</option>
+              </select>
+          </div>
+
+          <div class="form-group visible" id="group-submit">
+               <button type="button" id="btnSubmit">Kirim Data Kunjungan</button>
+          </div>
+
       </div>
-      <h4 class="text-2xl font-bold text-gray-800 mb-2">Data Kunjungan Berhasil Dikirim!</h4>
-      <p class="text-gray-600 mb-6">Terima kasih. Data form telah direset dan siap untuk entri berikutnya.</p>
-      <button id="closeModalBtn" class="bg-cyan-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-cyan-700 transition">Tutup</button>
     </div>
-  </div>
+
+    <div id="successModal" class="modal-overlay">
+      <div class="modal-content text-center">
+        <div class="text-6xl text-cyan-600 mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <h4 class="text-2xl font-bold text-gray-800 mb-2">Data Kunjungan Berhasil Dikirim!</h4>
+        <p class="text-gray-600 mb-6">Terima kasih. Data form telah direset dan siap untuk entri berikutnya.</p>
+        <button id="closeModalBtn" class="bg-cyan-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-cyan-700 transition">Tutup</button>
+      </div>
+    </div>
 
 
-  <script type="module">
-    // --- FIREBASE IMPORTS & CONFIG ---
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
-    import { getDatabase, ref, set, onValue, push } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js';
+    <script type="module">
+      // --- FIREBASE IMPORTS & CONFIG ---
+      import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
+      import { getDatabase, ref, set, onValue, push } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js';
 
-    // *** GANTI DENGAN CONFIG FIREBASE ASLI ANDA ***
-    const firebaseConfig = {
-      apiKey: "AIzaSyB6gaVW3ye680YylqzSebZugmQepYRA4g4", // Ganti
-      authDomain: "pengunjung-4489b.firebaseapp.com", // Ganti
-      projectId: "pengunjung-4489b", // Ganti
-      storageBucket: "pengunjung-4489b.firebasestorage.app", // Ganti
-      messagingSenderId: "233634425303", // Ganti
-      appId: "1:233634425303:web:9d45d775e703b94843c392", // Ganti
-      databaseURL: "https://pengunjung-4489b-default-rtdb.firebaseio.com" // Ganti
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-
-    // --- DOM ELEMENTS & STATE ---
-    const $ = id => document.getElementById(id);
-
-    const nisSearch = $('nisSearch');
-    const kodeBukuSearch = $('kodeBukuSearch');
-    const keteranganSelect = $('keterangan');
-
-    // Dropdown Kustom
-    const nisDropdown = $('dd-nisSearch');
-    const bukuDropdown = $('dd-kodeBukuSearch');
-
-    // Input Detail/Koreksi
-    const blokInput = $('blok');
-    const jenjangSelect = $('jenjang');
-    const kategoriBukuSelect = $('kategoriBuku'); 
-    
-    // Elemen Modal
-    const successModal = $('successModal');
-    const closeModalBtn = $('closeModalBtn'); 
-
-    // Semua input yang perlu divalidasi dan direset
-    const allInputs = [nisSearch, kodeBukuSearch, keteranganSelect, blokInput, jenjangSelect, kategoriBukuSelect];
-
-    let santriList = [];
-    let bukuList = [];
-    let selectedSantri = { nis: null, nama: null }; 
-    let selectedBuku = { kode: null, judul: null }; 
-    
-    // --- HELPER FUNCTIONS ---
-    
-    const VALID_JENJANG = ["SLTP", "SLTA", "PT"];
-    const VALID_KATEGORI = [
-        "Sejarah dan Geografi", "Kesusastraan", "Komik", "Agama", 
-        "Filsafat dan Psikologi", "Ilmu Murni", "Ilmu Sosial", 
-        "Ilmu Bahasa", "Berita", "Karya Umum", "Majalah"
-    ];
-
-    function parseInput(inputElement) {
-        const fullValue = inputElement.value.trim();
-        const match = fullValue.match(/\(([^)]+)\)$/); 
-
-        if (match) {
-            const id = match[1].trim(); 
-            const name = fullValue.replace(match[0], '').trim(); 
-            return { id: id, name: name || id }; 
-        } else {
-            return { id: fullValue, name: fullValue }; 
-        }
-    }
-
-    function showModal() {
-        successModal.classList.add('active'); 
-    }
-
-    function hideModal() {
-        successModal.classList.remove('active'); 
-        // Setelah modal ditutup, kembalikan fokus ke input pertama
-        nisSearch.focus();
-    }
-    
-    function resetFormDisplay() {
-        nisSearch.focus(); 
-    }
-
-    function resetForm() {
-        allInputs.forEach(input => {
-            input.value = '';
-            input.classList.remove('input-error');
-            input.setAttribute('aria-expanded', 'false');
-        });
-        
-        jenjangSelect.value = '';
-        kategoriBukuSelect.value = '';
-        
-        nisDropdown.innerHTML = '';
-        bukuDropdown.innerHTML = '';
-
-        selectedSantri = { nis: null, nama: null }; 
-        selectedBuku = { kode: null, judul: null }; 
-        
-        // JANGAN panggil resetFormDisplay di sini. Panggilan ke hideModal() di akhir akan handle fokus.
-        // resetFormDisplay(); 
-    }
-    
-    function performAutofill(selectedValue, masterArray, keyType) {
-        if (keyType === 'pengunjung') {
-            blokInput.value = '';
-            jenjangSelect.value = '';
-        } else if (keyType === 'buku') {
-            kategoriBukuSelect.value = '';
-        }
-        
-        const match = selectedValue.match(/\((.*?)\)$/);
-        const key = match ? match[1] : null; 
-
-        if (key) {
-            if (keyType === 'pengunjung') {
-                const santri = masterArray.find(p => p.nis === key);
-                if (santri) {
-                    blokInput.value = santri.blok ? santri.blok.toUpperCase() : '';
-                    let jenjangVal = santri.jenjang ? santri.jenjang.toUpperCase() : '';
-                    jenjangSelect.value = VALID_JENJANG.includes(jenjangVal) ? jenjangVal : '';
-                }
-            } else if (keyType === 'buku') {
-                const buku = masterArray.find(b => b.kode === key);
-                if (buku) {
-                    let kategoriVal = buku.kategori || '';
-                    kategoriBukuSelect.value = VALID_KATEGORI.includes(kategoriVal) ? kategoriVal : '';
-                }
-            }
-        }
-    }
-
-    // --- VALIDATION & ERROR HANDLING ---
-    function clearErrorMarks() {
-        allInputs.forEach(input => {
-            input.classList.remove('input-error');
-        });
-    }
-
-    function markEmptyFields() {
-        clearErrorMarks();
-        let errorCount = 0;
-        
-        if (!nisSearch.value.trim()) { nisSearch.classList.add('input-error'); errorCount++; }
-        if (!blokInput.value.trim()) { blokInput.classList.add('input-error'); errorCount++; }
-        if (!jenjangSelect.value) { jenjangSelect.classList.add('input-error'); errorCount++; }
-        if (!kodeBukuSearch.value.trim()) { kodeBukuSearch.classList.add('input-error'); errorCount++; }
-        if (!kategoriBukuSelect.value) { kategoriBukuSelect.classList.add('input-error'); errorCount++; }
-        if (!keteranganSelect.value) { keteranganSelect.classList.add('input-error'); errorCount++; }
-        
-        return errorCount > 0;
-    }
-    
-    // --- DATA LOADING (Tidak Berubah) ---
-    onValue(ref(db, 'siswa'), (snap) => {
-        const data = snap.val();
-        santriList = data ? Object.entries(data).map(([nis, val]) => ({ nis, nama: val.nama, blok: val.blok, jenjang: val.jenjang ? val.jenjang.toUpperCase() : '' })) : [];
-    });
-    
-    onValue(ref(db, 'buku'), (snap) => {
-        const data = snap.val();
-        bukuList = data ? Object.entries(data).map(([kode, val]) => ({ kode, judul: val.judul, kategori: val.kategori || '' })) : [];
-    });
-    
-    // --- FUNGSI DROPDOWN KUSTOM ---
-    
-    function getHighlightedText(fullText, filterText) {
-        if (!filterText) return fullText;
-        const regex = new RegExp(`(${filterText})`, 'gi');
-        return fullText.replace(regex, '<span class="highlight">$1</span>');
-    }
-    
-    function populateCustomDropdown(dropdownEl, matches, keyType, filterText) {
-        dropdownEl.innerHTML = '';
-        
-        matches.forEach(item => {
-            const li = document.createElement('li');
-            li.classList.add('custom-dropdown-item');
-            li.setAttribute('role', 'option'); 
-            
-            let displayValue;
-            
-            if (keyType === 'pengunjung') {
-                displayValue = `${item.nama} (${item.nis})`;
-                li.setAttribute('data-nis', item.nis);
-                li.setAttribute('data-nama', item.nama);
-                li.setAttribute('data-blok', item.blok || '');
-                li.setAttribute('data-jenjang', item.jenjang || '');
-                
-                li.innerHTML = getHighlightedText(displayValue, filterText) + `<div class="text-xs" style="color:#666">Blok: ${item.blok || '-'} | Jenjang: ${item.jenjang || '-'}</div>`;
-            } else { // buku
-                displayValue = `${item.judul} (${item.kode})`;
-                li.setAttribute('data-kode', item.kode);
-                li.setAttribute('data-judul', item.judul);
-                li.setAttribute('data-kategori', item.kategori || '');
-                
-                li.innerHTML = getHighlightedText(displayValue, filterText) + `<div class="text-xs" style="color:#666">Kategori: ${item.kategori || '-'}</div>`;
-            }
-
-            li.setAttribute('data-value', displayValue);
-            li.setAttribute('data-key-type', keyType);
-            dropdownEl.appendChild(li);
-        });
-        
-        dropdownEl.style.display = matches.length > 0 ? 'block' : 'none';
-        dropdownEl.closest('.form-group').querySelector('input').setAttribute('aria-expanded', matches.length > 0 ? 'true' : 'false');
-    }
-
-    function selectSuggestion(inputEl, dropdownEl, li) {
-        if (!li) return;
-        
-        const keyType = li.getAttribute('data-key-type');
-        const selectedValue = li.getAttribute('data-value');
-        
-        inputEl.value = selectedValue;
-        dropdownEl.style.display = 'none';
-        inputEl.setAttribute('aria-expanded', 'false');
-
-        // Lakukan autofill
-        if (keyType === 'pengunjung') {
-            selectedSantri.nis = li.dataset.nis;
-            selectedSantri.nama = li.dataset.nama;
-            blokInput.value = li.dataset.blok || '';
-            jenjangSelect.value = VALID_JENJANG.includes(li.dataset.jenjang) ? li.dataset.jenjang : '';
-            
-            inputEl.classList.remove('input-error');
-            blokInput.classList.remove('input-error');
-            jenjangSelect.classList.remove('input-error');
-            
-        } else if (keyType === 'buku') {
-            selectedBuku.kode = li.dataset.kode;
-            selectedBuku.judul = li.dataset.judul;
-            kategoriBukuSelect.value = VALID_KATEGORI.includes(li.dataset.kategori) ? li.dataset.kategori : '';
-            
-            inputEl.classList.remove('input-error');
-            kategoriBukuSelect.classList.remove('input-error');
-        }
-        
-        const nextInput = inputEl.closest('.form-group').nextElementSibling?.querySelector('.input-line-style, button');
-        if (nextInput) nextInput.focus();
-    }
-
-    function handleKeydown(e, searchInput, dropdownEl) {
-        const items = dropdownEl.querySelectorAll('.custom-dropdown-item:not([style*="none"])');
-        if (items.length === 0) return;
-
-        let currentFocused = dropdownEl.querySelector('.selected');
-        let currentIndex = Array.from(items).indexOf(currentFocused);
-
-        if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            currentIndex = (currentIndex < items.length - 1) ? currentIndex + 1 : 0;
-        } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            currentIndex = (currentIndex > 0) ? currentIndex - 1 : items.length - 1;
-        } else if (e.key === 'Enter') {
-            e.preventDefault();
-            if (currentFocused) {
-                selectSuggestion(searchInput, dropdownEl, currentFocused);
-            }
-            return;
-        } else if (e.key === 'Escape') {
-            dropdownEl.style.display = 'none';
-            searchInput.setAttribute('aria-expanded', 'false'); 
-            return;
-        }
-
-        items.forEach(item => item.classList.remove('selected'));
-        if (items[currentIndex]) {
-            items[currentIndex].classList.add('selected');
-            items[currentIndex].scrollIntoView({ block: "nearest" });
-        }
-    }
-    
-    // --- EVENT LISTENERS: INPUT & NAVIGASI ---
-
-    function handleSearchInput(inputEl, dropdownEl, list, keyType) {
-        inputEl.classList.remove('input-error');
-        
-        const val = inputEl.value.toLowerCase().trim();
-        
-        if (keyType === 'pengunjung') {
-            selectedSantri = { nis: null, nama: null };
-            performAutofill('', list, keyType); 
-        } else { // buku
-            selectedBuku = { kode: null, judul: null };
-            performAutofill('', list, keyType); 
-        }
-        
-        if(!val){ 
-            dropdownEl.innerHTML=''; 
-            dropdownEl.style.display = 'none'; 
-            inputEl.setAttribute('aria-expanded', 'false');
-            return; 
-        }
-        
-        const matches = list.filter(item => {
-            const searchField = keyType === 'pengunjung' ? item.nama.toLowerCase() : item.judul.toLowerCase();
-            const idField = keyType === 'pengunjung' ? item.nis : item.kode;
-            return searchField.includes(val) || idField.includes(val);
-        }).slice(0, 10);
-        
-        populateCustomDropdown(dropdownEl, matches, keyType, inputEl.value.trim());
-        
-        if (matches.length > 0) {
-             const firstItem = dropdownEl.querySelector('.custom-dropdown-item');
-             if (firstItem) firstItem.classList.add('selected');
-        } 
-    }
-
-    // Listener Santri
-    nisSearch.addEventListener('input', () => handleSearchInput(nisSearch, nisDropdown, santriList, 'pengunjung'));
-    nisSearch.addEventListener('keydown', (e) => handleKeydown(e, nisSearch, nisDropdown));
-    nisDropdown.addEventListener('click', e => {
-      const li = e.target.closest('.custom-dropdown-item'); if(!li || li.getAttribute('data-key-type') !== 'pengunjung') return;
-      selectSuggestion(nisSearch, nisDropdown, li);
-    });
-
-    // Listener Buku
-    kodeBukuSearch.addEventListener('input', () => handleSearchInput(kodeBukuSearch, bukuDropdown, bukuList, 'buku'));
-    kodeBukuSearch.addEventListener('keydown', (e) => handleKeydown(e, kodeBukuSearch, bukuDropdown));
-    bukuDropdown.addEventListener('click', e => {
-      const li = e.target.closest('.custom-dropdown-item'); if(!li || li.getAttribute('data-key-type') !== 'buku') return;
-      selectSuggestion(kodeBukuSearch, bukuDropdown, li);
-    });
-    
-    // Event listener untuk input NON-DROPDOWN
-    const nonDropdownInputs = [blokInput, jenjangSelect, kategoriBukuSelect, keteranganSelect];
-    nonDropdownInputs.forEach(input => {
-        if (input.tagName === 'SELECT') {
-            input.addEventListener('change', function() {
-                this.classList.remove('input-error');
-                const nextInput = this.closest('.form-group').nextElementSibling?.querySelector('.input-line-style, button');
-                if (nextInput) nextInput.focus();
-            });
-        } else { // input text (blokInput)
-            input.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault(); 
-                    this.classList.remove('input-error');
-                    const nextInput = this.closest('.form-group').nextElementSibling?.querySelector('.input-line-style, button');
-                    if (nextInput) nextInput.focus();
-                }
-            });
-            input.addEventListener('input', function() { 
-                this.classList.remove('input-error'); 
-                if (this.id === 'blok') this.value = this.value.toUpperCase(); 
-            });
-        }
-    });
-
-    // BLUR untuk sembunyikan dropdown
-    document.addEventListener('click', (e) => {
-        if (!nisSearch.contains(e.target) && !nisDropdown.contains(e.target)) {
-            nisDropdown.style.display = 'none';
-            nisSearch.setAttribute('aria-expanded', 'false');
-        }
-        if (!kodeBukuSearch.contains(e.target) && !bukuDropdown.contains(e.target)) {
-            bukuDropdown.style.display = 'none';
-            kodeBukuSearch.setAttribute('aria-expanded', 'false');
-        }
-    });
-
-    // Kontrol Modal (Diaktifkan kembali)
-    closeModalBtn.addEventListener('click', hideModal);
-    successModal.addEventListener('click', (e) => {
-        if (e.target.id === 'successModal') {
-            hideModal();
-        }
-    });
-    
-    // --- PENAMBAHAN: Pop-up bisa ditutup dengan ENTER ---
-    document.addEventListener('keydown', (e) => {
-        // Cek jika tombol Enter ditekan dan modal sedang aktif
-        if (e.key === 'Enter' && successModal.classList.contains('active')) {
-            e.preventDefault(); 
-            hideModal();
-        }
-    });
-    // ---------------------------------------------------
-
-    // --- LOGIKA SUBMIT PENGUNJUNG BARU (Dipertahankan) ---
-    $('btnSubmit').addEventListener('click', async () => {
-      
-      const hasErrors = markEmptyFields();
-      if(hasErrors) {
-        const firstError = document.querySelector('.input-line-style.input-error');
-        if (firstError) firstError.focus();
-        return; 
-      }
-      
-      console.log('Sedang memproses data...');
-      
-      const santriParsed = parseInput(nisSearch);
-      const bukuParsed = parseInput(kodeBukuSearch);
-
-      const now = new Date();
-      
-      const finalData = {
-        nis: santriParsed.id, 
-        nama: santriParsed.name, 
-        blok: blokInput.value.trim(), 
-        jenjang: jenjangSelect.value, 
-        kodeBuku: bukuParsed.id,
-        judulBuku: bukuParsed.name, 
-        kategoriBuku: kategoriBukuSelect.value, 
-        keterangan: keteranganSelect.value,
+      // *** GANTI DENGAN CONFIG FIREBASE ASLI ANDA ***
+      const firebaseConfig = {
+        apiKey: "AIzaSyB6gaVW3ye680YylqzSebZugmQepYRA4g4", // Ganti
+        authDomain: "pengunjung-4489b.firebaseapp.com", // Ganti
+        projectId: "pengunjung-4489b", // Ganti
+        storageBucket: "pengunjung-4489b.firebasestorage.app", // Ganti
+        messagingSenderId: "233634425303", // Ganti
+        appId: "1:233634425303:web:9d45d775e703b94843c392", // Ganti
+        databaseURL: "https://pengunjung-4489b-default-rtdb.firebaseio.com" // Ganti
       };
-      
-      const payload = {
-        ...finalData,
-        timestamp: now.getTime(),
-        tanggal: String(now.getDate()).padStart(2, '0'),
-        bulan: String(now.getMonth() + 1).padStart(2, '0'),
-        tahun: now.getFullYear(),
-        jam: now.toTimeString().substring(0, 5)
-      };
-        
-      try{
-        // 1. Update Santri Master
-        await set(ref(db, `siswa/${finalData.nis}`), { nama: finalData.nama, blok: finalData.blok, jenjang: finalData.jenjang });
 
-        // 2. Update Buku Master
-        await set(ref(db, `buku/${finalData.kodeBuku}`), { judul: finalData.judulBuku, kategori: finalData.kategoriBuku });
+      const app = initializeApp(firebaseConfig);
+      const db = getDatabase(app);
 
-        // 3. MENGIRIM DATA KUNJUNGAN BARU
-        await push(ref(db, `pengunjung`), payload); 
-        
-        // JIKA SUKSES: Reset form dan tampilkan pop-up
-        resetForm();
-        showModal();
-        
-      } catch(e){ 
-        console.error("Firebase Submit Error:", e); 
-        alert('GAGAL TOTAL: Kesalahan sistem saat kirim data/perbarui master. Cek Konsol.');
+      // --- HELPER FUNCTION BARU: TITLE CASE (KAPITAL OTOMATIS) ---
+      function titleCase(str) {
+          if (!str) return '';
+          // Mengubah semua ke lowercase, memecah berdasarkan spasi, lalu mengkapitalisasi huruf pertama setiap kata.
+          return str.toLowerCase().split(' ').map(word => {
+              if (word.length === 0) return '';
+              return (word.charAt(0).toUpperCase() + word.slice(1));
+          }).join(' ');
       }
-    });
+      // -----------------------------------------------------------
 
-    // Init focus & display
-    resetFormDisplay();
-    nisSearch.focus();
-  </script>
+      // --- DOM ELEMENTS & STATE ---
+      const $ = id => document.getElementById(id);
+
+      const nisSearch = $('nisSearch');
+      const kodeBukuSearch = $('kodeBukuSearch');
+      const keteranganSelect = $('keterangan');
+
+      // Dropdown Kustom
+      const nisDropdown = $('dd-nisSearch');
+      const bukuDropdown = $('dd-kodeBukuSearch');
+
+      // Input Detail/Koreksi
+      const blokInput = $('blok');
+      const jenjangSelect = $('jenjang');
+      const kategoriBukuSelect = $('kategoriBuku');
+
+      // Elemen Modal
+      const successModal = $('successModal');
+      const closeModalBtn = $('closeModalBtn');
+
+      // Semua input yang perlu divalidasi dan direset
+      const allInputs = [nisSearch, kodeBukuSearch, keteranganSelect, blokInput, jenjangSelect, kategoriBukuSelect];
+
+      let santriList = [];
+      let bukuList = [];
+      let selectedSantri = { nis: null, nama: null };
+      let selectedBuku = { kode: null, judul: null };
+
+      // --- HELPER FUNCTIONS ---
+
+      const VALID_JENJANG = ["SLTP", "SLTA", "PT"];
+      const VALID_KATEGORI = [
+          "Sejarah dan Geografi", "Kesusastraan", "Komik", "Agama",
+          "Filsafat dan Psikologi", "Ilmu Murni", "Ilmu Sosial",
+          "Ilmu Bahasa", "Berita", "Karya Umum", "Majalah"
+      ];
+
+      function parseInput(inputElement) {
+          const fullValue = inputElement.value.trim();
+          const match = fullValue.match(/\(([^)]+)\)$/);
+
+          if (match) {
+              const id = match[1].trim();
+              const name = fullValue.replace(match[0], '').trim();
+              return { id: id, name: name || id };
+          } else {
+              return { id: fullValue, name: fullValue };
+          }
+      }
+
+      function showModal() {
+          successModal.classList.add('active');
+      }
+
+      function hideModal() {
+          successModal.classList.remove('active');
+          // Setelah modal ditutup, kembalikan fokus ke input pertama
+          nisSearch.focus();
+      }
+
+      function resetFormDisplay() {
+          nisSearch.focus();
+      }
+
+      function resetForm() {
+          allInputs.forEach(input => {
+              input.value = '';
+              input.classList.remove('input-error');
+              input.setAttribute('aria-expanded', 'false');
+          });
+
+          jenjangSelect.value = '';
+          kategoriBukuSelect.value = '';
+
+          nisDropdown.innerHTML = '';
+          bukuDropdown.innerHTML = '';
+
+          selectedSantri = { nis: null, nama: null };
+          selectedBuku = { kode: null, judul: null };
+      }
+
+      function performAutofill(selectedValue, masterArray, keyType) {
+          if (keyType === 'pengunjung') {
+              blokInput.value = '';
+              jenjangSelect.value = '';
+          } else if (keyType === 'buku') {
+              kategoriBukuSelect.value = '';
+          }
+
+          const match = selectedValue.match(/\((.*?)\)$/);
+          const key = match ? match[1] : null;
+
+          if (key) {
+              if (keyType === 'pengunjung') {
+                  const santri = masterArray.find(p => p.nis === key);
+                  if (santri) {
+                      // Pastikan nilai yang diisikan juga Title Case
+                      blokInput.value = santri.blok ? titleCase(santri.blok) : '';
+                      let jenjangVal = santri.jenjang ? santri.jenjang.toUpperCase() : '';
+                      jenjangSelect.value = VALID_JENJANG.includes(jenjangVal) ? jenjangVal : '';
+                  }
+              } else if (keyType === 'buku') {
+                  const buku = masterArray.find(b => b.kode === key);
+                  if (buku) {
+                      let kategoriVal = buku.kategori || '';
+                      kategoriBukuSelect.value = VALID_KATEGORI.includes(kategoriVal) ? kategoriVal : '';
+                  }
+              }
+          }
+      }
+
+      // --- VALIDATION & ERROR HANDLING ---
+      function clearErrorMarks() {
+          allInputs.forEach(input => {
+              input.classList.remove('input-error');
+          });
+      }
+
+      function markEmptyFields() {
+          clearErrorMarks();
+          let errorCount = 0;
+
+          if (!nisSearch.value.trim()) { nisSearch.classList.add('input-error'); errorCount++; }
+          if (!blokInput.value.trim()) { blokInput.classList.add('input-error'); errorCount++; }
+          if (!jenjangSelect.value) { jenjangSelect.classList.add('input-error'); errorCount++; }
+          if (!kodeBukuSearch.value.trim()) { kodeBukuSearch.classList.add('input-error'); errorCount++; }
+          if (!kategoriBukuSelect.value) { kategoriBukuSelect.classList.add('input-error'); errorCount++; }
+          if (!keteranganSelect.value) { keteranganSelect.classList.add('input-error'); errorCount++; }
+
+          return errorCount > 0;
+      }
+
+      // --- DATA LOADING (Tidak Berubah) ---
+      onValue(ref(db, 'siswa'), (snap) => {
+          const data = snap.val();
+          santriList = data ? Object.entries(data).map(([nis, val]) => ({ nis, nama: val.nama, blok: val.blok, jenjang: val.jenjang ? val.jenjang.toUpperCase() : '' })) : [];
+      });
+
+      onValue(ref(db, 'buku'), (snap) => {
+          const data = snap.val();
+          bukuList = data ? Object.entries(data).map(([kode, val]) => ({ kode, judul: val.judul, kategori: val.kategori || '' })) : [];
+      });
+
+      // --- FUNGSI DROPDOWN KUSTOM ---
+
+      function getHighlightedText(fullText, filterText) {
+          if (!filterText) return fullText;
+          const regex = new RegExp(`(${filterText})`, 'gi');
+          return fullText.replace(regex, '<span class="highlight">$1</span>');
+      }
+
+      function populateCustomDropdown(dropdownEl, matches, keyType, filterText) {
+          dropdownEl.innerHTML = '';
+
+          matches.forEach(item => {
+              const li = document.createElement('li');
+              li.classList.add('custom-dropdown-item');
+              li.setAttribute('role', 'option');
+
+              let displayValue;
+
+              if (keyType === 'pengunjung') {
+                  // Pastikan nama ditampilkan dalam Title Case untuk konsistensi
+                  const namaTitleCase = titleCase(item.nama);
+                  displayValue = `${namaTitleCase} (${item.nis})`;
+                  li.setAttribute('data-nis', item.nis);
+                  li.setAttribute('data-nama', namaTitleCase); // Simpan dalam format Title Case
+                  li.setAttribute('data-blok', item.blok || '');
+                  li.setAttribute('data-jenjang', item.jenjang || '');
+
+                  li.innerHTML = getHighlightedText(displayValue, filterText) + `<div class="text-xs">Blok: ${item.blok || '-'} | Jenjang: ${item.jenjang || '-'}</div>`;
+              } else { // buku
+                  // Pastikan judul ditampilkan dalam Title Case
+                  const judulTitleCase = titleCase(item.judul);
+                  displayValue = `${judulTitleCase} (${item.kode})`;
+                  li.setAttribute('data-kode', item.kode);
+                  li.setAttribute('data-judul', judulTitleCase); // Simpan dalam format Title Case
+                  li.setAttribute('data-kategori', item.kategori || '');
+
+                  li.innerHTML = getHighlightedText(displayValue, filterText) + `<div class="text-xs">Kategori: ${item.kategori || '-'}</div>`;
+              }
+
+              li.setAttribute('data-value', displayValue);
+              li.setAttribute('data-key-type', keyType);
+              dropdownEl.appendChild(li);
+          });
+
+          dropdownEl.style.display = matches.length > 0 ? 'block' : 'none';
+          dropdownEl.closest('.form-group').querySelector('input').setAttribute('aria-expanded', matches.length > 0 ? 'true' : 'false');
+      }
+
+      function selectSuggestion(inputEl, dropdownEl, li) {
+          if (!li) return;
+
+          const keyType = li.getAttribute('data-key-type');
+          const selectedValue = li.getAttribute('data-value');
+
+          inputEl.value = selectedValue;
+          dropdownEl.style.display = 'none';
+          inputEl.setAttribute('aria-expanded', 'false');
+
+          // Lakukan autofill
+          if (keyType === 'pengunjung') {
+              selectedSantri.nis = li.dataset.nis;
+              selectedSantri.nama = li.dataset.nama; // Sudah Title Case dari dropdown
+              // Blok autofill juga di-Title Case
+              blokInput.value = li.dataset.blok ? titleCase(li.dataset.blok) : '';
+              jenjangSelect.value = VALID_JENJANG.includes(li.dataset.jenjang) ? li.dataset.jenjang : '';
+
+              inputEl.classList.remove('input-error');
+              blokInput.classList.remove('input-error');
+              jenjangSelect.classList.remove('input-error');
+
+          } else if (keyType === 'buku') {
+              selectedBuku.kode = li.dataset.kode;
+              selectedBuku.judul = li.dataset.judul; // Sudah Title Case dari dropdown
+              kategoriBukuSelect.value = VALID_KATEGORI.includes(li.dataset.kategori) ? li.dataset.kategori : '';
+
+              inputEl.classList.remove('input-error');
+              kategoriBukuSelect.classList.remove('input-error');
+          }
+
+          const nextInput = inputEl.closest('.form-group').nextElementSibling?.querySelector('.input-line-style, button');
+          if (nextInput) nextInput.focus();
+      }
+
+      function handleKeydown(e, searchInput, dropdownEl) {
+          const items = dropdownEl.querySelectorAll('.custom-dropdown-item:not([style*="none"])');
+          if (items.length === 0) return;
+
+          let currentFocused = dropdownEl.querySelector('.selected');
+          let currentIndex = Array.from(items).indexOf(currentFocused);
+
+          if (e.key === 'ArrowDown') {
+              e.preventDefault();
+              currentIndex = (currentIndex < items.length - 1) ? currentIndex + 1 : 0;
+          } else if (e.key === 'ArrowUp') {
+              e.preventDefault();
+              currentIndex = (currentIndex > 0) ? currentIndex - 1 : items.length - 1;
+          } else if (e.key === 'Enter') {
+              e.preventDefault();
+              if (currentFocused) {
+                  selectSuggestion(searchInput, dropdownEl, currentFocused);
+              }
+              return;
+          } else if (e.key === 'Escape') {
+              dropdownEl.style.display = 'none';
+              searchInput.setAttribute('aria-expanded', 'false');
+              return;
+          }
+
+          items.forEach(item => item.classList.remove('selected'));
+          if (items[currentIndex]) {
+              items[currentIndex].classList.add('selected');
+              items[currentIndex].scrollIntoView({ block: "nearest" });
+          }
+      }
+
+      // --- EVENT LISTENERS: INPUT & NAVIGASI ---
+
+      function handleSearchInput(inputEl, dropdownEl, list, keyType) {
+          inputEl.classList.remove('input-error');
+
+          const val = inputEl.value.toLowerCase().trim();
+
+          if (keyType === 'pengunjung') {
+              selectedSantri = { nis: null, nama: null };
+              performAutofill('', list, keyType);
+          } else { // buku
+              selectedBuku = { kode: null, judul: null };
+              performAutofill('', list, keyType);
+          }
+
+          if(!val){
+              dropdownEl.innerHTML='';
+              dropdownEl.style.display = 'none';
+              inputEl.setAttribute('aria-expanded', 'false');
+              return;
+          }
+
+          const matches = list.filter(item => {
+              const searchField = keyType === 'pengunjung' ? item.nama.toLowerCase() : item.judul.toLowerCase();
+              const idField = keyType === 'pengunjung' ? item.nis : item.kode;
+              return searchField.includes(val) || idField.includes(val);
+          }).slice(0, 10);
+
+          populateCustomDropdown(dropdownEl, matches, keyType, inputEl.value.trim());
+
+          if (matches.length > 0) {
+                const firstItem = dropdownEl.querySelector('.custom-dropdown-item');
+                if (firstItem) firstItem.classList.add('selected');
+          }
+      }
+
+      // Helper untuk menerapkan Title Case dan menjaga kursor
+      function applyTitleCaseAndMaintainCursor(inputEl) {
+          const start = inputEl.selectionStart;
+          const end = inputEl.selectionEnd;
+          inputEl.value = titleCase(inputEl.value);
+          inputEl.setSelectionRange(start, end);
+      }
+
+      // Listener Santri
+      nisSearch.addEventListener('input', function() {
+          applyTitleCaseAndMaintainCursor(this);
+          handleSearchInput(this, nisDropdown, santriList, 'pengunjung');
+      });
+      nisSearch.addEventListener('keydown', (e) => handleKeydown(e, nisSearch, nisDropdown));
+      nisDropdown.addEventListener('click', e => {
+        const li = e.target.closest('.custom-dropdown-item'); if(!li || li.getAttribute('data-key-type') !== 'pengunjung') return;
+        selectSuggestion(nisSearch, nisDropdown, li);
+      });
+
+      // Listener Buku
+      kodeBukuSearch.addEventListener('input', function() {
+          applyTitleCaseAndMaintainCursor(this);
+          handleSearchInput(this, bukuDropdown, bukuList, 'buku');
+      });
+      kodeBukuSearch.addEventListener('keydown', (e) => handleKeydown(e, kodeBukuSearch, bukuDropdown));
+      bukuDropdown.addEventListener('click', e => {
+        const li = e.target.closest('.custom-dropdown-item'); if(!li || li.getAttribute('data-key-type') !== 'buku') return;
+        selectSuggestion(kodeBukuSearch, bukuDropdown, li);
+      });
+
+      // Event listener untuk input NON-DROPDOWN
+      const nonDropdownInputs = [blokInput, jenjangSelect, kategoriBukuSelect, keteranganSelect];
+      nonDropdownInputs.forEach(input => {
+          if (input.tagName === 'SELECT') {
+              input.addEventListener('change', function() {
+                  this.classList.remove('input-error');
+                  const nextInput = this.closest('.form-group').nextElementSibling?.querySelector('.input-line-style, button');
+                  if (nextInput) nextInput.focus();
+              });
+          } else { // input text (blokInput)
+              input.addEventListener('keypress', function(e) {
+                  if (e.key === 'Enter') {
+                      e.preventDefault();
+                      this.classList.remove('input-error');
+                      const nextInput = this.closest('.form-group').nextElementSibling?.querySelector('.input-line-style, button');
+                      if (nextInput) nextInput.focus();
+                  }
+              });
+              input.addEventListener('input', function() {
+                  this.classList.remove('input-error');
+                  // MODIFIKASI: Mengubah dari toUpperCase menjadi titleCase untuk #blok
+                  if (this.id === 'blok') {
+                      applyTitleCaseAndMaintainCursor(this);
+                  }
+              });
+          }
+      });
+
+      // BLUR untuk sembunyikan dropdown
+      document.addEventListener('click', (e) => {
+          if (!nisSearch.contains(e.target) && !nisDropdown.contains(e.target)) {
+              nisDropdown.style.display = 'none';
+              nisSearch.setAttribute('aria-expanded', 'false');
+          }
+          if (!kodeBukuSearch.contains(e.target) && !bukuDropdown.contains(e.target)) {
+              bukuDropdown.style.display = 'none';
+              kodeBukuSearch.setAttribute('aria-expanded', 'false');
+          }
+      });
+
+      // Kontrol Modal (Diaktifkan kembali)
+      closeModalBtn.addEventListener('click', hideModal);
+      successModal.addEventListener('click', (e) => {
+          if (e.target.id === 'successModal') {
+              hideModal();
+          }
+      });
+
+      // PENAMBAHAN: Pop-up bisa ditutup dengan ENTER
+      document.addEventListener('keydown', (e) => {
+          // Cek jika tombol Enter ditekan dan modal sedang aktif
+          if (e.key === 'Enter' && successModal.classList.contains('active')) {
+              e.preventDefault();
+              hideModal();
+          }
+      });
+      // ---------------------------------------------------
+
+      // --- LOGIKA SUBMIT PENGUNJUNG BARU (Dipertahankan) ---
+      $('btnSubmit').addEventListener('click', async () => {
+
+        const hasErrors = markEmptyFields();
+        if(hasErrors) {
+          const firstError = document.querySelector('.input-line-style.input-error');
+          if (firstError) firstError.focus();
+          return;
+        }
+
+        console.log('Sedang memproses data...');
+
+        const santriParsed = parseInput(nisSearch);
+        const bukuParsed = parseInput(kodeBukuSearch);
+
+        const now = new Date();
+
+        // Data yang disimpan dijamin Title Case (untuk nama, blok, dan judul)
+        const finalData = {
+          nis: santriParsed.id.trim(), // NISN/Kode tetap, tidak perlu Title Case
+          nama: titleCase(santriParsed.name), // Di-Title Case
+          blok: titleCase(blokInput.value.trim()), // Di-Title Case
+          jenjang: jenjangSelect.value,
+          kodeBuku: bukuParsed.id.trim(), // NISN/Kode tetap
+          judulBuku: titleCase(bukuParsed.name), // Di-Title Case
+          kategoriBuku: kategoriBukuSelect.value,
+          keterangan: keteranganSelect.value,
+        };
+
+        const payload = {
+          ...finalData,
+          timestamp: now.getTime(),
+          tanggal: String(now.getDate()).padStart(2, '0'),
+          bulan: String(now.getMonth() + 1).padStart(2, '0'),
+          tahun: now.getFullYear(),
+          jam: now.toTimeString().substring(0, 5)
+        };
+
+        try{
+          // 1. Update Santri Master (Menggunakan Title Case untuk nama dan blok)
+          await set(ref(db, `siswa/${finalData.nis}`), { nama: finalData.nama, blok: finalData.blok, jenjang: finalData.jenjang });
+
+          // 2. Update Buku Master (Menggunakan Title Case untuk judul)
+          await set(ref(db, `buku/${finalData.kodeBuku}`), { judul: finalData.judulBuku, kategori: finalData.kategoriBuku });
+
+          // 3. MENGIRIM DATA KUNJUNGAN BARU
+          await push(ref(db, `pengunjung`), payload);
+
+          // JIKA SUKSES: Reset form dan tampilkan pop-up
+          resetForm();
+          showModal();
+
+        } catch(e){
+          console.error("Firebase Submit Error:", e);
+          alert('GAGAL TOTAL: Kesalahan sistem saat kirim data/perbarui master. Cek Konsol.');
+        }
+      });
+
+      // Init focus & display
+      resetFormDisplay();
+      nisSearch.focus();
+    </script>
 </body>
 </html>
