@@ -1,304 +1,315 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard Perpustakaan Lubangsa - Dynamic Layout V2</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@700&display=swap" rel="stylesheet">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Perpustakaan Modern (Multi-Iframe) - Lazy Load Khusus</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght300;400;500;700&display=swap" rel="stylesheet">
     <style>
-        /* ================================================= */
-        /* 1. Variabel CSS & Reset Dasar */
-        /* ================================================= */
-
+        /* Variabel CSS (Aksen Cyan) */
         :root {
-            --color-background-soft: #f4f7fa; 
-            --color-card-background: #ffffff;
-            --color-text-dark: #2c3e50;
-            --color-sidebar-bg: #212529; /* Lebih gelap, hampir hitam */
-            --color-sidebar-text: #e9ecef; 
-            --color-primary-green: #28a745; /* Hijau yang lebih kuat */
-            --color-neon-glow: rgba(40, 167, 69, 0.7); /* Glow hijau */
-            --color-border-subtle: #dee2e6; 
-
-            --shadow-card: 0 15px 45px rgba(0, 0, 0, 0.1); /* Bayangan lebih dramatis */
-            --radius-card: 16px; 
-            --content-padding: 30px; 
-            
-            /* Variabel Khusus untuk Pencarian di Sidebar */
-            --search-card-bg: rgba(255, 255, 255, 0.1); /* Untuk efek glassmorphism */
-            --search-card-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --primary-color: #00bcd4; 
+            --primary-dark: #0097a7;  
+            --secondary-color: #6c757d; 
+            --background-light: #f4f7f9; 
+            --content-background: #ffffff; 
+            --header-height: 70px; 
+            --text-dark: #343a40; 
+            --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.1); 
         }
 
         html, body {
             height: 100%;
-            overflow: hidden;
-            background-color: var(--color-background-soft);
-            font-family: 'Poppins', sans-serif;
-            color: var(--color-text-dark);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* ================================================= */
-        /* 2. Tata Letak Utama (Full Screen Grid) */
-        /* ================================================= */
-
-        .master-card-container {
-            width: 100vw; 
-            height: 100vh;
-            display: grid;
-            /* Lebar sidebar diperlebar dari 350px menjadi 400px */
-            grid-template-columns: 400px 1fr; 
-            box-shadow: none; 
-            overflow: hidden;
-        }
-        
-        /* ================================================= */
-        /* 3. Zona Kiri (Sidebar Gelap & Animasi) */
-        /* ================================================= */
-
-        .sidebar-left {
-            background-color: var(--color-sidebar-bg);
-            color: var(--color-sidebar-text);
-            display: flex;
-            flex-direction: column;
-            padding: 0;
-            border-right: 2px solid rgba(255, 255, 255, 0.05);
-        }
-
-        /* --- Animasi Pulse untuk Jam Neon --- */
-        @keyframes neonPulse {
-            0%, 100% { text-shadow: 0 0 10px var(--color-neon-glow), 0 0 20px var(--color-neon-glow), 0 0 30px var(--color-neon-glow); }
-            50% { text-shadow: 0 0 5px var(--color-neon-glow), 0 0 15px rgba(40, 167, 69, 0.5), 0 0 25px rgba(40, 167, 69, 0.3); }
-        }
-        
-        #live-clock {
-            padding: 40px var(--content-padding);
-            /* PENTING: Rata tengah teks jam */
-            text-align: center; 
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            cursor: default;
-        }
-
-        #live-clock .time-uniform {
-            display: block;
-            font-family: 'Space Mono', monospace; 
-            font-size: 3.5em; /* Ukuran font sedikit diperbesar */
-            font-weight: 700;
-            line-height: 1;
-            margin-bottom: 8px; 
-            /* PENTING: Warna jam menjadi hijau */
-            color: var(--color-primary-green); 
-            animation: neonPulse 2s ease-in-out infinite alternate;
-        }
-
-        #live-clock .date-small {
-            display: block;
-            font-size: 1.1em; /* Ukuran font sedikit diperbesar */
-            font-weight: 300;
-            opacity: 0.8; /* Sedikit lebih terang */
-            letter-spacing: 1.5px;
-        }
-        
-        /* --- Card Pencarian dengan Efek Glassmorphism --- */
-        .iframe-area.pencarian {
-            flex-grow: 1;
-            padding: 0; 
-            display: flex; 
-            justify-content: center;
-            align-items: center;
-            background-color: transparent; 
-        }
-
-        .iframe-area.pencarian .content-iframe {
-            margin: var(--content-padding); 
-            width: calc(100% - (2 * var(--content-padding))); 
-            height: calc(100% - (2 * var(--content-padding)));
-            
-            border-radius: var(--radius-card); 
-            
-            /* Glassmorphism Effect */
-            background: var(--search-card-bg); 
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            
-            box-shadow: var(--search-card-shadow);
-            position: relative; 
+            margin: 0;
             overflow: hidden; 
         }
 
-        .iframe-area.pencarian .content-iframe:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-        }
-        
-        /* ================================================= */
-        /* 4. Zona Kanan (Area Kerja Terang) - Form Kunjungan */
-        /* ================================================= */
-
-        .main-content-right {
-            background-color: var(--color-card-background);
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: var(--background-light);
+            color: var(--text-dark);
             display: flex;
             flex-direction: column;
-            overflow: hidden;
-            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.05);
         }
 
-        .iframe-area.kunjungan {
-            flex-grow: 1;
-            padding: var(--content-padding);
+        /* --- Header (Branding dan Navigasi) --- */
+        header {
+            height: var(--header-height);
+            background: var(--content-background);
+            color: var(--primary-color);
+            padding: 0 30px;
+            box-shadow: var(--shadow-subtle);
+            display: flex;
+            align-items: center; 
+            justify-content: space-between; 
+            flex-shrink: 0; 
+            
+            position: relative; 
+            z-index: 1001; 
+        }
+        
+        .branding {
+            font-size: 1.5em;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+        .branding i {
+            margin-right: 15px;
+            font-size: 1.2em;
+            color: var(--primary-dark);
         }
 
-        .iframe-area.kunjungan .content-iframe {
+        /* Navigasi Ikon Header */
+        #header-nav {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-icon {
+            background: none; 
+            border: none;
+            color: var(--secondary-color);
+            padding: 10px;
+            cursor: pointer;
+            font-size: 1.4em; 
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            position: relative; 
+            outline: none;
+            display: block;
+        }
+
+        /* Efek Hover (Saat Disentuh - untuk tombol non-aktif) */
+        .nav-icon:hover {
+            color: var(--primary-color); 
+            background-color: #f0f0f0; 
+        }
+        
+        /* Gaya Aktif (Hanya Warna) */
+        .nav-icon.active {
+            color: var(--primary-color); 
+            background: transparent; 
+            box-shadow: none; 
+            transform: none; 
+            font-weight: 700; 
+            cursor: default; 
+        }
+        
+        /* Gaya Tooltip Modern (Default Hidden) */
+        .nav-icon::after {
+            content: attr(data-tooltip); 
+            position: absolute;
+            bottom: -40px; 
+            left: 50%; 
+            transform: translate(-50%, 10px); 
+            
+            background-color: rgba(30, 30, 30, 0.9); 
+            color: white;
+            padding: 7px 12px;
+            border-radius: 6px; 
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); 
+            font-size: 0.9em;
+            font-weight: 400;
+            
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            
+            z-index: 10; 
+            pointer-events: none; 
+        }
+
+        /* Tooltip saat Hover/Focus (untuk tombol non-aktif) */
+        .nav-icon:hover::after,
+        .nav-icon:focus::after { 
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, 0); 
+        }
+        
+        /* Pengecualian Posisi Tooltip untuk Ikon Terakhir */
+        #header-nav .nav-icon:last-child::after {
+            left: auto; 
+            right: 0; 
+            transform: translate(0, 10px); 
+        }
+        
+        #header-nav .nav-icon:last-child:hover::after,
+        #header-nav .nav-icon:last-child:focus::after {
+            transform: translate(0, 0); 
+        }
+
+        /* Sembunyikan tooltip pada tombol yang aktif */
+        .nav-icon.active:hover::after,
+        .nav-icon.active:focus::after {
+            opacity: 0 !important;
+            visibility: hidden !important;
+            transform: translate(-50%, 10px) !important;
+        }
+        
+        /* Timpa pengecualian tombol aktif (penting untuk ikon terakhir) */
+        #header-nav .nav-icon.active:last-child:hover::after,
+        #header-nav .nav-icon.active:last-child:focus::after {
+            opacity: 0 !important;
+            visibility: hidden !important;
+            transform: translate(0, 10px) !important;
+        }
+        
+        .nav-icon.active:hover {
+            background-color: transparent;
+        }
+
+
+        /* --- Kontainer Utama (Menampung Iframe) --- */
+        #main-container {
+            flex-grow: 1; 
+            overflow: hidden; 
+            padding: 0; 
+            position: relative; 
+        }
+
+        /* Gaya Iframe Tumpuk */
+        .page-iframe {
             width: 100%;
             height: 100%;
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-            overflow-y: auto;
-        }
+            border: none; 
+            border-radius: 0; 
+            box-shadow: none;
+            background: var(--content-background); 
+            
+            position: absolute;
+            top: 0;
+            left: 0;
 
-        /* ================================================= */
-        /* 5. Scrollbar Kustom untuk Iframe (Webkit) */
-        /* ================================================= */
-        
-        .iframe-area.kunjungan .content-iframe::-webkit-scrollbar,
-        .iframe-area.pencarian .content-iframe::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        .iframe-area.kunjungan .content-iframe::-webkit-scrollbar-thumb,
-        .iframe-area.pencarian .content-iframe::-webkit-scrollbar-thumb {
-            background-color: rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
-        }
-
-        .iframe-area.kunjungan .content-iframe::-webkit-scrollbar-track,
-        .iframe-area.pencarian .content-iframe::-webkit-scrollbar-track {
-            background: transparent;
+            display: none; 
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            
+            z-index: 1000; 
         }
         
-        /* ================================================= */
-        /* 6. Responsif untuk Layar Kecil */
-        /* ================================================= */
-        
-        @media (max-width: 1000px) {
-            html, body { height: auto; overflow-y: auto; background-color: var(--color-background-soft); }
-            
-            .master-card-container {
-                width: 100vw; height: auto; min-height: 100vh;
-                grid-template-columns: 1fr; 
-            }
-            
-            .sidebar-left {
-                min-height: 400px; 
-                border-right: none;
-                border-bottom: 8px solid var(--color-background-soft);
-                align-items: center; 
-                justify-content: center;
-            }
-            
-            #live-clock { text-align: center; border-bottom: none; padding: 20px; }
-            
-            .main-content-right { min-height: 500px; box-shadow: none; }
-            
-            .iframe-area.pencarian .content-iframe {
-                margin: 20px; 
-                width: calc(100% - 40px);
-                height: calc(100% - 40px);
-                backdrop-filter: none; 
-                background: var(--color-card-background); 
-                border: none;
-            }
+        .page-iframe.active {
+            display: block; 
+            opacity: 1;
         }
         
     </style>
 </head>
 <body>
 
-    <main class="master-card-container" role="main">
+<header>
+    <div class="branding">
+        <i class="fas fa-book-open"></i>
+        SISTEM PERPUSTAKAAN
+    </div>
+    
+    <nav id="header-nav">
         
-        <div class="sidebar-left">
-            
-            <header id="live-clock" role="timer">
-                <span class="time-uniform">--:--:--</span>
-                <span class="date-small">Memuat Tanggal...</span>
-            </header>
-            
-            <div class="iframe-area pencarian">
-                 <iframe 
-                    src="https://perpustakaanlubangsa.github.io/pencarian" 
-                    class="content-iframe"
-                    title="Halaman Pencarian Katalog Buku"
-                    loading="lazy">
-                </iframe>
-            </div>
-            
-        </div>
+        <button data-target-id="iframe-peminjam" data-tooltip="Beranda" class="nav-icon active">
+            <i class="fas fa-home"></i>
+        </button>
+        <button data-target-id="iframe-pinjam" data-tooltip="Pinjam Buku" class="nav-icon">
+            <i class="fas fa-clipboard-list"></i>
+        </button>
+        <button data-target-id="iframe-keterlambatan" data-tooltip="Daftar Keterlambatan" class="nav-icon">
+            <i class="fas fa-hourglass-half"></i>
+        </button>
+        <button data-target-id="iframe-buku" data-tooltip="Manajemen Buku" class="nav-icon">
+            <i class="fas fa-book"></i>
+        </button>
+        <button data-target-id="iframe-keanggotaan" data-tooltip="Manajemen Keanggotaan" class="nav-icon">
+            <i class="fas fa-users"></i>
+        </button>
+        <button data-target-id="iframe-pinjamankhusus" data-tooltip="Pinjaman Khusus" class="nav-icon">
+            <i class="fas fa-file-invoice"></i> 
+        </button>
+    </nav>
+</header>
 
-        <section class="main-content-right" aria-label="Area Form Kunjungan Utama">
-            
-            <div class="iframe-area kunjungan">
-                <iframe 
-                    src="https://perpustakaanlubangsa.github.io/pengunjung" 
-                    class="content-iframe"
-                    title="Halaman Pengunjung Perpustakaan"
-                    loading="lazy">
-                </iframe>
-            </div>
+<div id="main-container">
+    <iframe id="iframe-peminjam" src="daftarpeminjam.html" frameborder="0" class="page-iframe active"></iframe>
+    <iframe id="iframe-pinjam" src="pinjam.html" frameborder="0" class="page-iframe"></iframe>
+    <iframe id="iframe-keterlambatan" src="daftarketerlambatan.html" frameborder="0" class="page-iframe"></iframe>
+    
+    <iframe id="iframe-buku" data-src="buku.html" frameborder="0" class="page-iframe"></iframe>
+    <iframe id="iframe-keanggotaan" data-src="keanggotaan.html" frameborder="0" class="page-iframe"></iframe>
+    <iframe id="iframe-pinjamankhusus" data-src="pinjamankhusus.html" frameborder="0" class="page-iframe"></iframe>
+</div>
 
-        </section>
+<script>
+    const navButtons = document.querySelectorAll('.nav-icon');
+    let activeIframeId = 'iframe-peminjam'; 
 
-    </main>
+    function switchPage(targetId, targetButton) {
+        if (activeIframeId === targetId) return;
 
-    <script>
-        function updateClock() {
-            const now = new Date();
-
-            const timeOptions = {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false,
-                timeZone: 'Asia/Jakarta' 
-            };
-
-            const dateOptions = {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            };
-
-            const locale = 'id-ID'; 
-            
-            const timeFull = now.toLocaleTimeString(locale, timeOptions);
-            const datePart = now.toLocaleDateString(locale, dateOptions);
-            
-            const timeEl = document.querySelector('#live-clock .time-uniform');
-            const dateEl = document.querySelector('#live-clock .date-small');
-
-            if (timeEl && dateEl) {
-                timeEl.textContent = timeFull;
-                dateEl.textContent = datePart;
-            }
+        // 1. Sembunyikan iframe yang sedang aktif
+        const currentIframe = document.getElementById(activeIframeId);
+        if (currentIframe) {
+            currentIframe.classList.remove('active');
         }
 
-        updateClock();
-        setInterval(updateClock, 1000);
-    </script>
+        // 2. Tampilkan iframe baru dan cek Lazy Load
+        const newIframe = document.getElementById(targetId);
+        if (newIframe) {
+            // KUNCI: LAZY LOAD LOGIC
+            const lazySrc = newIframe.getAttribute('data-src');
+            if (lazySrc && !newIframe.src) {
+                // Jika data-src ada dan src masih kosong, muat halamannya sekarang
+                newIframe.src = lazySrc;
+                // Optional: hapus data-src setelah dimuat (agar tidak dimuat ulang)
+                newIframe.removeAttribute('data-src'); 
+                console.log(`Lazy loading: ${targetId} dari ${lazySrc}`);
+            }
+            
+            newIframe.classList.add('active');
+            activeIframeId = targetId; 
+        }
+        
+        // 3. Update tombol aktif
+        updateActiveButton(targetButton);
+    }
+
+    function updateActiveButton(targetButton) {
+        navButtons.forEach(button => {
+            button.classList.remove('active');
+        });
+        targetButton.classList.add('active');
+    }
+
+    navButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target-id');
+            switchPage(targetId, this);
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const initialButton = document.querySelector('.nav-icon.active');
+        
+        if (initialButton) {
+             updateActiveButton(initialButton);
+        }
+
+        // Pastikan hanya iframe default yang terlihat
+        document.querySelectorAll('.page-iframe').forEach(iframe => {
+            if (iframe.id !== activeIframeId) {
+                iframe.classList.remove('active');
+            } else {
+                iframe.classList.add('active');
+            }
+            
+            // Catatan: Iframe yang lazy load akan muncul sebagai src="" 
+            // atau tanpa src (akan dimuat nanti oleh switchPage)
+        });
+    });
+</script>
 
 </body>
 </html>
