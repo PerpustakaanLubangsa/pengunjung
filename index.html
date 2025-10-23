@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Form Kunjungan Perpustakaan | Full Page White</title>
+    <title>Form Kunjungan Perpustakaan | Monokromatik Hijau</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
@@ -22,13 +22,20 @@
 
     <style>
       /* ---------------------------------------------------- */
-      /* WHITE BODY & FULL PAGE STYLES (DIUBAH) */
+      /* SKEMA WARNA: HIJAU MONOKROMATIK */
       /* ---------------------------------------------------- */
+      :root {
+          /* Definisi Palet Hijau */
+          --color-green-medium: #4CAF50;    /* Green 500 - Primary */
+          --color-green-dark: #388E3C;      /* Green 700 - Focus/Dark */
+          --color-green-light: #66BB6A;     /* Green 400 - Line/Hover */
+          --color-green-soft-bg: #E8F5E9;   /* Green 50 - Body/Container Background */
+      }
 
       body {
           font-family: 'Poppins', sans-serif;
-          /* Background diubah menjadi #DCEEFF */
-          background-color: #DCEEFF; 
+          /* Background diubah menjadi Hijau Sangat Pucat */
+          background-color: var(--color-green-soft-bg); 
           color: #333333;
           display: flex;
           justify-content: center;
@@ -41,8 +48,8 @@
           max-width: 600px;
           padding: 30px;
           margin: 0 auto;
-          /* Container tetap putih untuk kontras */
-          background: #DCEEFF; 
+          /* Container menyatu dengan body background */
+          background: var(--color-green-soft-bg); 
           border-radius: 0; 
           box-shadow: none;
           width: 100%;
@@ -56,7 +63,7 @@
       }
 
       /* ---------------------------------------------------- */
-      /* GARIS BAWAH CYAN INPUT & DROPDOWN STYLES */
+      /* GARIS BAWAH HIJAU INPUT & DROPDOWN STYLES */
       /* ---------------------------------------------------- */
 
       .form-group {
@@ -70,7 +77,8 @@
           margin-bottom: 15px;
           border: none;
           outline: none;
-          border-bottom: 2px solid #00BCD4;
+          /* Garis default menggunakan Hijau yang lebih lembut */
+          border-bottom: 2px solid var(--color-green-light); 
           background-color: transparent;
           color: #333333;
           transition: border-bottom-color 0.3s, border-bottom-width 0.3s;
@@ -83,10 +91,11 @@
       }
 
       .input-line-style:focus {
-          border-bottom: 3px solid #00AABF;
+          /* Garis focus menggunakan Hijau Gelap */
+          border-bottom: 3px solid var(--color-green-dark);
       }
 
-      /* GAYA ERROR: Garis Merah */
+      /* GAYA ERROR: Garis Merah (Dipertahankan untuk Kontras Error) */
       .input-line-style.input-error {
           border-bottom-color: #EF4444 !important;
           border-bottom-width: 3px !important;
@@ -135,15 +144,15 @@
 
       .custom-dropdown-item:hover,
       .custom-dropdown-item.selected {
-          /* GAYA FULL COLOR FOCUS */
-          background-color: #00BCD4; 
+          /* GAYA FULL COLOR FOCUS menggunakan Hijau Medium */
+          background-color: var(--color-green-medium); 
           color: #FFFFFF; 
       }
 
       .custom-dropdown-item span.highlight {
-          /* Highlight pada state normal */
-          color: #007bb6;
-          background-color: #f0f0f0;
+          /* Highlight pada state normal menggunakan Hijau Gelap */
+          color: var(--color-green-dark);
+          background-color: var(--color-green-soft-bg); /* Background Pucat */
           font-weight: 600;
           padding: 1px 3px;
           border-radius: 4px;
@@ -153,7 +162,7 @@
       .custom-dropdown-item:hover span.highlight {
           /* Highlight pada state focus/selected */
           color: #FFFFFF; 
-          background-color: #007bb6; 
+          background-color: var(--color-green-dark); 
       }
 
 
@@ -170,9 +179,10 @@
           color: #e0f7fa; 
       }
 
-      /* Tombol Submit (Tetap) */
+      /* Tombol Submit */
       #btnSubmit {
-          background-color: #00BCD4;
+          /* Warna tombol menggunakan Hijau Medium */
+          background-color: var(--color-green-medium);
           color: white;
           padding: 12px 25px;
           border: none;
@@ -186,12 +196,13 @@
           @apply shadow-none hover:shadow-none;
       }
       #btnSubmit:hover {
-          background-color: #00AABF;
+          /* Warna hover menggunakan Hijau Gelap */
+          background-color: var(--color-green-dark);
           transform: translateY(-1px);
       }
 
       /* ---------------------------------------------------- */
-      /* MODAL (Pop-up Sukses) (Tetap) */
+      /* MODAL (Pop-up Sukses) */
       /* ---------------------------------------------------- */
       .modal-overlay {
           position: fixed;
@@ -224,26 +235,35 @@
           transition: transform 0.3s ease-out;
       }
 
-      /* GAYA TEXT (Tetap) */
+      /* GAYA TEXT (Tailwind Overrides) */
       .text-gray-800 { color: #1f2937; }
       .text-gray-600 { color: #4b5563; }
-      .border-cyan-500 { border-color: #06b6d4; }
-
+      /* Mengganti border-cyan-500 dengan class custom border-green-500-custom */
+      .border-green-500-custom { border-color: var(--color-green-medium); }
+      
+      /* Tambahkan gaya untuk modal button */
+      .bg-green-600-custom { 
+          background-color: var(--color-green-medium);
+          transition: background-color 0.3s;
+      }
+      .bg-green-600-custom:hover {
+          background-color: var(--color-green-dark);
+      }
     </style>
 </head>
 
 <body>
 
     <div id="single-form-container">
-      <h1 class="text-3xl font-bold text-gray-800 mb-8 border-b-4 border-cyan-500 pb-2">Form Kunjungan Perpustakaan</h1>
+      <h1 class="text-3xl font-bold text-gray-800 mb-8 border-b-4 border-green-500-custom pb-2">Form Kunjungan Perpustakaan</h1>
 
       <div class="space-y-6">
 
           <h3 class="font-bold text-2xl border-b pb-2 text-gray-800 pt-4 mb-4" style="border-color: #e0e0e0;">Data Santri</h3>
 
           <div class="form-group visible" id="group-santri">
-              <label for="nisSearch">Nama & NISN Santri</label>
-              <input type="text" id="nisSearch" placeholder="Ketik Nama atau NISN..." class="input-line-style" autocomplete="off" autofocus aria-autocomplete="list" aria-controls="dd-nisSearch" data-next-group="group-blok">
+              <label for="nisSearch">Nama, NISN, atau Blok Santri</label>
+              <input type="text" id="nisSearch" placeholder="Ketik Nama, NISN, atau Blok..." class="input-line-style" autocomplete="off" autofocus aria-autocomplete="list" aria-controls="dd-nisSearch" data-next-group="group-blok">
               <ul id="dd-nisSearch" class="custom-dropdown" role="listbox"></ul>
           </div>
 
@@ -306,14 +326,14 @@
 
     <div id="successModal" class="modal-overlay">
       <div class="modal-content text-center">
-        <div class="text-6xl text-cyan-600 mb-4">
+        <div class="text-6xl mb-4" style="color: #4CAF50;">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
         <h4 class="text-2xl font-bold text-gray-800 mb-2">Data Kunjungan Berhasil Dikirim!</h4>
         <p class="text-gray-600 mb-6">Terima kasih. Data form telah direset dan siap untuk entri berikutnya.</p>
-        <button id="closeModalBtn" class="bg-cyan-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-cyan-700 transition">Tutup</button>
+        <button id="closeModalBtn" class="bg-green-600-custom text-white px-6 py-2 rounded-lg font-semibold transition">Tutup</button>
       </div>
     </div>
 
@@ -483,7 +503,13 @@
       // --- DATA LOADING (Tidak Berubah) ---
       onValue(ref(db, 'siswa'), (snap) => {
           const data = snap.val();
-          santriList = data ? Object.entries(data).map(([nis, val]) => ({ nis, nama: val.nama, blok: val.blok, jenjang: val.jenjang ? val.jenjang.toUpperCase() : '' })) : [];
+          // Simpan 'blok' dalam format Title Case agar konsisten dengan inputan user
+          santriList = data ? Object.entries(data).map(([nis, val]) => ({ 
+              nis, 
+              nama: val.nama, 
+              blok: val.blok ? titleCase(val.blok) : '', 
+              jenjang: val.jenjang ? val.jenjang.toUpperCase() : '' 
+          })) : [];
       });
 
       onValue(ref(db, 'buku'), (snap) => {
@@ -631,7 +657,11 @@
           const matches = list.filter(item => {
               const searchField = keyType === 'pengunjung' ? item.nama.toLowerCase() : item.judul.toLowerCase();
               const idField = keyType === 'pengunjung' ? item.nis : item.kode;
-              return searchField.includes(val) || idField.includes(val);
+              
+              // LOGIKA PENCARIAN BERDASARKAN BLOK/KAMAR
+              const blockField = (keyType === 'pengunjung' && item.blok) ? item.blok.toLowerCase() : ''; 
+              
+              return searchField.includes(val) || idField.includes(val) || blockField.includes(val);
           }).slice(0, 10);
 
           populateCustomDropdown(dropdownEl, matches, keyType, inputEl.value.trim());
