@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Form Kunjungan Perpustakaan | Monokromatik Hijau</title>
+    <title>Form Kunjungan Perpustakaan | Tema Gelap Dark Cyan</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
@@ -22,21 +22,28 @@
 
     <style>
       /* ---------------------------------------------------- */
-      /* SKEMA WARNA: HIJAU MONOKROMATIK */
+      /* SKEMA WARNA BARU: TEMA GELAP DENGAN AKSEN DARK CYAN */
       /* ---------------------------------------------------- */
       :root {
-          /* Definisi Palet Hijau */
-          --color-green-medium: #4CAF50;    /* Green 500 - Primary */
-          --color-green-dark: #388E3C;      /* Green 700 - Focus/Dark */
-          --color-green-light: #66BB6A;     /* Green 400 - Line/Hover */
-          --color-green-soft-bg: #E8F5E9;   /* Green 50 - Body/Container Background */
+          /* --- MODIFIKASI: Definisi Palet Dark Cyan untuk Aksen --- */
+          --color-cyan-primary: #00838F;      /* Cyan 800 - Primary/Accent (Darker) */
+          --color-cyan-dark: #006064;         /* Cyan 900 - Focus/Dark (Darkest) */
+          --color-cyan-light: #4DD0E1;        /* Cyan 400 - Line/Hover (Tetap Light untuk kontras garis) */
+          
+          /* Definisi Palet Gelap */
+          --color-dark-main-bg: #121212;      /* Background Utama */
+          --color-dark-container-bg: #121212; /* Background Kontainer */
+          --color-dark-border: #333333;       /* Garis Pembatas */
+          --color-text-light: #F0F0F0;        /* Teks Utama */
+          --color-text-secondary: #AAAAAA;    /* Teks Sekunder/Label */
+          --color-text-header: #FFFFFF;       /* Teks Header */
       }
 
       body {
           font-family: 'Poppins', sans-serif;
-          /* Background diubah menjadi Hijau Sangat Pucat */
-          background-color: var(--color-green-soft-bg); 
-          color: #333333;
+          /* Background diubah menjadi Gelap */
+          background-color: var(--color-dark-main-bg); 
+          color: var(--color-text-light);
           display: flex;
           justify-content: center;
           align-items: flex-start;
@@ -48,22 +55,31 @@
           max-width: 600px;
           padding: 30px;
           margin: 0 auto;
-          /* Container menyatu dengan body background */
-          background: var(--color-green-soft-bg); 
-          border-radius: 0; 
-          box-shadow: none;
+          /* Container dengan warna gelap sekunder */
+          background: var(--color-dark-container-bg); 
+          border-radius: 8px; /* Tambahkan sedikit radius */
           width: 100%;
+      }
+
+      h1, .text-3xl {
+          color: var(--color-text-header) !important;
+          border-color: var(--color-cyan-primary) !important;
+      }
+      
+      h3, .text-2xl {
+          color: var(--color-text-header) !important;
+          border-color: var(--color-dark-border) !important;
       }
 
       label {
           display: block;
           margin-top: 20px;
           font-weight: 600;
-          color: #444444;
+          color: var(--color-text-secondary);
       }
 
       /* ---------------------------------------------------- */
-      /* GARIS BAWAH HIJAU INPUT & DROPDOWN STYLES */
+      /* GARIS BAWAH CYAN INPUT & DROPDOWN STYLES */
       /* ---------------------------------------------------- */
 
       .form-group {
@@ -77,10 +93,10 @@
           margin-bottom: 15px;
           border: none;
           outline: none;
-          /* Garis default menggunakan Hijau yang lebih lembut */
-          border-bottom: 2px solid var(--color-green-light); 
+          /* Garis default menggunakan Warna Pembatas Gelap */
+          border-bottom: 2px solid var(--color-dark-border); 
           background-color: transparent;
-          color: #333333;
+          color: var(--color-text-light); /* Teks terang */
           transition: border-bottom-color 0.3s, border-bottom-width 0.3s;
           font-size: 17px;
           box-sizing: border-box;
@@ -91,29 +107,37 @@
       }
 
       .input-line-style:focus {
-          /* Garis focus menggunakan Hijau Gelap */
-          border-bottom: 3px solid var(--color-green-dark);
+          /* Garis focus menggunakan Cyan Primary (Dark Cyan) */
+          border-bottom: 3px solid var(--color-cyan-primary);
       }
 
-      /* GAYA ERROR: Garis Merah (Dipertahankan untuk Kontras Error) */
+      /* GAYA ERROR: Garis Merah */
       .input-line-style.input-error {
-          border-bottom-color: #EF4444 !important;
+          border-bottom-color: #F44336 !important; /* Merah kontras di tema gelap */
           border-bottom-width: 3px !important;
           box-shadow: none !important;
       }
 
-      /* Override Select Box (Tetap) */
+      /* Override Select Box */
       #jenjang, #kategoriBuku, #keterangan {
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%236B7280'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd' /%3E%3C/svg%3E");
+          /* Ganti SVG panah menjadi warna terang/sekunder */
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23AAAAAA'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd' /%3E%3C/svg%3E");
           background-repeat: no-repeat;
           background-position: right 0px center;
           background-size: 1.5em;
           padding-right: 2.5rem;
           background-color: transparent;
+          color: var(--color-text-light);
+      }
+      
+      /* Pastikan option di select terlihat di tema gelap */
+      select option {
+        background-color: var(--color-dark-container-bg);
+        color: var(--color-text-light);
       }
 
       /* ---------------------------------------------------- */
-      /* DROPDOWN KUSTOM (FULL COLOR FOCUS) */
+      /* DROPDOWN KUSTOM (FULL COLOR FOCUS - DARK CYAN) */
       /* ---------------------------------------------------- */
       .custom-dropdown {
           position: absolute;
@@ -121,10 +145,10 @@
           left: 0;
           right: 0;
           
-          border: 1px solid #d1d5db;
-          background-color: #ffffff;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-          border-radius: 8px;
+          border: 1px solid var(--color-dark-border);
+          background-color: var(--color-dark-container-bg); /* Latar belakang gelap */
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+          border-radius: 4px; /* Sedikit lebih kecil agar lebih "dark theme" */
           
           list-style: none;
           padding: 5px 0;
@@ -135,7 +159,7 @@
       }
 
       .custom-dropdown-item {
-          color: #333333;
+          color: var(--color-text-light);
           padding: 10px 15px;
           cursor: pointer;
           transition: background-color 0.2s, color 0.2s;
@@ -144,31 +168,33 @@
 
       .custom-dropdown-item:hover,
       .custom-dropdown-item.selected {
-          /* GAYA FULL COLOR FOCUS menggunakan Hijau Medium */
-          background-color: var(--color-green-medium); 
-          color: #FFFFFF; 
+          /* GAYA FULL COLOR FOCUS menggunakan Dark Cyan Primary */
+          background-color: var(--color-cyan-primary); 
+          color: var(--color-text-header); /* Teks putih solid */
       }
 
+      /* --- START MODIFIKASI: Menghapus Efek Stabilo (Sudah Diterapkan) --- */
       .custom-dropdown-item span.highlight {
-          /* Highlight pada state normal menggunakan Hijau Gelap */
-          color: var(--color-green-dark);
-          background-color: var(--color-green-soft-bg); /* Background Pucat */
-          font-weight: 600;
-          padding: 1px 3px;
-          border-radius: 4px;
+          /* Hapus efek stabilo, jadikan teks biasa */
+          color: inherit; 
+          background-color: transparent; 
+          font-weight: inherit;
+          padding: 0;
+          border-radius: 0;
       }
 
       .custom-dropdown-item.selected span.highlight,
       .custom-dropdown-item:hover span.highlight {
-          /* Highlight pada state focus/selected */
-          color: #FFFFFF; 
-          background-color: var(--color-green-dark); 
+          /* Hapus efek stabilo saat focus, jadikan teks putih seperti item normal */
+          color: inherit;
+          background-color: transparent; 
       }
+      /* --- END MODIFIKASI --- */
 
 
       /* GAYA TEXT TAMBAHAN DI DROPDOWN ITEM */
       .custom-dropdown-item .text-xs {
-          color: #6b7280;
+          color: var(--color-text-secondary); /* Teks deskripsi abu-abu */
           margin-top: 2px;
           font-size: 13px;
       }
@@ -176,14 +202,14 @@
       .custom-dropdown-item.selected .text-xs,
       .custom-dropdown-item:hover .text-xs {
           /* Teks deskripsi diubah menjadi putih juga saat focus */
-          color: #e0f7fa; 
+          color: var(--color-text-header); 
       }
 
       /* Tombol Submit */
       #btnSubmit {
-          /* Warna tombol menggunakan Hijau Medium */
-          background-color: var(--color-green-medium);
-          color: white;
+          /* Warna tombol menggunakan Dark Cyan Primary */
+          background-color: var(--color-cyan-primary);
+          color: var(--color-text-header);
           padding: 12px 25px;
           border: none;
           border-radius: 6px;
@@ -196,8 +222,8 @@
           @apply shadow-none hover:shadow-none;
       }
       #btnSubmit:hover {
-          /* Warna hover menggunakan Hijau Gelap */
-          background-color: var(--color-green-dark);
+          /* Warna hover menggunakan Dark Cyan Darker */
+          background-color: var(--color-cyan-dark);
           transform: translateY(-1px);
       }
 
@@ -210,7 +236,7 @@
           left: 0;
           width: 100%;
           height: 100%;
-          background: rgba(0, 0, 0, 0.7);
+          background: rgba(0, 0, 0, 0.8); /* Lebih gelap */
           display: none;
           justify-content: center;
           align-items: center;
@@ -225,29 +251,36 @@
       }
 
       .modal-content {
-          background: #ffffff;
+          background: var(--color-dark-container-bg); /* Konten modal gelap */
+          color: var(--color-text-light);
           padding: 30px;
           border-radius: 12px;
           max-width: 400px;
           width: 90%;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
           transform: translateY(-50px);
           transition: transform 0.3s ease-out;
+          border: 1px solid var(--color-cyan-primary); /* Border Dark Cyan */
       }
 
-      /* GAYA TEXT (Tailwind Overrides) */
-      .text-gray-800 { color: #1f2937; }
-      .text-gray-600 { color: #4b5563; }
-      /* Mengganti border-cyan-500 dengan class custom border-green-500-custom */
-      .border-green-500-custom { border-color: var(--color-green-medium); }
+      /* GAYA TEXT (Tailwind Overrides disesuaikan untuk Dark Theme) */
+      .text-gray-800 { color: var(--color-text-header); }
+      .text-gray-600 { color: var(--color-text-secondary); }
+      
+      /* Mengganti class custom dengan Dark Cyan */
+      .border-cyan-500-custom { border-color: var(--color-cyan-primary); }
+      
+      /* Tambahkan gaya untuk modal icon */
+      .text-cyan-500-custom { color: var(--color-cyan-primary); }
       
       /* Tambahkan gaya untuk modal button */
-      .bg-green-600-custom { 
-          background-color: var(--color-green-medium);
+      .bg-cyan-600-custom { 
+          background-color: var(--color-cyan-primary);
+          color: var(--color-text-header);
           transition: background-color 0.3s;
       }
-      .bg-green-600-custom:hover {
-          background-color: var(--color-green-dark);
+      .bg-cyan-600-custom:hover {
+          background-color: var(--color-cyan-dark);
       }
     </style>
 </head>
@@ -255,11 +288,11 @@
 <body>
 
     <div id="single-form-container">
-      <h1 class="text-3xl font-bold text-gray-800 mb-8 border-b-4 border-green-500-custom pb-2">Form Kunjungan Perpustakaan</h1>
+      <h1 class="text-3xl font-bold text-gray-800 mb-8 border-b-4 border-cyan-500-custom pb-2">Form Kunjungan Perpustakaan</h1>
 
       <div class="space-y-6">
 
-          <h3 class="font-bold text-2xl border-b pb-2 text-gray-800 pt-4 mb-4" style="border-color: #e0e0e0;">Data Santri</h3>
+          <h3 class="font-bold text-2xl border-b pb-2 text-gray-800 pt-4 mb-4">Data Santri</h3>
 
           <div class="form-group visible" id="group-santri">
               <label for="nisSearch">Nama, NISN, atau Blok Santri</label>
@@ -282,7 +315,7 @@
               </select>
           </div>
 
-          <h3 class="font-bold text-2xl border-b pb-2 text-gray-800 pt-8 mb-4" style="border-color: #e0e0e0;">Data Buku</h3>
+          <h3 class="font-bold text-2xl border-b pb-2 text-gray-800 pt-8 mb-4">Data Buku</h3>
 
           <div class="form-group visible" id="group-bukuSearch">
               <label for="kodeBukuSearch">Judul & Kode Buku</label>
@@ -326,19 +359,21 @@
 
     <div id="successModal" class="modal-overlay">
       <div class="modal-content text-center">
-        <div class="text-6xl mb-4" style="color: #4CAF50;">
+        <div class="text-6xl mb-4 text-cyan-500-custom">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
         <h4 class="text-2xl font-bold text-gray-800 mb-2">Data Kunjungan Berhasil Dikirim!</h4>
         <p class="text-gray-600 mb-6">Terima kasih. Data form telah direset dan siap untuk entri berikutnya.</p>
-        <button id="closeModalBtn" class="bg-green-600-custom text-white px-6 py-2 rounded-lg font-semibold transition">Tutup</button>
+        <button id="closeModalBtn" class="bg-cyan-600-custom text-white px-6 py-2 rounded-lg font-semibold transition">Tutup</button>
       </div>
     </div>
 
 
     <script type="module">
+      // LOGIKA JAVASCRIPT TETAP DIJAGA KARENA SUDAH EFISIEN
+
       // --- FIREBASE IMPORTS & CONFIG ---
       import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
       import { getDatabase, ref, set, onValue, push } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js';
@@ -519,10 +554,10 @@
 
       // --- FUNGSI DROPDOWN KUSTOM ---
 
+      /* --- FUNGSI MODIFIKASI: Tidak ada highlight / stabilo --- */
       function getHighlightedText(fullText, filterText) {
-          if (!filterText) return fullText;
-          const regex = new RegExp(`(${filterText})`, 'gi');
-          return fullText.replace(regex, '<span class="highlight">$1</span>');
+          // Hanya mengembalikan teks utuh tanpa tag <span> highlight
+          return fullText;
       }
 
       function populateCustomDropdown(dropdownEl, matches, keyType, filterText) {
@@ -544,6 +579,7 @@
                   li.setAttribute('data-blok', item.blok || '');
                   li.setAttribute('data-jenjang', item.jenjang || '');
 
+                  // Menggunakan getHighlightedText (yang sudah dimodifikasi)
                   li.innerHTML = getHighlightedText(displayValue, filterText) + `<div class="text-xs">Blok: ${item.blok || '-'} | Jenjang: ${item.jenjang || '-'}</div>`;
               } else { // buku
                   // Pastikan judul ditampilkan dalam Title Case
@@ -553,6 +589,7 @@
                   li.setAttribute('data-judul', judulTitleCase); // Simpan dalam format Title Case
                   li.setAttribute('data-kategori', item.kategori || '');
 
+                  // Menggunakan getHighlightedText (yang sudah dimodifikasi)
                   li.innerHTML = getHighlightedText(displayValue, filterText) + `<div class="text-xs">Kategori: ${item.kategori || '-'}</div>`;
               }
 
@@ -659,8 +696,10 @@
               const idField = keyType === 'pengunjung' ? item.nis : item.kode;
               
               // LOGIKA PENCARIAN BERDASARKAN BLOK/KAMAR
+              // --- PERBAIKAN DROPDOWN AUTOCUMPLETE: Mengakses item.blok secara langsung ---
               const blockField = (keyType === 'pengunjung' && item.blok) ? item.blok.toLowerCase() : ''; 
-              
+              // --- AKHIR PERBAIKAN ---
+
               return searchField.includes(val) || idField.includes(val) || blockField.includes(val);
           }).slice(0, 10);
 
