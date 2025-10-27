@@ -127,7 +127,7 @@
       /* Override Select Box */
       #jenjang, #kategoriBuku, #keterangan {
           /* Ganti SVG panah menjadi warna gelap sekunder */
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%236B7280'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd' /%3E%3C/svg%3E");
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%236B7280'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1m1.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd' /%3E%3C/svg%3E");
           background-repeat: no-repeat;
           background-position: right 0px center;
           background-size: 1.5em;
@@ -802,8 +802,11 @@
           // 2. Update Buku Master 
           await set(ref(db, `buku/${finalData.kodeBuku}`), { judul: finalData.judulBuku, kategori: finalData.kategoriBuku });
 
-          // 3. MENGIRIM DATA KUNJUNGAN BARU
+          // 3. MENGIRIM DATA KUNJUNGAN BARU (Log Utama/Lengkap)
           await push(ref(db, `pengunjung`), payload);
+          
+          // 4. MENGIRIM DATA UNTUK HISTORI RINGKASAN (Penyimpanan Khusus) <-- PENAMBAHAN
+          await push(ref(db, `histori_ringkasan`), payload);
 
           // JIKA SUKSES: Reset form dan tampilkan pop-up
           resetForm();

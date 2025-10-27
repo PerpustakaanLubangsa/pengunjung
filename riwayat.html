@@ -6,7 +6,7 @@
     <title>Riwayat Kunjungan Perpustakaan - Ringkasan</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght{400;600;700}&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
@@ -18,6 +18,10 @@
             --color-text-dark: #333333;
             --color-text-secondary: #6B7280;
             --color-text-header: #1F2937;
+
+            /* Warna Khusus */
+            --color-red-danger: #DC2626;
+            --color-red-danger-dark: #B91C1C;
         }
 
         body {
@@ -87,198 +91,439 @@
             color: var(--color-text-secondary);
             padding: 50px;
         }
+
+        /* Input Date Styles */
+        .input-date-style {
+            padding: 8px 10px;
+            border: 1px solid var(--color-light-border);
+            border-radius: 4px;
+            margin-right: 15px;
+            font-size: 14px;
+        }
+
+        .btn-filter {
+            background-color: var(--color-cyan-primary);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        .btn-filter:hover {
+            background-color: var(--color-cyan-dark);
+        }
+
+        .btn-danger {
+            background-color: var(--color-red-danger);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        .btn-danger:hover {
+            background-color: var(--color-red-danger-dark);
+        }
+        .btn-danger:disabled {
+            background-color: #FECACA;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 
 <body>
 
     <div class="container-table">
-      <h1 class="text-3xl font-bold text-gray-800 mb-8 border-b-4 pb-2">Ringkasan Riwayat Kunjungan Perpustakaan</h1>
-      
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <h1 class="text-3xl font-bold text-gray-800 mb-8 border-b-4 pb-2">Ringkasan Riwayat Kunjungan Perpustakaan</h1>
 
-        <div class="card">
-            <h2 class="text-2xl font-semibold mb-4">A. Riwayat Kunjungan Santri (Total)</h2>
-            <div id="santriSummaryContainer" class="overflow-y-auto relative" style="max-height: 70vh;">
-                <table id="santriSummaryTable" class="summary-table">
-                    <thead>
-                        <tr>
-                            <th>Nama Santri (NIS)</th>
-                            <th class="text-center">Total Kunjungan</th>
-                            <th class="text-center">Total Baca</th>
-                            <th class="text-center">Total Pinjam</th>
-                        </tr>
-                    </thead>
-                    <tbody id="santriTableBody">
-                        </tbody>
-                </table>
-            </div>
-            <p class="text-sm text-gray-600 mt-4">Jumlah Santri Unik: <span id="totalSantriCount" class="font-bold">0</span></p>
-        </div>
+        <div class="card mb-6 p-4">
+            <h2 class="text-xl font-semibold mb-3 border-none pb-0">Aksi & Filter</h2>
+            
+            <div class="flex items-center mb-4">
+                <label for="startDate" class="text-sm font-semibold mr-2">Dari Tanggal:</label>
+                <input type="date" id="startDate" class="input-date-style">
+                
+                <label for="endDate" class="text-sm font-semibold mr-2">Sampai Tanggal:</label>
+                <input type="date" id="endDate" class="input-date-style">
 
-        <div class="card">
-            <h2 class="text-2xl font-semibold mb-4">B. Riwayat Buku (Total)</h2>
-            <div id="bukuSummaryContainer" class="overflow-y-auto relative" style="max-height: 70vh;">
-                <table id="bukuSummaryTable" class="summary-table">
-                    <thead>
-                        <tr>
-                            <th>Judul Buku (Kode)</th>
-                            <th class="text-center">Total Akses</th>
-                            <th class="text-center">Total Baca</th>
-                            <th class="text-center">Total Pinjam</th>
-                        </tr>
-                    </thead>
-                    <tbody id="bukuTableBody">
-                        </tbody>
-                </table>
+                <button id="btnFilter" class="btn-filter">Terapkan Filter</button>
+                <button id="btnResetFilter" class="btn-filter ml-3 bg-gray-500 hover:bg-gray-700">Semua Riwayat</button>
             </div>
-            <p class="text-sm text-gray-600 mt-4">Jumlah Buku Unik: <span id="totalBukuCount" class="font-bold">0</span></p>
+
+            <div class="mt-4 pt-3 border-t border-dashed border-gray-300">
+                <button id="btnDeleteSelected" class="btn-danger mr-3" disabled>Hapus Data Terpilih (0)</button>
+                <button id="btnDeleteAll" class="btn-danger">⚠️ Hapus Semua Riwayat</button>
+            </div>
         </div>
-      </div>
-      
-      <div id="loading">Memuat data riwayat dari database...</div>
-      
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+            <div class="card">
+                <h2 class="text-2xl font-semibold mb-4">A. Riwayat Kunjungan Santri (Total)</h2>
+                <div id="santriSummaryContainer" class="overflow-y-auto relative" style="max-height: 70vh;">
+                    <table id="santriSummaryTable" class="summary-table">
+                        <thead>
+                            <tr>
+                                <th class="w-12">Pilih</th> <th>Nama Santri (NIS)</th>
+                                <th class="text-center">Total Kunjungan</th>
+                                <th class="text-center">Total Baca</th>
+                                <th class="text-center">Total Pinjam</th>
+                            </tr>
+                        </thead>
+                        <tbody id="santriTableBody">
+                            </tbody>
+                    </table>
+                </div>
+                <p class="text-sm text-gray-600 mt-4">Jumlah Santri Unik: <span id="totalSantriCount" class="font-bold">0</span></p>
+            </div>
+
+            <div class="card">
+                <h2 class="text-2xl font-semibold mb-4">B. Riwayat Buku (Total)</h2>
+                <div id="bukuSummaryContainer" class="overflow-y-auto relative" style="max-height: 70vh;">
+                    <table id="bukuSummaryTable" class="summary-table">
+                        <thead>
+                            <tr>
+                                <th class="w-12">Pilih</th> <th>Judul Buku (Kode)</th>
+                                <th class="text-center">Total Akses</th>
+                                <th class="text-center">Total Baca</th>
+                                <th class="text-center">Total Pinjam</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bukuTableBody">
+                            </tbody>
+                    </table>
+                </div>
+                <p class="text-sm text-gray-600 mt-4">Jumlah Buku Unik: <span id="totalBukuCount" class="font-bold">0</span></p>
+            </div>
+        </div>
+        
+        <div id="loading">Memuat data riwayat dari database...</div>
+        
+    </div>
+
+    <div id="confirmModal" class="modal-overlay" style="display:none; opacity:0; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); justify-content:center; align-items:center; z-index:50; transition:opacity 0.3s ease-out;">
+        <div class="modal-content" style="background:var(--color-light-container-bg); padding:30px; border-radius:12px; max-width:400px; width:90%; box-shadow:0 10px 30px rgba(0,0,0,0.2); transform:translateY(-50px); transition:transform 0.3s ease-out; border:1px solid var(--color-cyan-primary);">
+            <h4 id="modalTitle" class="text-xl font-bold text-gray-800 mb-2">Konfirmasi Penghapusan</h4>
+            <p id="modalBody" class="text-gray-600 mb-6">Apakah Anda yakin ingin menghapus semua data riwayat kunjungan? Tindakan ini tidak dapat dibatalkan!</p>
+            <div class="flex justify-end space-x-3">
+                <button id="btnCancelDelete" class="bg-gray-500 hover:bg-gray-700 text-white px-4 py-2 rounded-lg">Batal</button>
+                <button id="btnConfirmDelete" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold">Hapus Sekarang</button>
+            </div>
+        </div>
     </div>
 
 
     <script type="module">
-      // --- FIREBASE IMPORTS & CONFIG DARI INDEX.HTML ---
-      import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
-      import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js';
+        // --- FIREBASE IMPORTS & CONFIG DARI INDEX.HTML ---
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
+        // Menambahkan remove untuk fungsi hapus
+        import { getDatabase, ref, onValue, remove, set } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js';
 
-      // *** KONFIGURASI YANG SAMA PERSIS DENGAN INDEX.HTML ***
-      const firebaseConfig = {
-        apiKey: "AIzaSyB6gaVW3ye680YylqzSebZugmQepYRA4g4", 
-        authDomain: "pengunjung-4489b.firebaseapp.com", 
-        projectId: "pengunjung-4489b", 
-        storageBucket: "pengunjung-4489b.firebasestorage.app", 
-        messagingSenderId: "233634425303", 
-        appId: "1:233634425303:web:9d45d775e703b94843c392", 
-        databaseURL: "https://pengunjung-4489b-default-rtdb.firebaseio.com" 
-      };
+        // *** KONFIGURASI YANG SAMA PERSIS DENGAN INDEX.HTML ***
+        const firebaseConfig = {
+            apiKey: "AIzaSyB6gaVW3ye680YylqzSebZugmQepYRA4g4", 
+            authDomain: "pengunjung-4489b.firebaseapp.com", 
+            projectId: "pengunjung-4489b", 
+            storageBucket: "pengunjung-4489b.firebasestorage.app", 
+            messagingSenderId: "233634425303", 
+            appId: "1:233634425303:web:9d45d775e703b94843c392", 
+            databaseURL: "https://pengunjung-4489b-default-rtdb.firebaseio.com" 
+        };
 
-      const app = initializeApp(firebaseConfig);
-      const db = getDatabase(app);
-      const dbRef = ref(db, 'pengunjung'); // Membaca dari path 'pengunjung'
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const dbRef = ref(db, 'histori_ringkasan'); // Membaca dari path 'histori_ringkasan'
 
-      // --- DOM ELEMENTS ---
-      const santriTableBody = document.getElementById('santriTableBody');
-      const bukuTableBody = document.getElementById('bukuTableBody');
-      const loadingIndicator = document.getElementById('loading');
-      const totalSantriCount = document.getElementById('totalSantriCount');
-      const totalBukuCount = document.getElementById('totalBukuCount');
+        // --- GLOBAL STATE ---
+        let allHistoryData = {}; // Menyimpan data lengkap { key: item }
+        let currentHistoryDataArray = []; // Menyimpan data yang difilter (Array of items)
+        let selectedKeys = []; // Menyimpan kunci (key) item yang dipilih untuk dihapus
 
-      // --- DATA AGGREGATION ---
-      function summarizeData(historyData) {
-          const santriSummary = {};
-          const bukuSummary = {};
+        // --- DOM ELEMENTS ---
+        const santriTableBody = document.getElementById('santriTableBody');
+        const bukuTableBody = document.getElementById('bukuTableBody');
+        const loadingIndicator = document.getElementById('loading');
+        const totalSantriCount = document.getElementById('totalSantriCount');
+        const totalBukuCount = document.getElementById('totalBukuCount');
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+        const btnDeleteSelected = document.getElementById('btnDeleteSelected');
+        const btnDeleteAll = document.getElementById('btnDeleteAll');
+        const btnFilter = document.getElementById('btnFilter');
+        const btnResetFilter = document.getElementById('btnResetFilter');
 
-          historyData.forEach(item => {
-              // Summarize Santri
-              const santriKey = item.nis;
-              if (!santriSummary[santriKey]) {
-                  santriSummary[santriKey] = { 
-                      nama: item.nama || 'Nama Tidak Diketahui',
-                      nis: item.nis, 
-                      total: 0, 
-                      baca: 0, 
-                      pinjam: 0 
-                  };
-              }
-              santriSummary[santriKey].total++;
-              if (item.keterangan === 'Baca') {
-                  santriSummary[santriKey].baca++;
-              } else if (item.keterangan === 'Pinjam') {
-                  santriSummary[santriKey].pinjam++;
-              }
+        const confirmModal = document.getElementById('confirmModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+        const btnCancelDelete = document.getElementById('btnCancelDelete');
+        const btnConfirmDelete = document.getElementById('btnConfirmDelete');
 
-              // Summarize Buku
-              const bukuKey = item.kodeBuku;
-              if (!bukuSummary[bukuKey]) {
-                  bukuSummary[bukuKey] = { 
-                      judul: item.judulBuku || 'Judul Tidak Diketahui', 
-                      kode: item.kodeBuku, 
-                      total: 0, 
-                      baca: 0, 
-                      pinjam: 0 
-                  };
-              }
-              bukuSummary[bukuKey].total++;
-              if (item.keterangan === 'Baca') {
-                  bukuSummary[bukuKey].baca++;
-              } else if (item.keterangan === 'Pinjam') {
-                  bukuSummary[bukuKey].pinjam++;
-              }
-          });
+        // --- HELPER FUNCTIONS ---
 
-          // Konversi ke array dan urutkan berdasarkan Total Kunjungan/Akses (Descending)
-          const sortedSantri = Object.values(santriSummary).sort((a, b) => b.total - a.total);
-          const sortedBuku = Object.values(bukuSummary).sort((a, b) => b.total - a.total);
+        function updateSelectedState(key, isSelected) {
+            const index = selectedKeys.indexOf(key);
+            if (isSelected && index === -1) {
+                selectedKeys.push(key);
+            } else if (!isSelected && index > -1) {
+                selectedKeys.splice(index, 1);
+            }
+            btnDeleteSelected.textContent = `Hapus Data Terpilih (${selectedKeys.length})`;
+            btnDeleteSelected.disabled = selectedKeys.length === 0;
+        }
 
-          return { santri: sortedSantri, buku: sortedBuku };
-      }
+        function clearSelection() {
+            selectedKeys = [];
+            btnDeleteSelected.textContent = `Hapus Data Terpilih (0)`;
+            btnDeleteSelected.disabled = true;
+            document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+        }
 
-      // --- RENDER FUNCTIONS ---
-      function renderSantriSummary(data) {
-          santriTableBody.innerHTML = '';
-          totalSantriCount.textContent = data.length;
+        function showModal(title, body, onConfirm) {
+            modalTitle.textContent = title;
+            modalBody.textContent = body;
+            confirmModal.style.display = 'flex';
+            setTimeout(() => confirmModal.style.opacity = '1', 10); // Animasi
+            
+            btnConfirmDelete.onclick = async () => {
+                await onConfirm();
+                hideModal();
+                // Setelah aksi hapus, data akan otomatis diperbarui oleh onValue listener
+            };
+        }
 
-          if (data.length === 0) {
-              santriTableBody.innerHTML = `<tr><td colspan="4" class="text-center text-gray-500 py-4">Tidak ada data kunjungan santri.</td></tr>`;
-              return;
-          }
+        function hideModal() {
+            confirmModal.style.opacity = '0';
+            setTimeout(() => confirmModal.style.display = 'none', 300);
+        }
 
-          data.forEach(item => {
-              const row = santriTableBody.insertRow();
-              row.innerHTML = `
-                  <td>${item.nama} (${item.nis})</td>
-                  <td class="text-center font-bold">${item.total}</td>
-                  <td class="text-center">${item.baca}</td>
-                  <td class="text-center">${item.pinjam}</td>
-              `;
-          });
-      }
+        // --- FILTER LOGIC ---
+        function filterDataByDate(dataArray, startDateStr, endDateStr) {
+            const startTimestamp = startDateStr ? new Date(startDateStr).setHours(0, 0, 0, 0) : 0;
+            const endTimestamp = endDateStr ? new Date(endDateStr).setHours(23, 59, 59, 999) : Infinity;
 
-      function renderBukuSummary(data) {
-          bukuTableBody.innerHTML = '';
-          totalBukuCount.textContent = data.length;
+            return dataArray.filter(item => {
+                const itemTimestamp = item.timestamp;
+                return itemTimestamp >= startTimestamp && itemTimestamp <= endTimestamp;
+            });
+        }
 
-          if (data.length === 0) {
-              bukuTableBody.innerHTML = `<tr><td colspan="4" class="text-center text-gray-500 py-4">Tidak ada data akses buku.</td></tr>`;
-              return;
-          }
+        function handleFilter() {
+            const startDate = startDateInput.value;
+            const endDate = endDateInput.value;
 
-          data.forEach(item => {
-              const row = bukuTableBody.insertRow();
-              row.innerHTML = `
-                  <td>${item.judul} (${item.kode})</td>
-                  <td class="text-center font-bold">${item.total}</td>
-                  <td class="text-center">${item.baca}</td>
-                  <td class="text-center">${item.pinjam}</td>
-              `;
-          });
-      }
+            // Dapatkan array data dari objek global (tanpa key, hanya values)
+            const dataArray = Object.values(allHistoryData); 
 
-      // --- INITIAL DATA LOAD ---
-      // onValue adalah fungsi yang diimpor dari modul, bukan firebase.onValue global
-      onValue(dbRef, (snapshot) => {
-          loadingIndicator.style.display = 'none';
+            currentHistoryDataArray = filterDataByDate(dataArray, startDate, endDate);
+            
+            // Agregasi dan Render ulang
+            const summary = summarizeData(currentHistoryDataArray);
+            renderSantriSummary(summary.santri);
+            renderBukuSummary(summary.buku);
+            clearSelection();
+        }
 
-          const data = snapshot.val();
-          let allHistoryData = [];
+        function resetFilter() {
+            startDateInput.value = '';
+            endDateInput.value = '';
+            // Data akan otomatis di-render ulang karena onValue akan memuat semua data
+            handleFilter(); 
+        }
 
-          if (data) {
-              allHistoryData = Object.values(data);
-          }
-          
-          const summary = summarizeData(allHistoryData);
+        // --- DATA AGGREGATION & RENDER ---
+        function summarizeData(historyData) {
+            const santriSummary = {};
+            const bukuSummary = {};
 
-          renderSantriSummary(summary.santri);
-          renderBukuSummary(summary.buku);
-          
-      }, {
-          onlyOnce: false 
-      });
+            historyData.forEach(item => {
+                // Summarize Santri
+                const santriKey = item.nis;
+                if (!santriSummary[santriKey]) {
+                    santriSummary[santriKey] = { 
+                        nama: item.nama || 'Nama Tidak Diketahui',
+                        nis: item.nis, 
+                        keys: [], // Menyimpan semua keys yang berkontribusi
+                        total: 0, 
+                        baca: 0, 
+                        pinjam: 0 
+                    };
+                }
+                santriSummary[santriKey].keys.push(item.key);
+                santriSummary[santriKey].total++;
+                if (item.keterangan === 'Baca') {
+                    santriSummary[santriKey].baca++;
+                } else if (item.keterangan === 'Pinjam') {
+                    santriSummary[santriKey].pinjam++;
+                }
+
+                // Summarize Buku
+                const bukuKey = item.kodeBuku;
+                if (!bukuSummary[bukuKey]) {
+                    bukuSummary[bukuKey] = { 
+                        judul: item.judulBuku || 'Judul Tidak Diketahui', 
+                        kode: item.kodeBuku, 
+                        keys: [], // Menyimpan semua keys yang berkontribusi
+                        total: 0, 
+                        baca: 0, 
+                        pinjam: 0 
+                    };
+                }
+                bukuSummary[bukuKey].keys.push(item.key);
+                bukuSummary[bukuKey].total++;
+                if (item.keterangan === 'Baca') {
+                    bukuSummary[bukuKey].baca++;
+                } else if (item.keterangan === 'Pinjam') {
+                    bukuSummary[bukuKey].pinjam++;
+                }
+            });
+
+            const sortedSantri = Object.values(santriSummary).sort((a, b) => b.total - a.total);
+            const sortedBuku = Object.values(bukuSummary).sort((a, b) => b.total - a.total);
+
+            return { santri: sortedSantri, buku: sortedBuku };
+        }
+
+        function renderSantriSummary(data) {
+            santriTableBody.innerHTML = '';
+            totalSantriCount.textContent = data.length;
+
+            if (data.length === 0) {
+                santriTableBody.innerHTML = `<tr><td colspan="5" class="text-center text-gray-500 py-4">Tidak ada data kunjungan santri dalam periode ini.</td></tr>`;
+                return;
+            }
+
+            data.forEach(item => {
+                const row = santriTableBody.insertRow();
+                // Menggabungkan semua key transaksi ke dalam satu atribut untuk memudahkan penghapusan
+                const keysAttr = item.keys.join(','); 
+                row.setAttribute('data-keys', keysAttr);
+                
+                const isSelected = selectedKeys.some(key => item.keys.includes(key));
+
+                row.innerHTML = `
+                    <td class="text-center">
+                        <input type="checkbox" 
+                                class="h-4 w-4 text-cyan-primary border-gray-300 rounded"
+                                data-keys="${keysAttr}"
+                                ${isSelected ? 'checked' : ''}
+                        >
+                    </td>
+                    <td>${item.nama} (${item.nis})</td>
+                    <td class="text-center font-bold">${item.total}</td>
+                    <td class="text-center">${item.baca}</td>
+                    <td class="text-center">${item.pinjam}</td>
+                `;
+            });
+        }
+
+        function renderBukuSummary(data) {
+            bukuTableBody.innerHTML = '';
+            totalBukuCount.textContent = data.length;
+
+            if (data.length === 0) {
+                bukuTableBody.innerHTML = `<tr><td colspan="5" class="text-center text-gray-500 py-4">Tidak ada data akses buku dalam periode ini.</td></tr>`;
+                return;
+            }
+
+            data.forEach(item => {
+                const row = bukuTableBody.insertRow();
+                const keysAttr = item.keys.join(',');
+                row.setAttribute('data-keys', keysAttr);
+                
+                const isSelected = selectedKeys.some(key => item.keys.includes(key));
+                
+                row.innerHTML = `
+                    <td class="text-center">
+                        <input type="checkbox" 
+                                class="h-4 w-4 text-cyan-primary border-gray-300 rounded"
+                                data-keys="${keysAttr}"
+                                ${isSelected ? 'checked' : ''}
+                        >
+                    </td>
+                    <td>${item.judul} (${item.kode})</td>
+                    <td class="text-center font-bold">${item.total}</td>
+                    <td class="text-center">${item.baca}</td>
+                    <td class="text-center">${item.pinjam}</td>
+                `;
+            });
+        }
+
+        // --- INITIAL DATA LOAD LISTENER ---
+        // onValue listener utama, akan dijalankan setiap kali data berubah
+        onValue(dbRef, (snapshot) => {
+            loadingIndicator.style.display = 'none';
+
+            const data = snapshot.val();
+            allHistoryData = {};
+            currentHistoryDataArray = [];
+
+            if (data) {
+                Object.entries(data).forEach(([key, val]) => {
+                    allHistoryData[key] = { ...val, key };
+                });
+            }
+            
+            // Setelah data master dimuat/diperbarui, terapkan filter yang sedang aktif
+            handleFilter();
+
+        }, {
+            onlyOnce: false 
+        });
+
+
+        // --- EVENT LISTENERS PENGHAPUSAN ---
+        btnCancelDelete.addEventListener('click', hideModal);
+
+        btnDeleteAll.addEventListener('click', () => {
+            showModal(
+                "Konfirmasi Hapus Semua Riwayat",
+                "ANDA AKAN MENGHAPUS SELURUH data riwayat kunjungan perpustakaan. Apakah Anda benar-benar yakin? Tindakan ini tidak dapat dibatalkan!",
+                async () => {
+                    await set(dbRef, null); // Menghapus seluruh node 'histori_ringkasan'
+                    alert('Semua riwayat kunjungan berhasil dihapus.');
+                    // onValue listener akan otomatis reload
+                }
+            );
+        });
+
+        btnDeleteSelected.addEventListener('click', () => {
+            if (selectedKeys.length === 0) return;
+            
+            showModal(
+                "Konfirmasi Hapus Data Terpilih",
+                `Apakah Anda yakin ingin menghapus ${selectedKeys.length} data transaksi riwayat yang dipilih?`,
+                async () => {
+                    let successCount = 0;
+                    for (const key of selectedKeys) {
+                        try {
+                            await remove(ref(db, `histori_ringkasan/${key}`));
+                            successCount++;
+                        } catch (error) {
+                            console.error(`Gagal menghapus key ${key}:`, error);
+                        }
+                    }
+                    alert(`${successCount} data transaksi riwayat berhasil dihapus.`);
+                    // onValue listener akan otomatis reload
+                }
+            );
+        });
+
+        // --- EVENT LISTENERS CHECKBOX SELECTION ---
+        document.addEventListener('change', (e) => {
+            if (e.target.matches('input[type="checkbox"][data-keys]')) {
+                const keysString = e.target.getAttribute('data-keys');
+                const keys = keysString.split(',');
+                const isChecked = e.target.checked;
+                
+                // Tambahkan atau hapus semua key yang terkait dengan item ringkasan ini
+                keys.forEach(key => updateSelectedState(key, isChecked));
+            }
+        });
+
+        // --- EVENT LISTENERS FILTER ---
+        btnFilter.addEventListener('click', handleFilter);
+        btnResetFilter.addEventListener('click', resetFilter);
+
     </script>
 </body>
 </html>
