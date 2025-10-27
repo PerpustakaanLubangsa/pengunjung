@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Form Kunjungan Perpustakaan | Tema Gelap Dark Cyan</title>
+    <title>Form Kunjungan Perpustakaan | Tema Terang Soft Light</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
@@ -22,28 +22,31 @@
 
     <style>
       /* ---------------------------------------------------- */
-      /* SKEMA WARNA BARU: TEMA GELAP DENGAN AKSEN DARK CYAN */
+      /* SKEMA WARNA BARU: TEMA TERANG (SOFT LIGHT MODE) DENGAN AKSEN DARK CYAN */
       /* ---------------------------------------------------- */
       :root {
-          /* --- MODIFIKASI: Definisi Palet Dark Cyan untuk Aksen --- */
+          /* --- Palet Dark Cyan untuk Aksen (Dipertahankan) --- */
           --color-cyan-primary: #00838F;      /* Cyan 800 - Primary/Accent (Darker) */
           --color-cyan-dark: #006064;         /* Cyan 900 - Focus/Dark (Darkest) */
-          --color-cyan-light: #4DD0E1;        /* Cyan 400 - Line/Hover (Tetap Light untuk kontras garis) */
+          --color-cyan-light: #4DD0E1;        /* Cyan 400 - Line/Hover */
           
-          /* Definisi Palet Gelap */
-          --color-dark-main-bg: #121212;      /* Background Utama */
-          --color-dark-container-bg: #121212; /* Background Kontainer */
-          --color-dark-border: #333333;       /* Garis Pembatas */
-          --color-text-light: #F0F0F0;        /* Teks Utama */
-          --color-text-secondary: #AAAAAA;    /* Teks Sekunder/Label */
-          --color-text-header: #FFFFFF;       /* Teks Header */
+          /* Definisi Palet Terang (Soft Light Mode) */
+          --color-light-main-bg: #d0deec;      /* Background Utama (Sangat Terang, off-white) */
+          --color-light-container-bg: #FFFFFF; /* Background Kontainer (Putih Bersih) */
+          --color-light-border: #D1D5DB;       /* Garis Pembatas (Abu-abu lembut) */
+          --color-text-dark: #333333;          /* Teks Utama (Abu-abu gelap lembut) */
+          --color-text-secondary: #6B7280;     /* Teks Sekunder/Label (Abu-abu sedang) */
+          --color-text-header: #1F2937;        /* Teks Header (Abu-abu ekstra gelap) */
+
+          /* Tambahan untuk Fokus Dropdown Putih Abu */
+          --color-soft-gray-focus: #E5E7EB;   /* Gray 200 - Background Fokus Dropdown */
       }
 
       body {
           font-family: 'Poppins', sans-serif;
-          /* Background diubah menjadi Gelap */
-          background-color: var(--color-dark-main-bg); 
-          color: var(--color-text-light);
+          /* Background diubah menjadi Terang */
+          background-color: var(--color-light-main-bg); 
+          color: var(--color-text-dark);
           display: flex;
           justify-content: center;
           align-items: flex-start;
@@ -55,27 +58,30 @@
           max-width: 600px;
           padding: 30px;
           margin: 0 auto;
-          /* Container dengan warna gelap sekunder */
-          background: var(--color-dark-container-bg); 
-          border-radius: 8px; /* Tambahkan sedikit radius */
+          /* Container dengan warna terang */
+          background: var(--color-light-container-bg); 
+          border-radius: 8px; 
           width: 100%;
+          /* Tambahkan Shadow lembut untuk kesan "mengambang" */
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+          border: 1px solid var(--color-light-border); /* Border lembut */
       }
 
       h1, .text-3xl {
           color: var(--color-text-header) !important;
-          border-color: var(--color-cyan-primary) !important;
+          border-color: var(--color-cyan-primary) !important; /* Aksen Cyan tetap */
       }
       
       h3, .text-2xl {
           color: var(--color-text-header) !important;
-          border-color: var(--color-dark-border) !important;
+          border-color: var(--color-light-border) !important; /* Border lembut */
       }
 
       label {
           display: block;
           margin-top: 20px;
           font-weight: 600;
-          color: var(--color-text-secondary);
+          color: var(--color-text-secondary); /* Teks label abu-abu */
       }
 
       /* ---------------------------------------------------- */
@@ -93,10 +99,10 @@
           margin-bottom: 15px;
           border: none;
           outline: none;
-          /* Garis default menggunakan Warna Pembatas Gelap */
-          border-bottom: 2px solid var(--color-dark-border); 
+          /* Garis default menggunakan Warna Pembatas Terang */
+          border-bottom: 2px solid var(--color-light-border); 
           background-color: transparent;
-          color: var(--color-text-light); /* Teks terang */
+          color: var(--color-text-dark); /* Teks gelap */
           transition: border-bottom-color 0.3s, border-bottom-width 0.3s;
           font-size: 17px;
           box-sizing: border-box;
@@ -113,31 +119,31 @@
 
       /* GAYA ERROR: Garis Merah */
       .input-line-style.input-error {
-          border-bottom-color: #F44336 !important; /* Merah kontras di tema gelap */
+          border-bottom-color: #EF4444 !important; /* Merah kontras di tema terang */
           border-bottom-width: 3px !important;
           box-shadow: none !important;
       }
 
       /* Override Select Box */
       #jenjang, #kategoriBuku, #keterangan {
-          /* Ganti SVG panah menjadi warna terang/sekunder */
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23AAAAAA'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd' /%3E%3C/svg%3E");
+          /* Ganti SVG panah menjadi warna gelap sekunder */
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%236B7280'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd' /%3E%3C/svg%3E");
           background-repeat: no-repeat;
           background-position: right 0px center;
           background-size: 1.5em;
           padding-right: 2.5rem;
           background-color: transparent;
-          color: var(--color-text-light);
+          color: var(--color-text-dark);
       }
       
-      /* Pastikan option di select terlihat di tema gelap */
+      /* Pastikan option di select terlihat di tema terang */
       select option {
-        background-color: var(--color-dark-container-bg);
-        color: var(--color-text-light);
+        background-color: var(--color-light-container-bg);
+        color: var(--color-text-dark);
       }
 
       /* ---------------------------------------------------- */
-      /* DROPDOWN KUSTOM (FULL COLOR FOCUS - DARK CYAN) */
+      /* DROPDOWN KUSTOM (SOFT GRAY FOCUS) */
       /* ---------------------------------------------------- */
       .custom-dropdown {
           position: absolute;
@@ -145,10 +151,10 @@
           left: 0;
           right: 0;
           
-          border: 1px solid var(--color-dark-border);
-          background-color: var(--color-dark-container-bg); /* Latar belakang gelap */
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-          border-radius: 4px; /* Sedikit lebih kecil agar lebih "dark theme" */
+          border: 1px solid var(--color-light-border);
+          background-color: var(--color-light-container-bg); /* Latar belakang terang */
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Shadow lembut */
+          border-radius: 4px;
           
           list-style: none;
           padding: 5px 0;
@@ -159,23 +165,24 @@
       }
 
       .custom-dropdown-item {
-          color: var(--color-text-light);
+          color: var(--color-text-dark); /* Teks gelap default */
           padding: 10px 15px;
           cursor: pointer;
           transition: background-color 0.2s, color 0.2s;
           font-size: 16px;
       }
 
+      /* MODIFIKASI: Fokus menggunakan Putih Abu */
       .custom-dropdown-item:hover,
       .custom-dropdown-item.selected {
-          /* GAYA FULL COLOR FOCUS menggunakan Dark Cyan Primary */
-          background-color: var(--color-cyan-primary); 
-          color: var(--color-text-header); /* Teks putih solid */
+          /* Menggunakan warna abu-abu lembut untuk latar belakang */
+          background-color: var(--color-soft-gray-focus); 
+          /* Mempertahankan warna teks gelap untuk kontras */
+          color: var(--color-text-dark); 
       }
 
-      /* --- START MODIFIKASI: Menghapus Efek Stabilo (Sudah Diterapkan) --- */
+      /* Menghapus Efek Stabilo */
       .custom-dropdown-item span.highlight {
-          /* Hapus efek stabilo, jadikan teks biasa */
           color: inherit; 
           background-color: transparent; 
           font-weight: inherit;
@@ -185,31 +192,29 @@
 
       .custom-dropdown-item.selected span.highlight,
       .custom-dropdown-item:hover span.highlight {
-          /* Hapus efek stabilo saat focus, jadikan teks putih seperti item normal */
           color: inherit;
           background-color: transparent; 
       }
-      /* --- END MODIFIKASI --- */
 
 
       /* GAYA TEXT TAMBAHAN DI DROPDOWN ITEM */
       .custom-dropdown-item .text-xs {
-          color: var(--color-text-secondary); /* Teks deskripsi abu-abu */
+          color: var(--color-text-secondary); /* Teks deskripsi abu-abu sekunder */
           margin-top: 2px;
           font-size: 13px;
       }
 
       .custom-dropdown-item.selected .text-xs,
       .custom-dropdown-item:hover .text-xs {
-          /* Teks deskripsi diubah menjadi putih juga saat focus */
-          color: var(--color-text-header); 
+          /* Teks deskripsi dipertahankan */
+          color: var(--color-text-secondary); 
       }
 
       /* Tombol Submit */
       #btnSubmit {
-          /* Warna tombol menggunakan Dark Cyan Primary */
+          /* Warna tombol menggunakan Dark Cyan Primary (Dipertahankan) */
           background-color: var(--color-cyan-primary);
-          color: var(--color-text-header);
+          color: var(--color-light-container-bg); /* Teks Putih */
           padding: 12px 25px;
           border: none;
           border-radius: 6px;
@@ -222,7 +227,7 @@
           @apply shadow-none hover:shadow-none;
       }
       #btnSubmit:hover {
-          /* Warna hover menggunakan Dark Cyan Darker */
+          /* Warna hover menggunakan Dark Cyan Darker (Dipertahankan) */
           background-color: var(--color-cyan-dark);
           transform: translateY(-1px);
       }
@@ -236,7 +241,7 @@
           left: 0;
           width: 100%;
           height: 100%;
-          background: rgba(0, 0, 0, 0.8); /* Lebih gelap */
+          background: rgba(0, 0, 0, 0.4); /* Lebih terang dari sebelumnya (Soft Overlay) */
           display: none;
           justify-content: center;
           align-items: center;
@@ -251,21 +256,21 @@
       }
 
       .modal-content {
-          background: var(--color-dark-container-bg); /* Konten modal gelap */
-          color: var(--color-text-light);
+          background: var(--color-light-container-bg); /* Konten modal terang */
+          color: var(--color-text-dark);
           padding: 30px;
           border-radius: 12px;
           max-width: 400px;
           width: 90%;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); /* Shadow lembut */
           transform: translateY(-50px);
           transition: transform 0.3s ease-out;
           border: 1px solid var(--color-cyan-primary); /* Border Dark Cyan */
       }
 
-      /* GAYA TEXT (Tailwind Overrides disesuaikan untuk Dark Theme) */
-      .text-gray-800 { color: var(--color-text-header); }
-      .text-gray-600 { color: var(--color-text-secondary); }
+      /* GAYA TEXT (Tailwind Overrides disesuaikan untuk Light Theme) */
+      .text-gray-800 { color: var(--color-text-header); } 
+      .text-gray-600 { color: var(--color-text-secondary); } 
       
       /* Mengganti class custom dengan Dark Cyan */
       .border-cyan-500-custom { border-color: var(--color-cyan-primary); }
@@ -276,7 +281,7 @@
       /* Tambahkan gaya untuk modal button */
       .bg-cyan-600-custom { 
           background-color: var(--color-cyan-primary);
-          color: var(--color-text-header);
+          color: var(--color-light-container-bg);
           transition: background-color 0.3s;
       }
       .bg-cyan-600-custom:hover {
@@ -372,8 +377,6 @@
 
 
     <script type="module">
-      // LOGIKA JAVASCRIPT TETAP DIJAGA KARENA SUDAH EFISIEN
-
       // --- FIREBASE IMPORTS & CONFIG ---
       import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
       import { getDatabase, ref, set, onValue, push } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js';
@@ -392,10 +395,9 @@
       const app = initializeApp(firebaseConfig);
       const db = getDatabase(app);
 
-      // --- HELPER FUNCTION BARU: TITLE CASE (KAPITAL OTOMATIS) ---
+      // --- HELPER FUNCTION: TITLE CASE ---
       function titleCase(str) {
           if (!str) return '';
-          // Mengubah semua ke lowercase, memecah berdasarkan spasi, lalu mengkapitalisasi huruf pertama setiap kata.
           return str.toLowerCase().split(' ').map(word => {
               if (word.length === 0) return '';
               return (word.charAt(0).toUpperCase() + word.slice(1));
@@ -423,15 +425,13 @@
       const successModal = $('successModal');
       const closeModalBtn = $('closeModalBtn');
 
-      // Semua input yang perlu divalidasi dan direset
       const allInputs = [nisSearch, kodeBukuSearch, keteranganSelect, blokInput, jenjangSelect, kategoriBukuSelect];
 
       let santriList = [];
       let bukuList = [];
+      
       let selectedSantri = { nis: null, nama: null };
       let selectedBuku = { kode: null, judul: null };
-
-      // --- HELPER FUNCTIONS ---
 
       const VALID_JENJANG = ["SLTP", "SLTA", "PT"];
       const VALID_KATEGORI = [
@@ -459,7 +459,6 @@
 
       function hideModal() {
           successModal.classList.remove('active');
-          // Setelah modal ditutup, kembalikan fokus ke input pertama
           nisSearch.focus();
       }
 
@@ -484,43 +483,6 @@
           selectedBuku = { kode: null, judul: null };
       }
 
-      function performAutofill(selectedValue, masterArray, keyType) {
-          if (keyType === 'pengunjung') {
-              blokInput.value = '';
-              jenjangSelect.value = '';
-          } else if (keyType === 'buku') {
-              kategoriBukuSelect.value = '';
-          }
-
-          const match = selectedValue.match(/\((.*?)\)$/);
-          const key = match ? match[1] : null;
-
-          if (key) {
-              if (keyType === 'pengunjung') {
-                  const santri = masterArray.find(p => p.nis === key);
-                  if (santri) {
-                      // Pastikan nilai yang diisikan juga Title Case
-                      blokInput.value = santri.blok ? titleCase(santri.blok) : '';
-                      let jenjangVal = santri.jenjang ? santri.jenjang.toUpperCase() : '';
-                      jenjangSelect.value = VALID_JENJANG.includes(jenjangVal) ? jenjangVal : '';
-                  }
-              } else if (keyType === 'buku') {
-                  const buku = masterArray.find(b => b.kode === key);
-                  if (buku) {
-                      let kategoriVal = buku.kategori || '';
-                      kategoriBukuSelect.value = VALID_KATEGORI.includes(kategoriVal) ? kategoriVal : '';
-                  }
-              }
-          }
-      }
-
-      // --- VALIDATION & ERROR HANDLING ---
-      function clearErrorMarks() {
-          allInputs.forEach(input => {
-              input.classList.remove('input-error');
-          });
-      }
-
       function markEmptyFields() {
           clearErrorMarks();
           let errorCount = 0;
@@ -535,10 +497,17 @@
           return errorCount > 0;
       }
 
-      // --- DATA LOADING (Tidak Berubah) ---
+      function clearErrorMarks() {
+          allInputs.forEach(input => {
+              input.classList.remove('input-error');
+          });
+      }
+
+      // --- DATA LOADING ---
+      
+      // 1. Ambil Data Santri
       onValue(ref(db, 'siswa'), (snap) => {
           const data = snap.val();
-          // Simpan 'blok' dalam format Title Case agar konsisten dengan inputan user
           santriList = data ? Object.entries(data).map(([nis, val]) => ({ 
               nis, 
               nama: val.nama, 
@@ -547,16 +516,16 @@
           })) : [];
       });
 
+      // 2. Ambil Data Buku
       onValue(ref(db, 'buku'), (snap) => {
           const data = snap.val();
           bukuList = data ? Object.entries(data).map(([kode, val]) => ({ kode, judul: val.judul, kategori: val.kategori || '' })) : [];
       });
 
-      // --- FUNGSI DROPDOWN KUSTOM ---
 
-      /* --- FUNGSI MODIFIKASI: Tidak ada highlight / stabilo --- */
+      // --- FUNGSI DROPDOWN KUSTOM (Tanpa Riwayat) ---
+
       function getHighlightedText(fullText, filterText) {
-          // Hanya mengembalikan teks utuh tanpa tag <span> highlight
           return fullText;
       }
 
@@ -569,37 +538,49 @@
               li.setAttribute('role', 'option');
 
               let displayValue;
+              let detailsText;
 
               if (keyType === 'pengunjung') {
-                  // Pastikan nama ditampilkan dalam Title Case untuk konsistensi
                   const namaTitleCase = titleCase(item.nama);
                   displayValue = `${namaTitleCase} (${item.nis})`;
+                  detailsText = `Blok: ${item.blok || '-'} | Jenjang: ${item.jenjang || '-'}`;
+                  
                   li.setAttribute('data-nis', item.nis);
-                  li.setAttribute('data-nama', namaTitleCase); // Simpan dalam format Title Case
+                  li.setAttribute('data-nama', namaTitleCase); 
                   li.setAttribute('data-blok', item.blok || '');
                   li.setAttribute('data-jenjang', item.jenjang || '');
 
-                  // Menggunakan getHighlightedText (yang sudah dimodifikasi)
-                  li.innerHTML = getHighlightedText(displayValue, filterText) + `<div class="text-xs">Blok: ${item.blok || '-'} | Jenjang: ${item.jenjang || '-'}</div>`;
               } else { // buku
-                  // Pastikan judul ditampilkan dalam Title Case
                   const judulTitleCase = titleCase(item.judul);
                   displayValue = `${judulTitleCase} (${item.kode})`;
+                  detailsText = `Kategori: ${item.kategori || '-'}`;
+                  
                   li.setAttribute('data-kode', item.kode);
-                  li.setAttribute('data-judul', judulTitleCase); // Simpan dalam format Title Case
+                  li.setAttribute('data-judul', judulTitleCase); 
                   li.setAttribute('data-kategori', item.kategori || '');
-
-                  // Menggunakan getHighlightedText (yang sudah dimodifikasi)
-                  li.innerHTML = getHighlightedText(displayValue, filterText) + `<div class="text-xs">Kategori: ${item.kategori || '-'}</div>`;
               }
 
               li.setAttribute('data-value', displayValue);
               li.setAttribute('data-key-type', keyType);
+
+              // Tampilkan tanpa hitungan riwayat
+              li.innerHTML = getHighlightedText(displayValue, filterText) + `<div class="text-xs">${detailsText}</div>`;
+
               dropdownEl.appendChild(li);
           });
 
           dropdownEl.style.display = matches.length > 0 ? 'block' : 'none';
           dropdownEl.closest('.form-group').querySelector('input').setAttribute('aria-expanded', matches.length > 0 ? 'true' : 'false');
+      }
+
+      // ... (FUNGSI LAINNYA TETAP SAMA) ...
+
+      // Helper untuk menerapkan Title Case dan menjaga kursor
+      function applyTitleCaseAndMaintainCursor(inputEl) {
+          const start = inputEl.selectionStart;
+          const end = inputEl.selectionEnd;
+          inputEl.value = titleCase(inputEl.value);
+          inputEl.setSelectionRange(start, end);
       }
 
       function selectSuggestion(inputEl, dropdownEl, li) {
@@ -612,13 +593,11 @@
           dropdownEl.style.display = 'none';
           inputEl.setAttribute('aria-expanded', 'false');
 
-          // Lakukan autofill
           if (keyType === 'pengunjung') {
               selectedSantri.nis = li.dataset.nis;
-              selectedSantri.nama = li.dataset.nama; // Sudah Title Case dari dropdown
-              // Blok autofill juga di-Title Case
+              selectedSantri.nama = li.dataset.nama; 
               blokInput.value = li.dataset.blok ? titleCase(li.dataset.blok) : '';
-              jenjangSelect.value = VALID_JENJANG.includes(li.dataset.jenjang) ? li.dataset.jenjang : '';
+              jenjangSelect.value = li.dataset.jenjang || '';
 
               inputEl.classList.remove('input-error');
               blokInput.classList.remove('input-error');
@@ -626,8 +605,8 @@
 
           } else if (keyType === 'buku') {
               selectedBuku.kode = li.dataset.kode;
-              selectedBuku.judul = li.dataset.judul; // Sudah Title Case dari dropdown
-              kategoriBukuSelect.value = VALID_KATEGORI.includes(li.dataset.kategori) ? li.dataset.kategori : '';
+              selectedBuku.judul = li.dataset.judul; 
+              kategoriBukuSelect.value = li.dataset.kategori || '';
 
               inputEl.classList.remove('input-error');
               kategoriBukuSelect.classList.remove('input-error');
@@ -669,8 +648,6 @@
           }
       }
 
-      // --- EVENT LISTENERS: INPUT & NAVIGASI ---
-
       function handleSearchInput(inputEl, dropdownEl, list, keyType) {
           inputEl.classList.remove('input-error');
 
@@ -678,10 +655,8 @@
 
           if (keyType === 'pengunjung') {
               selectedSantri = { nis: null, nama: null };
-              performAutofill('', list, keyType);
-          } else { // buku
+          } else { 
               selectedBuku = { kode: null, judul: null };
-              performAutofill('', list, keyType);
           }
 
           if(!val){
@@ -694,11 +669,7 @@
           const matches = list.filter(item => {
               const searchField = keyType === 'pengunjung' ? item.nama.toLowerCase() : item.judul.toLowerCase();
               const idField = keyType === 'pengunjung' ? item.nis : item.kode;
-              
-              // LOGIKA PENCARIAN BERDASARKAN BLOK/KAMAR
-              // --- PERBAIKAN DROPDOWN AUTOCUMPLETE: Mengakses item.blok secara langsung ---
               const blockField = (keyType === 'pengunjung' && item.blok) ? item.blok.toLowerCase() : ''; 
-              // --- AKHIR PERBAIKAN ---
 
               return searchField.includes(val) || idField.includes(val) || blockField.includes(val);
           }).slice(0, 10);
@@ -711,13 +682,6 @@
           }
       }
 
-      // Helper untuk menerapkan Title Case dan menjaga kursor
-      function applyTitleCaseAndMaintainCursor(inputEl) {
-          const start = inputEl.selectionStart;
-          const end = inputEl.selectionEnd;
-          inputEl.value = titleCase(inputEl.value);
-          inputEl.setSelectionRange(start, end);
-      }
 
       // Listener Santri
       nisSearch.addEventListener('input', function() {
@@ -750,7 +714,7 @@
                   const nextInput = this.closest('.form-group').nextElementSibling?.querySelector('.input-line-style, button');
                   if (nextInput) nextInput.focus();
               });
-          } else { // input text (blokInput)
+          } else { 
               input.addEventListener('keypress', function(e) {
                   if (e.key === 'Enter') {
                       e.preventDefault();
@@ -761,7 +725,6 @@
               });
               input.addEventListener('input', function() {
                   this.classList.remove('input-error');
-                  // MODIFIKASI: Mengubah dari toUpperCase menjadi titleCase untuk #blok
                   if (this.id === 'blok') {
                       applyTitleCaseAndMaintainCursor(this);
                   }
@@ -781,7 +744,7 @@
           }
       });
 
-      // Kontrol Modal (Diaktifkan kembali)
+      // Kontrol Modal
       closeModalBtn.addEventListener('click', hideModal);
       successModal.addEventListener('click', (e) => {
           if (e.target.id === 'successModal') {
@@ -789,9 +752,7 @@
           }
       });
 
-      // PENAMBAHAN: Pop-up bisa ditutup dengan ENTER
       document.addEventListener('keydown', (e) => {
-          // Cek jika tombol Enter ditekan dan modal sedang aktif
           if (e.key === 'Enter' && successModal.classList.contains('active')) {
               e.preventDefault();
               hideModal();
@@ -799,7 +760,7 @@
       });
       // ---------------------------------------------------
 
-      // --- LOGIKA SUBMIT PENGUNJUNG BARU (Dipertahankan) ---
+      // --- LOGIKA SUBMIT PENGUNJUNG BARU ---
       $('btnSubmit').addEventListener('click', async () => {
 
         const hasErrors = markEmptyFields();
@@ -809,39 +770,36 @@
           return;
         }
 
-        console.log('Sedang memproses data...');
-
         const santriParsed = parseInput(nisSearch);
         const bukuParsed = parseInput(kodeBukuSearch);
 
         const now = new Date();
+        const parseDate = (d) => ({
+            timestamp: d.getTime(),
+            tanggal: String(d.getDate()).padStart(2, '0'),
+            bulan: String(d.getMonth() + 1).padStart(2, '0'),
+            tahun: d.getFullYear(),
+            jam: d.toTimeString().substring(0, 5)
+        });
 
-        // Data yang disimpan dijamin Title Case (untuk nama, blok, dan judul)
         const finalData = {
-          nis: santriParsed.id.trim(), // NISN/Kode tetap, tidak perlu Title Case
-          nama: titleCase(santriParsed.name), // Di-Title Case
-          blok: titleCase(blokInput.value.trim()), // Di-Title Case
+          nis: santriParsed.id.trim(), 
+          nama: titleCase(santriParsed.name), 
+          blok: titleCase(blokInput.value.trim()), 
           jenjang: jenjangSelect.value,
-          kodeBuku: bukuParsed.id.trim(), // NISN/Kode tetap
-          judulBuku: titleCase(bukuParsed.name), // Di-Title Case
+          kodeBuku: bukuParsed.id.trim(), 
+          judulBuku: titleCase(bukuParsed.name), 
           kategoriBuku: kategoriBukuSelect.value,
           keterangan: keteranganSelect.value,
         };
 
-        const payload = {
-          ...finalData,
-          timestamp: now.getTime(),
-          tanggal: String(now.getDate()).padStart(2, '0'),
-          bulan: String(now.getMonth() + 1).padStart(2, '0'),
-          tahun: now.getFullYear(),
-          jam: now.toTimeString().substring(0, 5)
-        };
+        const payload = { ...finalData, ...parseDate(now) };
 
         try{
-          // 1. Update Santri Master (Menggunakan Title Case untuk nama dan blok)
+          // 1. Update Santri Master 
           await set(ref(db, `siswa/${finalData.nis}`), { nama: finalData.nama, blok: finalData.blok, jenjang: finalData.jenjang });
 
-          // 2. Update Buku Master (Menggunakan Title Case untuk judul)
+          // 2. Update Buku Master 
           await set(ref(db, `buku/${finalData.kodeBuku}`), { judul: finalData.judulBuku, kategori: finalData.kategoriBuku });
 
           // 3. MENGIRIM DATA KUNJUNGAN BARU
@@ -856,6 +814,7 @@
           alert('GAGAL TOTAL: Kesalahan sistem saat kirim data/perbarui master. Cek Konsol.');
         }
       });
+      
 
       // Init focus & display
       resetFormDisplay();

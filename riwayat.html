@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="id">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Riwayat Kunjungan Perpustakaan - Ringkasan</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght{400;600;700}&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --color-cyan-primary: #00838F;
+            --color-cyan-dark: #006064;
+            --color-light-main-bg: #F9FAFB;
+            --color-light-container-bg: #FFFFFF;
+            --color-light-border: #D1D5DB;
+            --color-text-dark: #333333;
+            --color-text-secondary: #6B7280;
+            --color-text-header: #1F2937;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--color-light-main-bg);
+            color: var(--color-text-dark);
+            padding: 30px 20px;
+        }
+
+        .container-table {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--color-light-container-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--color-light-border);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: var(--color-text-header);
+            border-color: var(--color-cyan-primary);
+        }
+        
+        h2 {
+            color: var(--color-text-dark);
+            border-bottom: 2px solid var(--color-light-border);
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+        }
+
+        /* Table Styles */
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .summary-table thead th {
+            background-color: var(--color-cyan-primary);
+            color: var(--color-light-container-bg);
+            text-align: left;
+            padding: 12px 15px;
+            font-weight: 700;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .summary-table tbody td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--color-light-border);
+            font-size: 14px;
+        }
+
+        .summary-table tbody tr:hover {
+            background-color: var(--color-soft-gray-focus, #E5E7EB);
+        }
+        
+        /* Loading Indicator */
+        #loading {
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--color-text-secondary);
+            padding: 50px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container-table">
+      <h1 class="text-3xl font-bold text-gray-800 mb-8 border-b-4 pb-2">Ringkasan Riwayat Kunjungan Perpustakaan</h1>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <div class="card">
+            <h2 class="text-2xl font-semibold mb-4">A. Riwayat Kunjungan Santri (Total)</h2>
+            <div id="santriSummaryContainer" class="overflow-y-auto relative" style="max-height: 70vh;">
+                <table id="santriSummaryTable" class="summary-table">
+                    <thead>
+                        <tr>
+                            <th>Nama Santri (NIS)</th>
+                            <th class="text-center">Total Kunjungan</th>
+                            <th class="text-center">Total Baca</th>
+                            <th class="text-center">Total Pinjam</th>
+                        </tr>
+                    </thead>
+                    <tbody id="santriTableBody">
+                        </tbody>
+                </table>
+            </div>
+            <p class="text-sm text-gray-600 mt-4">Jumlah Santri Unik: <span id="totalSantriCount" class="font-bold">0</span></p>
+        </div>
+
+        <div class="card">
+            <h2 class="text-2xl font-semibold mb-4">B. Riwayat Buku (Total)</h2>
+            <div id="bukuSummaryContainer" class="overflow-y-auto relative" style="max-height: 70vh;">
+                <table id="bukuSummaryTable" class="summary-table">
+                    <thead>
+                        <tr>
+                            <th>Judul Buku (Kode)</th>
+                            <th class="text-center">Total Akses</th>
+                            <th class="text-center">Total Baca</th>
+                            <th class="text-center">Total Pinjam</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bukuTableBody">
+                        </tbody>
+                </table>
+            </div>
+            <p class="text-sm text-gray-600 mt-4">Jumlah Buku Unik: <span id="totalBukuCount" class="font-bold">0</span></p>
+        </div>
+      </div>
+      
+      <div id="loading">Memuat data riwayat dari database...</div>
+      
+    </div>
+
+
+    <script type="module">
+      // --- FIREBASE IMPORTS & CONFIG DARI INDEX.HTML ---
+      import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
+      import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js';
+
+      // *** KONFIGURASI YANG SAMA PERSIS DENGAN INDEX.HTML ***
+      const firebaseConfig = {
+        apiKey: "AIzaSyB6gaVW3ye680YylqzSebZugmQepYRA4g4", 
+        authDomain: "pengunjung-4489b.firebaseapp.com", 
+        projectId: "pengunjung-4489b", 
+        storageBucket: "pengunjung-4489b.firebasestorage.app", 
+        messagingSenderId: "233634425303", 
+        appId: "1:233634425303:web:9d45d775e703b94843c392", 
+        databaseURL: "https://pengunjung-4489b-default-rtdb.firebaseio.com" 
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getDatabase(app);
+      const dbRef = ref(db, 'pengunjung'); // Membaca dari path 'pengunjung'
+
+      // --- DOM ELEMENTS ---
+      const santriTableBody = document.getElementById('santriTableBody');
+      const bukuTableBody = document.getElementById('bukuTableBody');
+      const loadingIndicator = document.getElementById('loading');
+      const totalSantriCount = document.getElementById('totalSantriCount');
+      const totalBukuCount = document.getElementById('totalBukuCount');
+
+      // --- DATA AGGREGATION ---
+      function summarizeData(historyData) {
+          const santriSummary = {};
+          const bukuSummary = {};
+
+          historyData.forEach(item => {
+              // Summarize Santri
+              const santriKey = item.nis;
+              if (!santriSummary[santriKey]) {
+                  santriSummary[santriKey] = { 
+                      nama: item.nama || 'Nama Tidak Diketahui',
+                      nis: item.nis, 
+                      total: 0, 
+                      baca: 0, 
+                      pinjam: 0 
+                  };
+              }
+              santriSummary[santriKey].total++;
+              if (item.keterangan === 'Baca') {
+                  santriSummary[santriKey].baca++;
+              } else if (item.keterangan === 'Pinjam') {
+                  santriSummary[santriKey].pinjam++;
+              }
+
+              // Summarize Buku
+              const bukuKey = item.kodeBuku;
+              if (!bukuSummary[bukuKey]) {
+                  bukuSummary[bukuKey] = { 
+                      judul: item.judulBuku || 'Judul Tidak Diketahui', 
+                      kode: item.kodeBuku, 
+                      total: 0, 
+                      baca: 0, 
+                      pinjam: 0 
+                  };
+              }
+              bukuSummary[bukuKey].total++;
+              if (item.keterangan === 'Baca') {
+                  bukuSummary[bukuKey].baca++;
+              } else if (item.keterangan === 'Pinjam') {
+                  bukuSummary[bukuKey].pinjam++;
+              }
+          });
+
+          // Konversi ke array dan urutkan berdasarkan Total Kunjungan/Akses (Descending)
+          const sortedSantri = Object.values(santriSummary).sort((a, b) => b.total - a.total);
+          const sortedBuku = Object.values(bukuSummary).sort((a, b) => b.total - a.total);
+
+          return { santri: sortedSantri, buku: sortedBuku };
+      }
+
+      // --- RENDER FUNCTIONS ---
+      function renderSantriSummary(data) {
+          santriTableBody.innerHTML = '';
+          totalSantriCount.textContent = data.length;
+
+          if (data.length === 0) {
+              santriTableBody.innerHTML = `<tr><td colspan="4" class="text-center text-gray-500 py-4">Tidak ada data kunjungan santri.</td></tr>`;
+              return;
+          }
+
+          data.forEach(item => {
+              const row = santriTableBody.insertRow();
+              row.innerHTML = `
+                  <td>${item.nama} (${item.nis})</td>
+                  <td class="text-center font-bold">${item.total}</td>
+                  <td class="text-center">${item.baca}</td>
+                  <td class="text-center">${item.pinjam}</td>
+              `;
+          });
+      }
+
+      function renderBukuSummary(data) {
+          bukuTableBody.innerHTML = '';
+          totalBukuCount.textContent = data.length;
+
+          if (data.length === 0) {
+              bukuTableBody.innerHTML = `<tr><td colspan="4" class="text-center text-gray-500 py-4">Tidak ada data akses buku.</td></tr>`;
+              return;
+          }
+
+          data.forEach(item => {
+              const row = bukuTableBody.insertRow();
+              row.innerHTML = `
+                  <td>${item.judul} (${item.kode})</td>
+                  <td class="text-center font-bold">${item.total}</td>
+                  <td class="text-center">${item.baca}</td>
+                  <td class="text-center">${item.pinjam}</td>
+              `;
+          });
+      }
+
+      // --- INITIAL DATA LOAD ---
+      // onValue adalah fungsi yang diimpor dari modul, bukan firebase.onValue global
+      onValue(dbRef, (snapshot) => {
+          loadingIndicator.style.display = 'none';
+
+          const data = snapshot.val();
+          let allHistoryData = [];
+
+          if (data) {
+              allHistoryData = Object.values(data);
+          }
+          
+          const summary = summarizeData(allHistoryData);
+
+          renderSantriSummary(summary.santri);
+          renderBukuSummary(summary.buku);
+          
+      }, {
+          onlyOnce: false 
+      });
+    </script>
+</body>
+</html>
