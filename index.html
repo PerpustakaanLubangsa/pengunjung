@@ -127,7 +127,7 @@
       /* Override Select Box */
       #jenjang, #kategoriBuku, #keterangan {
           /* Ganti SVG panah menjadi warna gelap sekunder */
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%236B7280'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1m1.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd' /%3E%3C/svg%3E");
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%236B7280'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd' /%3E%3C/svg%3E");
           background-repeat: no-repeat;
           background-position: right 0px center;
           background-size: 1.5em;
@@ -230,6 +230,13 @@
           /* Warna hover menggunakan Dark Cyan Darker (Dipertahankan) */
           background-color: var(--color-cyan-dark);
           transform: translateY(-1px);
+      }
+      
+      /* Gaya saat tombol disabled */
+      #btnSubmit:disabled {
+          background-color: #6B7280; /* Warna abu-abu saat disabled */
+          cursor: not-allowed;
+          transform: none;
       }
 
       /* ---------------------------------------------------- */
@@ -420,6 +427,9 @@
       const blokInput = $('blok');
       const jenjangSelect = $('jenjang');
       const kategoriBukuSelect = $('kategoriBuku');
+      
+      // Tombol Submit
+      const btnSubmit = $('btnSubmit');
 
       // Elemen Modal
       const successModal = $('successModal');
@@ -475,6 +485,7 @@
 
           jenjangSelect.value = '';
           kategoriBukuSelect.value = '';
+          keteranganSelect.value = ''; // Pastikan keterangan juga direset
 
           nisDropdown.innerHTML = '';
           bukuDropdown.innerHTML = '';
@@ -526,7 +537,9 @@
       // --- FUNGSI DROPDOWN KUSTOM (Tanpa Riwayat) ---
 
       function getHighlightedText(fullText, filterText) {
-          return fullText;
+          // Fungsi ini disederhanakan/dihilangkan fungsinya di kode asli Anda.
+          // Untuk tema terang ini, fungsi dikembalikan ke dasar (tanpa highlight)
+          return fullText; 
       }
 
       function populateCustomDropdown(dropdownEl, matches, keyType, filterText) {
@@ -573,9 +586,6 @@
           dropdownEl.closest('.form-group').querySelector('input').setAttribute('aria-expanded', matches.length > 0 ? 'true' : 'false');
       }
 
-      // ... (FUNGSI LAINNYA TETAP SAMA) ...
-
-      // Helper untuk menerapkan Title Case dan menjaga kursor
       function applyTitleCaseAndMaintainCursor(inputEl) {
           const start = inputEl.selectionStart;
           const end = inputEl.selectionEnd;
@@ -760,13 +770,21 @@
       });
       // ---------------------------------------------------
 
-      // --- LOGIKA SUBMIT PENGUNJUNG BARU ---
-      $('btnSubmit').addEventListener('click', async () => {
+      // --- LOGIKA SUBMIT PENGUNJUNG BARU (DIPERBAIKI UNTUK ANTI-DUPLIKASI) ---
+      btnSubmit.addEventListener('click', async () => {
+
+        // Menonaktifkan tombol segera setelah diklik untuk mencegah klik ganda
+        btnSubmit.disabled = true;
+        btnSubmit.textContent = 'Memproses...'; 
 
         const hasErrors = markEmptyFields();
         if(hasErrors) {
           const firstError = document.querySelector('.input-line-style.input-error');
           if (firstError) firstError.focus();
+          
+          // Mengaktifkan kembali jika ada error validasi
+          btnSubmit.disabled = false;
+          btnSubmit.textContent = 'Kirim Data Kunjungan'; 
           return;
         }
 
@@ -805,7 +823,7 @@
           // 3. MENGIRIM DATA KUNJUNGAN BARU (Log Utama/Lengkap)
           await push(ref(db, `pengunjung`), payload);
           
-          // 4. MENGIRIM DATA UNTUK HISTORI RINGKASAN (Penyimpanan Khusus) <-- PENAMBAHAN
+          // 4. MENGIRIM DATA UNTUK HISTORI RINGKASAN (Penyimpanan Khusus)
           await push(ref(db, `histori_ringkasan`), payload);
 
           // JIKA SUKSES: Reset form dan tampilkan pop-up
@@ -815,6 +833,10 @@
         } catch(e){
           console.error("Firebase Submit Error:", e);
           alert('GAGAL TOTAL: Kesalahan sistem saat kirim data/perbarui master. Cek Konsol.');
+        } finally {
+          // Mengaktifkan kembali tombol submit (baik sukses maupun gagal)
+          btnSubmit.disabled = false;
+          btnSubmit.textContent = 'Kirim Data Kunjungan';
         }
       });
       
