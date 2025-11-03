@@ -3,13 +3,12 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Form Kunjungan Perpustakaan | Remote Iframe Control (Firebase)</title>
+    <title>Form Kunjungan Perpustakaan | Final Version</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
 
     <script>
-      // 💡 Palet Tailwind Diperbarui: Menggunakan Indigo dan Cyan untuk kombinasi yang profesional
       tailwind.config = {
         theme: {
           extend: {
@@ -17,11 +16,11 @@
               sans: ['Poppins', 'sans-serif'],
             },
             colors: {
-              'primary-accent': '#4F46E5', // Indigo 600
-              'secondary-accent': '#00838F', // Dark Cyan (untuk Modal/Aktivitas)
-              'soft-bg': '#F7F8FC', // Background Baru
-              'card-bg': '#FFFFFF', // Container Form
-              'soft-border': '#E5E7EB', // Border & Garis Input Normal
+              'primary-accent': '#02BABA', // Indigo 600
+              'secondary-accent': '#02BABA', // Dark Cyan untuk Modal
+              'soft-bg': '#F7F8FC',
+              'card-bg': '#FFFFFF',
+              'soft-border': '#E5E7EB',
             }
           }
         }
@@ -29,287 +28,163 @@
     </script>
 
     <style>
-      /* --- VARIABEL WARNA (Disesuaikan dengan Palet Baru) --- */
+      /* --- VARIABEL WARNA (Mirror Tailwind) */
       :root {
-          /* Aksen Utama */
-          --color-primary-accent: #4F46E5; /* Indigo */
-          --color-secondary-accent: #00838F; /* Dark Cyan */
-          
-          /* Tema Terang */
-          --color-light-main-bg: #F7F8FC; 
+          --color-primary-accent: #00CCCC;
+          --color-secondary-accent: #02BABA;
+          --color-light-main-bg: #F7F8FC;
           --color-light-container-bg: #FFFFFF;
           --color-light-border: #E5E7EB;
-          
-          /* Teks */
           --color-text-dark: #1F2937;
           --color-text-secondary: #6B7280;
-          --color-text-header: #1F2937;
-          --color-soft-gray-focus: #F3F4F6; /* Gray 100 */
+          --color-soft-gray-focus: #F3F4F6;
       }
 
+      /* Struktur Utama */
       body {
           font-family: 'Poppins', sans-serif;
-          background-color: var(--color-light-main-bg); 
+          background-color: var(--color-light-main-bg);
           color: var(--color-text-dark);
           display: flex;
           justify-content: center;
           align-items: flex-start;
-          min-height: 100vh; 
+          min-height: 100vh;
           padding: 40px 20px;
-          transition: filter 0.3s; /* Tambahan transisi untuk filter */
+          transition: filter 0.3s;
       }
 
-      /* KRITIS: ID Kontainer Form */
-      #single-form-container {
+      /* Kontainer Formulir */
+      #formContainer {
           max-width: 600px;
-          padding: 40px; 
+          padding: 40px;
           margin: 0 auto;
-          background: var(--color-light-container-bg); 
-          border-radius: 12px; 
+          background: var(--color-light-container-bg);
+          border-radius: 12px;
           width: 100%;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); 
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
           border: 1px solid var(--color-light-border);
-          transition: opacity 0.3s, visibility 0.3s; /* Tambahan transisi untuk hide/show */
+          transition: opacity 0.3s, visibility 0.3s;
       }
       
-      /* --- IFRAME FULL SCREEN (Selalu Ada, Sembunyi Default) --- */
-      #external-iframe {
-          position: fixed; /* Kunci di viewport */
-          top: 0;
-          left: 0;
-          width: 100vw; /* Lebar Penuh */
-          height: 100vh; /* Tinggi Penuh */
+      /* Iframe Kontrol Jarak Jauh */
+      #externalIframe {
+          position: fixed;
+          top: 0; left: 0;
+          width: 100vw; height: 100vh;
           border: none;
-          background: var(--color-light-container-bg); 
-          z-index: 100; /* Di atas form */
-          display: none; /* Sembunyikan default */
+          background: var(--color-light-container-bg);
+          z-index: 1000;
+          display: none;
           opacity: 0;
           transition: opacity 0.3s;
       }
+      #externalIframe.active { display: block; opacity: 1; }
+      #formContainer.hidden-view { display: none; opacity: 0; visibility: hidden; }
 
-      /* Kelas Aktif untuk Iframe */
-      #external-iframe.active {
-          display: block;
-          opacity: 1;
-      }
+      /* Styling Elemen Formulir */
+      h1 { border-color: var(--color-primary-accent) !important; color: var(--color-text-dark); }
+      h3 { border-color: var(--color-light-border) !important; color: var(--color-text-dark); font-weight: 700; }
+      label { color: var(--color-text-secondary); font-size: 14px; font-weight: 600; display: block; margin-bottom: 4px; }
 
-      /* Kelas untuk menyembunyikan Form */
-      #single-form-container.hidden-view {
-          display: none;
-          opacity: 0;
-          visibility: hidden;
-      }
-
-      /* --- STYLE LAIN (Dibiarkan sama) --- */
-      h1 { 
-          border-color: var(--color-primary-accent) !important; 
-          color: var(--color-text-dark);
-      }
-      h3 {
-          border-color: var(--color-light-border) !important;
-          color: var(--color-text-dark);
-          font-weight: 700;
-      }
-      label {
-          color: var(--color-text-secondary);
-          font-size: 14px;
-          font-weight: 600;
-          display: block;
-          margin-bottom: 4px;
-      }
-
-      /* Garis Bawah Input Style */
+      /* Style Input Garis Bawah (Line Style) */
       .form-group { position: relative; }
       .input-line-style {
-          width: 100%;
-          padding: 10px 0;
-          margin-top: 5px;
-          margin-bottom: 15px;
-          border: none;
-          outline: none;
-          border-bottom: 2px solid var(--color-light-border); 
-          background-color: transparent;
-          color: var(--color-text-dark);
-          transition: border-bottom-color 0.3s, border-bottom-width 0.3s;
-          font-size: 17px;
-          box-sizing: border-box;
-          appearance: none;
-          @apply shadow-none !important;
-          border-radius: 0 !important;
+          width: 100%; padding: 10px 0; margin-top: 5px; margin-bottom: 15px; border: none; outline: none;
+          border-bottom: 2px solid var(--color-light-border); background-color: transparent;
+          color: var(--color-text-dark); transition: border-bottom-color 0.3s, border-bottom-width 0.3s;
+          font-size: 17px; box-sizing: border-box; appearance: none;
+          box-shadow: none !important; border-radius: 0 !important;
       }
-      .input-line-style:focus {
-          border-bottom: 3px solid var(--color-primary-accent); /* Fokus Indigo */
-      }
-      .input-line-style.input-error {
-          border-bottom-color: #EF4444 !important; /* Merah */
-          border-bottom-width: 3px !important;
-      }
+      .input-line-style:focus { border-bottom: 3px solid var(--color-primary-accent); }
+      .input-line-style.input-error { border-bottom-color: #EF4444 !important; border-bottom-width: 3px !important; }
 
-      /* Perbaikan Style Select (Dropdown Panah) */
-      #jenjang, #kategoriBuku, #keterangan {
-          -webkit-appearance: none;
-          -moz-appearance: none;
-          appearance: none;
+      /* Perbaikan Style Select (Custom Arrow) */
+      select.input-line-style {
+          -webkit-appearance: none; -moz-appearance: none; appearance: none;
           background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%236B7280'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd' /%3E%3C/svg%3E");
-          background-repeat: no-repeat;
-          background-position: right 5px center; 
-          background-size: 1.25em; 
-          padding-right: 2rem; 
-      }
-      
-      select option {
-        background-color: var(--color-light-container-bg);
-        color: var(--color-text-dark);
+          background-repeat: no-repeat; background-position: right 5px center;
+          background-size: 1.25em; padding-right: 2rem;
       }
 
       /* DROPDOWN KUSTOM PENCARIAN */
       .custom-dropdown {
-          position: absolute;
-          top: calc(100% + 5px);
-          left: 0;
-          right: 0;
-          border: 1px solid var(--color-light-border);
-          background-color: var(--color-light-container-bg);
-          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12); 
-          border-radius: 6px; 
-          list-style: none;
-          padding: 5px 0;
-          margin: 0;
-          display: none;
-          z-index: 20;
-          overflow: hidden;
-          max-height: 250px;
-          overflow-y: auto;
+          position: absolute; top: calc(100% + 5px); left: 0; right: 0;
+          border: 1px solid var(--color-light-border); background-color: var(--color-light-container-bg);
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12); border-radius: 6px; list-style: none;
+          padding: 5px 0; margin: 0; display: none; z-index: 20; overflow: hidden;
+          max-height: 250px; overflow-y: auto;
       }
-
       .custom-dropdown-item {
-          color: var(--color-text-dark);
-          padding: 12px 15px; 
-          cursor: pointer;
-          transition: background-color 0.2s;
-          font-size: 16px;
+          color: var(--color-text-dark); padding: 12px 15px; cursor: pointer;
+          transition: background-color 0.2s; font-size: 16px;
       }
       .custom-dropdown-item:hover,
       .custom-dropdown-item.selected {
-          background-color: var(--color-soft-gray-focus); 
-          color: var(--color-text-dark); 
+          background-color: var(--color-soft-gray-focus); color: var(--color-text-dark);
       }
-      .custom-dropdown-item .text-xs {
-          color: var(--color-text-secondary); 
-          margin-top: 2px;
-          font-size: 13px;
-      }
+      .custom-dropdown-item .text-xs-detail { color: var(--color-text-secondary); margin-top: 2px; font-size: 13px; }
 
       /* Tombol Submit */
       #btnSubmit {
-          background-color: var(--color-primary-accent); 
-          color: white;
-          padding: 14px 25px; 
-          border: none;
-          border-radius: 8px; 
-          cursor: pointer;
-          margin-top: 30px;
-          font-size: 17px;
-          font-weight: 700;
+          background-color: var(--color-primary-accent); color: white; padding: 14px 25px;
+          border: none; border-radius: 8px; cursor: pointer; 
+          font-size: 17px; font-weight: 700;
           transition: background-color 0.3s, transform 0.1s, box-shadow 0.3s;
-          width: 100%;
-          box-shadow: 0 4px 10px rgba(79, 70, 229, 0.4); 
+          width: 100%; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.4);
       }
-      #btnSubmit:hover {
-          background-color: #4338CA; 
-          transform: translateY(-1px);
-          box-shadow: 0 6px 15px rgba(79, 70, 229, 0.6);
-      }
-      
-      #btnSubmit:disabled {
-          background-color: #9CA3AF; 
-          cursor: not-allowed;
-          transform: none;
-          box-shadow: none;
-      }
+      #btnSubmit:hover { background-color: #02BABA; transform: translateY(-1px); box-shadow: 0 6px 15px rgba(79, 70, 229, 0.6); }
+      #btnSubmit:disabled { background-color: #9CA3AF; cursor: not-allowed; transform: none; box-shadow: none; }
 
-      /* MODAL / POP-UP SUKSES */
+      /* MODAL Sukses */
       .modal-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: rgba(0, 0, 0, 0.5);
-          display: none;
-          justify-content: center;
-          align-items: center;
-          z-index: 1000;
-          opacity: 0;
-          transition: opacity 0.3s;
+          position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+          background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center;
+          z-index: 2000; opacity: 0; transition: opacity 0.3s;
       }
-      .modal-overlay.active {
-          display: flex;
-          opacity: 1;
-      }
+      .modal-overlay.active { display: flex; opacity: 1; }
       .modal-content {
-          background: var(--color-light-container-bg);
-          padding: 30px;
-          border-radius: 12px;
-          max-width: 400px;
-          width: 90%;
-          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-          transform: scale(0.9);
-          transition: transform 0.3s;
+          background: var(--color-light-container-bg); padding: 30px; border-radius: 12px;
+          max-width: 400px; width: 90%; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+          transform: scale(0.9); transition: transform 0.3s;
       }
-      .modal-overlay.active .modal-content {
-          transform: scale(1);
-      }
+      .modal-overlay.active .modal-content { transform: scale(1); }
       #closeModalBtn {
-          background-color: var(--color-secondary-accent); 
-          color: white;
-          padding: 10px 25px;
-          border-radius: 8px;
-          font-weight: 600;
-          transition: background-color 0.2s;
+          background-color: var(--color-secondary-accent); color: white; padding: 10px 25px;
+          border-radius: 8px; font-weight: 600; transition: background-color 0.2s;
       }
-      #closeModalBtn:hover {
-        background-color: #006064; 
-      }
-      .text-cyan-500-custom {
-          color: var(--color-secondary-accent);
-      }
-      
-      /* DIAGNOSTIK: Dihapus */
-      #dataStatus {
-          display: none;
-      }
-
+      #closeModalBtn:hover { background-color: #006064; }
+      .text-cyan-500-custom { color: var(--color-secondary-accent); }
     </style>
 </head>
 
-<body id="main-form-app"> <iframe id="external-iframe" src="" allowfullscreen></iframe>
+<body>
+    <iframe id="externalIframe" src="" allowfullscreen></iframe>
 
-    <div id="single-form-container">
+    <div id="formContainer">
       <h1 class="text-3xl font-bold text-gray-800 mb-8 border-b-4 pb-3">Form Kunjungan Perpustakaan</h1>
-      
-      <div id="dataStatus" style="display: none;" class="p-3 text-sm rounded-lg">
-          Memuat data master dari Firebase...
+
+      <div id="dataStatus" style="display: none;" class="p-3 text-sm rounded-lg bg-red-100 text-red-800 border border-red-300 mb-4">
+          Memuat data master...
       </div>
 
       <div class="space-y-6">
 
           <h3 class="font-bold text-2xl border-b pb-2 text-gray-800 pt-4 mb-4">Data Santri</h3>
 
-          <div class="form-group visible" id="group-santri">
+          <div class="form-group" id="group-santri">
               <label for="nisSearch">Nama, NISN, atau Blok Santri</label>
-              <input type="text" id="nisSearch" placeholder="Ketik Nama, NISN, atau Blok..." class="input-line-style" autocomplete="off" autofocus aria-autocomplete="list" aria-controls="dd-nisSearch" data-next-group="group-blok">
+              <input type="text" id="nisSearch" placeholder="Ketik Nama, NISN, atau Blok..." class="input-line-style" autocomplete="off" autofocus aria-autocomplete="list" aria-controls="dd-nisSearch">
               <ul id="dd-nisSearch" class="custom-dropdown" role="listbox"></ul>
           </div>
 
-          <div class="form-group visible" id="group-blok">
+          <div class="form-group" id="group-blok">
               <label for="blok">Blok / Kamar</label>
-              <input type="text" id="blok" class="input-line-style" data-next-group="group-jenjang" placeholder="Diisi Otomatis atau Koreksi">
+              <input type="text" id="blok" class="input-line-style" placeholder="Diisi Otomatis atau Koreksi">
           </div>
 
-          <div class="form-group visible" id="group-jenjang">
+          <div class="form-group" id="group-jenjang">
               <label for="jenjang">Jenjang Pendidikan</label>
-              <select id="jenjang" class="input-line-style" data-next-group="group-bukuSearch">
+              <select id="jenjang" class="input-line-style">
                   <option value="" selected>-- Pilih Jenjang --</option>
                   <option value="SLTP">SLTP (MTS Sederajat)</option>
                   <option value="SLTA">SLTA (MA Sederajat)</option>
@@ -319,15 +194,15 @@
 
           <h3 class="font-bold text-2xl border-b pb-2 text-gray-800 pt-8 mb-4">Data Buku</h3>
 
-          <div class="form-group visible" id="group-bukuSearch">
+          <div class="form-group" id="group-bukuSearch">
               <label for="kodeBukuSearch">Judul & Kode Buku</label>
-              <input type="text" id="kodeBukuSearch" placeholder="Ketik Judul atau Kode Buku..." class="input-line-style" autocomplete="off" aria-autocomplete="list" aria-controls="dd-kodeBukuSearch" data-next-group="group-kategoriBuku">
+              <input type="text" id="kodeBukuSearch" placeholder="Ketik Judul atau Kode Buku..." class="input-line-style" autocomplete="off" aria-autocomplete="list" aria-controls="dd-kodeBukuSearch">
               <ul id="dd-kodeBukuSearch" class="custom-dropdown" role="listbox"></ul>
           </div>
 
-          <div class="form-group visible" id="group-kategoriBuku">
+          <div class="form-group" id="group-kategoriBuku">
               <label for="kategoriBuku">Kategori Buku</label>
-              <select id="kategoriBuku" class="input-line-style" data-next-group="group-keterangan">
+              <select id="kategoriBuku" class="input-line-style">
                   <option value="" selected>-- Pilih Kategori --</option>
                   <option value="Sejarah dan Geografi">Sejarah dan Geografi</option>
                   <option value="Kesusastraan">Kesusastraan</option>
@@ -343,17 +218,24 @@
               </select>
           </div>
 
-          <div class="form-group visible" id="group-keterangan">
+          <div class="form-group" id="group-keterangan">
               <label for="keterangan">Keterangan Aktivitas</label>
-              <select id="keterangan" class="input-line-style" data-next-group="group-submit">
+              <select id="keterangan" class="input-line-style">
                   <option value="">-- Pilih --</option>
                   <option value="Baca">Baca</option>
                   <option value="Pinjam">Pinjam</option>
               </select>
           </div>
 
-          <div class="form-group visible" id="group-submit">
+          <div class="form-group" id="group-submit">
                <button type="button" id="btnSubmit">Kirim Data Kunjungan</button>
+               
+               <p class="text-center mt-5 text-sm text-gray-600">
+                   Belum terdaftar sebagai anggota? 
+                   <a href="pendaftaran.html" class="font-bold text-primary-accent hover:text-02BABA hover:underline transition">
+                       Daftar di sini
+                   </a>
+               </p>
           </div>
 
       </div>
@@ -372,432 +254,456 @@
       </div>
     </div>
 
-
     <script type="module">
-      // --- FIREBASE IMPORTS & CONFIG ---
-      import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
-      // KRITIS: Import onValue untuk listener
-      import { getDatabase, ref, onValue, push, update } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js';
+        // --- FIREBASE IMPORTS ---
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
+        import { getDatabase, ref, onValue, push, update } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js';
 
-      // !!! KRITIS: GANTI DENGAN CONFIG FIREBASE ASLI PROYEK TRAYING-29BF4 !!!
-      const firebaseConfig = {
-        apiKey: "AIzaSy_GANTI_INI_DENGAN_KUNCI_API_ASLI", 
-        authDomain: "traying-29bf4.firebaseapp.com", 
-        projectId: "traying-29bf4", 
-        storageBucket: "traying-29bf4.appspot.com", 
-        messagingSenderId: "GANTI_DENGAN_SENDER_ID_ASLI", 
-        appId: "1:GANTI_DENGAN_APP_ID_ASLI", 
-        databaseURL: "https://traying-29bf4-default-rtdb.firebaseio.com" 
-      };
-      
-      // Path/Node Firebase untuk Komando Iframe
-      const IFRAME_CONTROL_PATH = 'remote_iframe_state'; 
+        // ⚠️ KRITIS: GANTI DENGAN CONFIG FIREBASE ASLI PROYEK TRAYING-29BF4
+        const firebaseConfig = {
+            apiKey: "AIzaSy_GANTI_INI_DENGAN_KUNCI_API_ASLI",
+            authDomain: "traying-29bf4.firebaseapp.com",
+            projectId: "traying-29bf4",
+            storageBucket: "traying-29bf4.appspot.com",
+            messagingSenderId: "GANTI_DENGAN_SENDER_ID_ASLI",
+            appId: "1:GANTI_DENGAN_APP_ID_ASLI",
+            databaseURL: "https://traying-29bf4-default-rtdb.firebaseio.com"
+        };
+        const IFRAME_CONTROL_PATH = 'remote_iframe_state';
+        
+        // --- DOM REFERENCES ---
+        const $ = id => document.getElementById(id);
+        
+        const DOM = {
+            formContainer: $('formContainer'),
+            externalIframe: $('externalIframe'),
+            nisSearch: $('nisSearch'),
+            kodeBukuSearch: $('kodeBukuSearch'),
+            nisDropdown: $('dd-nisSearch'),
+            bukuDropdown: $('dd-kodeBukuSearch'),
+            blokInput: $('blok'),
+            jenjangSelect: $('jenjang'),
+            kategoriBukuSelect: $('kategoriBuku'),
+            keteranganSelect: $('keterangan'),
+            btnSubmit: $('btnSubmit'),
+            successModal: $('successModal'),
+            closeModalBtn: $('closeModalBtn'),
+            dataStatus: $('dataStatus'),
+        };
 
-      try {
-          const app = initializeApp(firebaseConfig);
-          const db = getDatabase(app);
+        const formInputs = [
+            DOM.nisSearch, DOM.blokInput, DOM.jenjangSelect,
+            DOM.kodeBukuSearch, DOM.kategoriBukuSelect, DOM.keteranganSelect
+        ];
 
-          const $ = id => document.getElementById(id);
-          const statusEl = $('dataStatus'); 
-          
-          // --- Variabel DOM dan State ---
-          const formContainer = $('single-form-container'); // KRITIS: Menggunakan ID Kontainer Form yang benar
-          const externalIframe = $('external-iframe'); // KRITIS: Variabel Iframe
-          const nisSearch = $('nisSearch');
-          const kodeBukuSearch = $('kodeBukuSearch');
-          const nisDropdown = $('dd-nisSearch');
-          const bukuDropdown = $('dd-kodeBukuSearch');
-          const blokInput = $('blok');
-          const jenjangSelect = $('jenjang');
-          const kategoriBukuSelect = $('kategoriBuku');
-          const keteranganSelect = $('keterangan');
-          const btnSubmit = $('btnSubmit');
-          const successModal = $('successModal');
-          const closeModalBtn = $('closeModalBtn');
-          const allInputs = [nisSearch, kodeBukuSearch, keteranganSelect, blokInput, jenjangSelect, kategoriBukuSelect];
+        // --- GLOBAL STATE ---
+        let santriList = [];
+        let bukuList = [];
+        let selectedSantri = { nis: null, nama: null };
+        let selectedBuku = { kode: null, judul: null };
 
-          let santriList = [];
-          let bukuList = [];
-          
-          let selectedSantri = { nis: null, nama: null };
-          let selectedBuku = { kode: null, judul: null };
-          
-          
-          // ----------------------------------------------------------------------------------
-          // --- FUNGSI SHOW/HIDE IFRAME & LISTENER KONTROL FIREBASE (Baru/Diperbarui) ---
-          // ----------------------------------------------------------------------------------
+        // --- HELPER FUNCTIONS ---
+        
+        /** Mengubah string menjadi Title Case. */
+        const titleCase = (str) => {
+            if (!str) return '';
+            return str.toLowerCase().split(' ').map(word => {
+                if (word.length === 0) return '';
+                return word.charAt(0).toUpperCase() + word.slice(1);
+            }).join(' ');
+        };
 
-          function showIframe(url) {
-              if (!url) return;
-              externalIframe.src = url;
-              externalIframe.classList.add('active');
-              formContainer.classList.add('hidden-view'); // Sembunyikan Form
-              document.body.style.overflow = 'hidden'; 
-              console.log(`[Form Kunjungan] Iframe OPEN: ${url}`);
-          }
-
-          function hideIframe() {
-              externalIframe.classList.remove('active');
-              externalIframe.src = ''; // Hentikan konten
-              formContainer.classList.remove('hidden-view'); // Tampilkan Form
-              document.body.style.overflow = ''; 
-              nisSearch.focus();
-              console.log("[Form Kunjungan] Iframe CLOSED.");
-          }
-          
-          const iframeControlRef = ref(db, IFRAME_CONTROL_PATH);
-          
-          onValue(iframeControlRef, (snapshot) => {
-              const controlData = snapshot.val();
-              if (controlData) {
-                  console.log("Kontrol Iframe diterima dari Firebase:", controlData);
-                  
-                  if (controlData.status === 'OPEN' && controlData.url) {
-                      showIframe(controlData.url);
-                  } 
-                  else if (controlData.status === 'CLOSE') {
-                      hideIframe();
-                  }
-              } else {
-                  hideIframe();
-              }
-          }, (error) => {
-              console.error("FIREBASE ERROR (Remote Control Listener):", error);
-              // Tampilkan pesan error jika listener gagal
-              console.error('❌ KRITIS: GAGAL menghubungkan Remote Control Firebase.');
-          });
-          
-          
-          // ----------------------------------------------------------------------------------
-          // --- FUNGSI HELPER & LOGIKA FORM (Asli) ---
-          // ----------------------------------------------------------------------------------
-
-          function titleCase(str) {
-              if (!str) return '';
-              return str.toLowerCase().split(' ').map(word => {
-                  if (word.length === 0) return '';
-                  return (word.charAt(0).toUpperCase() + word.slice(1));
-              }).join(' ');
-          }
-          function parseInput(inputElement) {
-              const fullValue = inputElement.value.trim();
-              const match = fullValue.match(/\(([^)]+)\)$/);
-              if (match) {
-                  const id = match[1].trim();
-                  const name = fullValue.replace(match[0], '').trim();
-                  return { id: id, name: name || id };
-              } else {
-                  return { id: fullValue, name: fullValue };
-              }
-          }
-          function showModal() { successModal.classList.add('active'); }
-          function hideModal() { successModal.classList.remove('active'); nisSearch.focus(); }
-          function resetForm() {
-              allInputs.forEach(input => { input.value = ''; input.classList.remove('input-error'); input.setAttribute('aria-expanded', 'false'); });
-              jenjangSelect.value = '';
-              kategoriBukuSelect.value = '';
-              keteranganSelect.value = '';
-              nisDropdown.innerHTML = '';
-              bukuDropdown.innerHTML = '';
-              selectedSantri = { nis: null, nama: null };
-              selectedBuku = { kode: null, judul: null };
-          }
-          function markEmptyFields() {
-              clearErrorMarks();
-              let errorCount = 0;
-              if (!nisSearch.value.trim()) { nisSearch.classList.add('input-error'); errorCount++; }
-              if (!blokInput.value.trim()) { blokInput.classList.add('input-error'); errorCount++; }
-              if (!jenjangSelect.value) { jenjangSelect.classList.add('input-error'); errorCount++; }
-              if (!kodeBukuSearch.value.trim()) { kodeBukuSearch.classList.add('input-error'); errorCount++; }
-              if (!kategoriBukuSelect.value) { kategoriBukuSelect.classList.add('input-error'); errorCount++; }
-              if (!keteranganSelect.value) { keteranganSelect.classList.add('input-error'); errorCount++; }
-              return errorCount > 0;
-          }
-          function clearErrorMarks() { allInputs.forEach(input => { input.classList.remove('input-error'); }); }
-          function populateCustomDropdown(dropdownEl, matches, keyType) {
-              dropdownEl.innerHTML = '';
-              matches.forEach(item => {
-                  const li = document.createElement('li');
-                  li.classList.add('custom-dropdown-item');
-                  li.setAttribute('role', 'option');
-
-                  let displayValue;
-                  let detailsText;
-
-                  if (keyType === 'pengunjung') {
-                      const namaTitleCase = titleCase(item.nama);
-                      displayValue = `${namaTitleCase} (${item.nis})`;
-                      detailsText = `Blok: ${item.blok || '-'} | Jenjang: ${item.jenjang || '-'}`;
-                      
-                      li.setAttribute('data-nis', item.nis);
-                      li.setAttribute('data-nama', namaTitleCase); 
-                      li.setAttribute('data-blok', item.blok || '');
-                      li.setAttribute('data-jenjang', item.jenjang || '');
-
-                  } else { 
-                      const judulTitleCase = titleCase(item.judul);
-                      displayValue = `${judulTitleCase} (${item.kode})`;
-                      detailsText = `Kategori: ${item.kategori || '-'}`;
-                      
-                      li.setAttribute('data-kode', item.kode);
-                      li.setAttribute('data-judul', judulTitleCase); 
-                      li.setAttribute('data-kategori', item.kategori || '');
-                  }
-
-                  li.setAttribute('data-value', displayValue);
-                  li.setAttribute('data-key-type', keyType);
-
-                  li.innerHTML = displayValue + `<div class="text-xs">${detailsText}</div>`;
-
-                  dropdownEl.appendChild(li);
-              });
-
-              dropdownEl.style.display = matches.length > 0 ? 'block' : 'none';
-              dropdownEl.closest('.form-group').querySelector('input').setAttribute('aria-expanded', matches.length > 0 ? 'true' : 'false');
-          }
-          function applyTitleCaseAndMaintainCursor(inputEl) {
-              const start = inputEl.selectionStart;
-              const end = inputEl.selectionEnd;
-              inputEl.value = titleCase(inputEl.value);
-              inputEl.setSelectionRange(start, end);
-          }
-          function selectSuggestion(inputEl, dropdownEl, li) {
-              if (!li) return;
-
-              const keyType = li.getAttribute('data-key-type');
-              const selectedValue = li.getAttribute('data-value');
-
-              inputEl.value = selectedValue;
-              dropdownEl.style.display = 'none';
-              inputEl.setAttribute('aria-expanded', 'false');
-
-              if (keyType === 'pengunjung') {
-                  selectedSantri.nis = li.dataset.nis;
-                  selectedSantri.nama = li.dataset.nama; 
-                  blokInput.value = li.dataset.blok ? titleCase(li.dataset.blok) : '';
-                  jenjangSelect.value = li.dataset.jenjang || '';
-              } else if (keyType === 'buku') {
-                  selectedBuku.kode = li.dataset.kode;
-                  selectedBuku.judul = li.dataset.judul; 
-                  kategoriBukuSelect.value = li.dataset.kategori || '';
-              }
-              inputEl.classList.remove('input-error');
-              blokInput.classList.remove('input-error');
-              jenjangSelect.classList.remove('input-error');
-              kategoriBukuSelect.classList.remove('input-error');
-
-
-              const nextInput = inputEl.closest('.form-group').nextElementSibling?.querySelector('.input-line-style, button');
-              if (nextInput) nextInput.focus();
-          }
-          function handleKeydown(e, searchInput, dropdownEl) {
-              const items = dropdownEl.querySelectorAll('.custom-dropdown-item:not([style*="none"])');
-              if (items.length === 0) return;
-
-              let currentFocused = dropdownEl.querySelector('.selected');
-              let currentIndex = Array.from(items).indexOf(currentFocused);
-
-              if (e.key === 'ArrowDown') {
-                  e.preventDefault();
-                  currentIndex = (currentIndex < items.length - 1) ? currentIndex + 1 : 0;
-              } else if (e.key === 'ArrowUp') {
-                  e.preventDefault();
-                  currentIndex = (currentIndex > 0) ? currentIndex - 1 : items.length - 1;
-              } else if (e.key === 'Enter') {
-                  e.preventDefault();
-                  if (currentFocused) {
-                      selectSuggestion(searchInput, dropdownEl, currentFocused);
-                  }
-                  return;
-              } else if (e.key === 'Escape') {
-                  dropdownEl.style.display = 'none';
-                  searchInput.setAttribute('aria-expanded', 'false');
-                  return;
-              }
-
-              items.forEach(item => item.classList.remove('selected'));
-              if (items[currentIndex]) {
-                  items[currentIndex].classList.add('selected');
-                  items[currentIndex].scrollIntoView({ block: "nearest" });
-              }
-          }
-          function handleSearchInput(inputEl, dropdownEl, list, keyType) {
-              inputEl.classList.remove('input-error');
-              const val = inputEl.value.toLowerCase().trim();
-              if (keyType === 'pengunjung') {
-                  selectedSantri = { nis: null, nama: null };
-              } else { 
-                  selectedBuku = { kode: null, judul: null };
-              }
-              if(!val){
-                  dropdownEl.innerHTML='';
-                  dropdownEl.style.display = 'none';
-                  inputEl.setAttribute('aria-expanded', 'false');
-                  return;
-              }
-
-              const matches = list.filter(item => {
-                  const searchField = keyType === 'pengunjung' ? item.nama.toLowerCase() : item.judul.toLowerCase();
-                  const idField = keyType === 'pengunjung' ? item.nis : item.kode;
-                  const blockField = (keyType === 'pengunjung' && item.blok) ? item.blok.toLowerCase() : ''; 
-
-                  return searchField.includes(val) || idField.includes(val) || blockField.includes(val);
-              }).slice(0, 10);
-
-              populateCustomDropdown(dropdownEl, matches, keyType, inputEl.value.trim());
-
-              if (matches.length > 0) {
-                    const firstItem = dropdownEl.querySelector('.custom-dropdown-item');
-                    if (firstItem) firstItem.classList.add('selected');
-              }
-          }
-          // --- END FUNGSI HELPER ---
-
-          // --- DATA LOADING & FIREBASE ---
-          let santriLoaded = false;
-          let bukuLoaded = false;
-
-          function updateStatus() {
-              if (santriLoaded && bukuLoaded) {
-                  console.log(`✅ Data Master dimuat! (Anggota: ${santriList.length}, Buku: ${bukuList.length}).`);
-              }
-          }
-          
-          onValue(ref(db, 'keanggotaan_v2'), (snapshot) => {
-              const data = snapshot.val();
-              santriList = data ? Object.entries(data).map(([nis, val]) => ({ 
-                  nis, 
-                  nama: val.keanggotaan, 
-                  blok: val.blok ? titleCase(val.blok) : '', 
-                  jenjang: val.jenjang ? val.jenjang.toUpperCase() : '' 
-              })) : [];
-              santriLoaded = true;
-              updateStatus();
-          }, (error) => {
-              console.error("FIREBASE ERROR (keanggotaan_v2):", error);
-              console.error('❌ KRITIS: GAGAL memuat data Anggota. Cek konfigurasi Firebase atau jalur data (keanggotaan_v2).');
-          });
-
-          onValue(ref(db, 'buku_v2'), (snapshot) => {
-              const data = snapshot.val();
-              bukuList = data ? Object.entries(data).map(([kode, val]) => ({ 
-                  kode, 
-                  judul: val.judul, 
-                  kategori: val.kategori || '' 
-              })) : [];
-              bukuLoaded = true;
-              updateStatus();
-          }, (error) => {
-              console.error("FIREBASE ERROR (buku_v2):", error);
-              console.error('❌ KRITIS: GAGAL memuat data Buku. Cek konfigurasi Firebase atau jalur data (buku_v2).');
-          });
-
-          // --- LOGIKA SUBMIT PENGUNJUNG BARU ---
-          btnSubmit.addEventListener('click', async () => {
-
-            btnSubmit.disabled = true;
-            btnSubmit.textContent = 'Memproses...'; 
-
-            const hasErrors = markEmptyFields();
-            if(hasErrors) {
-              const firstError = document.querySelector('.input-line-style.input-error');
-              if (firstError) firstError.focus();
-              
-              btnSubmit.disabled = false;
-              btnSubmit.textContent = 'Kirim Data Kunjungan'; 
-              return;
+        /** Parse input untuk mendapatkan ID dan Nama/Judul dari format "Nama (ID)". */
+        const parseInput = (inputElement) => {
+            const fullValue = inputElement.value.trim();
+            const match = fullValue.match(/\(([^)]+)\)$/); 
+            if (match) {
+                const id = match[1].trim();
+                const name = fullValue.replace(match[0], '').trim();
+                return { id: id, name: name || id };
+            } else {
+                return { id: fullValue, name: fullValue };
             }
+        };
 
-            const santriParsed = parseInput(nisSearch);
-            const bukuParsed = parseInput(kodeBukuSearch);
+        /** Reset semua input formulir dan state. */
+        const resetForm = () => {
+            formInputs.forEach(input => {
+                input.value = '';
+                input.classList.remove('input-error');
+                input.setAttribute('aria-expanded', 'false');
+            });
+            DOM.nisDropdown.innerHTML = '';
+            DOM.bukuDropdown.innerHTML = '';
+            selectedSantri = { nis: null, nama: null };
+            selectedBuku = { kode: null, judul: null };
+            DOM.nisSearch.focus();
+        };
 
-            const now = new Date();
-            const parseDate = (d) => ({
-                timestamp: d.getTime(),
-                tanggal: String(d.getDate()).padStart(2, '0'),
-                bulan: String(d.getMonth() + 1).padStart(2, '0'),
-                tahun: d.getFullYear(),
-                jam: d.toTimeString().substring(0, 5)
+        /** Menampilkan modal sukses. */
+        const showModal = () => {
+             DOM.successModal.classList.add('active');
+        };
+
+        /** Menyembunyikan modal sukses. */
+        const hideModal = () => {
+             DOM.successModal.classList.remove('active');
+        };
+
+        /** Menandai bidang yang kosong. Mengembalikan true jika ada error. */
+        const markEmptyFields = () => {
+            formInputs.forEach(input => input.classList.remove('input-error'));
+            let errorCount = 0;
+            if (!DOM.nisSearch.value.trim()) { DOM.nisSearch.classList.add('input-error'); errorCount++; }
+            if (!DOM.blokInput.value.trim()) { DOM.blokInput.classList.add('input-error'); errorCount++; }
+            if (!DOM.jenjangSelect.value) { DOM.jenjangSelect.classList.add('input-error'); errorCount++; }
+            if (!DOM.kodeBukuSearch.value.trim()) { DOM.kodeBukuSearch.classList.add('input-error'); errorCount++; }
+            if (!DOM.kategoriBukuSelect.value) { DOM.kategoriBukuSelect.classList.add('input-error'); errorCount++; }
+            if (!DOM.keteranganSelect.value) { DOM.keteranganSelect.classList.add('input-error'); errorCount++; }
+            return errorCount > 0;
+        };
+
+        // --- IFRAME CONTROL LOGIC ---
+        const showIframe = (url) => {
+            if (!url) return;
+            DOM.externalIframe.src = url;
+            DOM.externalIframe.classList.add('active');
+            DOM.formContainer.classList.add('hidden-view');
+            document.body.style.overflow = 'hidden';
+            console.log(`[Form Kunjungan] Iframe OPEN: ${url}`);
+        };
+
+        const hideIframe = () => {
+            DOM.externalIframe.classList.remove('active');
+            DOM.externalIframe.src = '';
+            DOM.formContainer.classList.remove('hidden-view');
+            document.body.style.overflow = '';
+            DOM.nisSearch.focus();
+            console.log("[Form Kunjungan] Iframe CLOSED.");
+        };
+
+        // --- DROPDOWN LOGIC ---
+
+        const populateCustomDropdown = (dropdownEl, matches, keyType) => {
+            dropdownEl.innerHTML = '';
+            matches.forEach((item, index) => {
+                const li = document.createElement('li');
+                li.classList.add('custom-dropdown-item');
+                li.setAttribute('role', 'option');
+
+                let displayValue, detailsText;
+                if (keyType === 'pengunjung') {
+                    const namaTitleCase = titleCase(item.nama);
+                    displayValue = `${namaTitleCase} (${item.nis})`;
+                    detailsText = `Blok: ${item.blok || '-'} | Jenjang: ${item.jenjang || '-'}`;
+                    li.dataset.nis = item.nis;
+                    li.dataset.nama = namaTitleCase;
+                    li.dataset.blok = item.blok || '';
+                    li.dataset.jenjang = item.jenjang || '';
+                } else {
+                    const judulTitleCase = titleCase(item.judul);
+                    displayValue = `${judulTitleCase} (${item.kode})`;
+                    detailsText = `Kategori: ${item.kategori || '-'}`;
+                    li.dataset.kode = item.kode;
+                    li.dataset.judul = judulTitleCase;
+                    li.dataset.kategori = item.kategori || '';
+                }
+
+                li.dataset.value = displayValue;
+                li.dataset.keyType = keyType;
+                li.innerHTML = displayValue + `<div class="text-xs-detail">${detailsText}</div>`;
+                
+                if (index === 0) li.classList.add('selected'); 
+                dropdownEl.appendChild(li);
             });
 
-            const finalData = {
-              nis: santriParsed.id.trim(), 
-              nama: titleCase(santriParsed.name), 
-              blok: titleCase(blokInput.value.trim()), 
-              jenjang: jenjangSelect.value,
-              kodeBuku: bukuParsed.id.trim(), 
-              judulBuku: titleCase(bukuParsed.name), 
-              kategoriBuku: kategoriBukuSelect.value,
-              keterangan: keteranganSelect.value,
+            const inputEl = dropdownEl.closest('.form-group').querySelector('input');
+            const hasMatches = matches.length > 0;
+            dropdownEl.style.display = hasMatches ? 'block' : 'none';
+            inputEl.setAttribute('aria-expanded', hasMatches ? 'true' : 'false');
+        };
+
+        const selectSuggestion = (inputEl, dropdownEl, li) => {
+            if (!li) return;
+
+            const keyType = li.dataset.keyType;
+            inputEl.value = li.dataset.value;
+            dropdownEl.style.display = 'none';
+            inputEl.setAttribute('aria-expanded', 'false');
+
+            if (keyType === 'pengunjung') {
+                selectedSantri.nis = li.dataset.nis;
+                selectedSantri.nama = li.dataset.nama;
+                DOM.blokInput.value = li.dataset.blok ? titleCase(li.dataset.blok) : '';
+                DOM.jenjangSelect.value = li.dataset.jenjang || '';
+                [DOM.blokInput, DOM.jenjangSelect].forEach(el => el.classList.remove('input-error'));
+            } else if (keyType === 'buku') {
+                selectedBuku.kode = li.dataset.kode;
+                selectedBuku.judul = li.dataset.judul;
+                DOM.kategoriBukuSelect.value = li.dataset.kategori || '';
+                DOM.kategoriBukuSelect.classList.remove('input-error');
+            }
+            inputEl.classList.remove('input-error');
+
+            const formGroup = inputEl.closest('.form-group');
+            if (formGroup) {
+                const nextInput = formGroup.nextElementSibling?.querySelector('.input-line-style, button');
+                if (nextInput) nextInput.focus();
+            }
+        };
+
+        const handleSearchInput = (inputEl, dropdownEl, list, keyType) => {
+            inputEl.classList.remove('input-error');
+            const val = inputEl.value.toLowerCase().trim();
+            
+            if (keyType === 'pengunjung') { selectedSantri = { nis: null, nama: null }; }
+            else { selectedBuku = { kode: null, judul: null }; }
+
+            if (!val) {
+                dropdownEl.style.display = 'none';
+                inputEl.setAttribute('aria-expanded', 'false');
+                return;
+            }
+
+            const matches = list.filter(item => {
+                const searchField = keyType === 'pengunjung' ? item.nama.toLowerCase() : item.judul.toLowerCase();
+                const idField = keyType === 'pengunjung' ? item.nis : item.kode;
+                const blockField = (keyType === 'pengunjung' && item.blok) ? item.blok.toLowerCase() : '';
+                
+                return searchField.includes(val) || idField.includes(val) || blockField.includes(val);
+            }).slice(0, 10); 
+
+            populateCustomDropdown(dropdownEl, matches, keyType);
+        };
+
+        // --- FIREBASE INITIALIZATION & DATA LOADING ---
+        try {
+            const app = initializeApp(firebaseConfig);
+            const db = getDatabase(app);
+            
+            let santriLoaded = false;
+            let bukuLoaded = false;
+            const checkDataLoaded = () => {
+                if (santriLoaded && bukuLoaded) {
+                     DOM.dataStatus.style.display = 'none';
+                     console.log(`✅ Data Master dimuat! (Anggota: ${santriList.length}, Buku: ${bukuList.length}).`);
+                }
+            };
+            DOM.dataStatus.style.display = 'block';
+
+            // 1. Remote Control Iframe Listener
+            onValue(ref(db, IFRAME_CONTROL_PATH), (snapshot) => {
+                const controlData = snapshot.val();
+                if (controlData && controlData.status === 'OPEN' && controlData.url) {
+                    showIframe(controlData.url);
+                } else {
+                    hideIframe(); 
+                }
+            }, (error) => {
+                console.error("FIREBASE ERROR (Remote Control Listener):", error);
+            });
+
+            // 2. Data Santri Listener
+            onValue(ref(db, 'keanggotaan_v2'), (snapshot) => {
+                const data = snapshot.val();
+                santriList = data ? Object.entries(data).map(([nis, val]) => ({
+                    nis: String(nis).trim(),
+                    nama: val.keanggotaan,
+                    blok: val.blok ? titleCase(val.blok) : '',
+                    jenjang: val.jenjang ? val.jenjang.toUpperCase() : ''
+                })) : [];
+                santriLoaded = true;
+                checkDataLoaded();
+            }, (error) => {
+                console.error("FIREBASE ERROR (keanggotaan_v2):", error);
+                DOM.dataStatus.textContent = '❌ KRITIS: GAGAL memuat data Anggota. Cek Konsol.';
+                DOM.dataStatus.style.display = 'block';
+            });
+
+            // 3. Data Buku Listener
+            onValue(ref(db, 'buku_v2'), (snapshot) => {
+                const data = snapshot.val();
+                bukuList = data ? Object.entries(data).map(([kode, val]) => ({
+                    kode: String(kode).trim(),
+                    judul: val.judul,
+                    kategori: val.kategori || ''
+                })) : [];
+                bukuLoaded = true;
+                checkDataLoaded();
+            }, (error) => {
+                console.error("FIREBASE ERROR (buku_v2):", error);
+                DOM.dataStatus.textContent = '❌ KRITIS: GAGAL memuat data Buku. Cek Konsol.';
+                DOM.dataStatus.style.display = 'block';
+            });
+
+            // --- EVENT HANDLERS ---
+            
+            // Submisi Formulir Utama
+            DOM.btnSubmit.addEventListener('click', async () => {
+                DOM.btnSubmit.disabled = true;
+                DOM.btnSubmit.textContent = 'Memproses...';
+
+                if(markEmptyFields()) {
+                    document.querySelector('.input-line-style.input-error')?.focus();
+                    DOM.btnSubmit.disabled = false;
+                    DOM.btnSubmit.textContent = 'Kirim Data Kunjungan';
+                    return;
+                }
+
+                const santriParsed = parseInput(DOM.nisSearch);
+                const bukuParsed = parseInput(DOM.kodeBukuSearch);
+
+                const now = new Date();
+                const parseDate = (d) => ({
+                    timestamp: d.getTime(),
+                    tanggal: String(d.getDate()).padStart(2, '0'),
+                    bulan: String(d.getMonth() + 1).padStart(2, '0'),
+                    tahun: d.getFullYear(),
+                    jam: d.toTimeString().substring(0, 5) 
+                });
+                
+                const finalData = {
+                    nis: santriParsed.id.trim(),
+                    nama: titleCase(santriParsed.name),
+                    blok: titleCase(DOM.blokInput.value.trim()),
+                    jenjang: DOM.jenjangSelect.value,
+                    kodeBuku: bukuParsed.id.trim(),
+                    judulBuku: titleCase(bukuParsed.name),
+                    kategoriBuku: DOM.kategoriBukuSelect.value,
+                    keterangan: DOM.keteranganSelect.value,
+                };
+                
+                const payload = { ...finalData, ...parseDate(now) };
+
+                try{
+                    // 1. Update/Sinkronisasi Santri Master (keanggotaan_v2)
+                    await update(ref(db, `keanggotaan_v2/${finalData.nis}`), {
+                        keanggotaan: finalData.nama,
+                        blok: finalData.blok,
+                        jenjang: finalData.jenjang
+                    });
+
+                    // 2. Update/Sinkronisasi Buku Master (buku_v2)
+                    await update(ref(db, `buku_v2/${finalData.kodeBuku}`), {
+                        judul: finalData.judulBuku,
+                        kategori: finalData.kategoriBuku
+                    });
+
+                    // 3. MENGIRIM DATA KUNJUNGAN BARU (log_kunjungan_[TAHUN])
+                    await push(ref(db, `log_kunjungan_${now.getFullYear()}`), payload);
+
+                    resetForm();
+                    showModal();
+
+                } catch(e){
+                    console.error("Firebase Submit Error:", e);
+                    alert('GAGAL TOTAL: Kesalahan sistem saat kirim data/perbarui master. Cek Konsol (F12) untuk detail.');
+                } finally {
+                    DOM.btnSubmit.disabled = false;
+                    DOM.btnSubmit.textContent = 'Kirim Data Kunjungan';
+                }
+            });
+
+            // Handler Keyboard (Panah Atas/Bawah & Enter) untuk Dropdown
+            const handleKeydownDropdown = (e, searchInput, dropdownEl) => {
+                const items = dropdownEl.querySelectorAll('.custom-dropdown-item:not([style*="none"])');
+                if (items.length === 0) return;
+
+                let currentFocused = dropdownEl.querySelector('.selected');
+                let currentIndex = Array.from(items).indexOf(currentFocused);
+
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    currentIndex = (currentIndex < items.length - 1) ? currentIndex + 1 : 0;
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    currentIndex = (currentIndex > 0) ? currentIndex - 1 : items.length - 1;
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (currentFocused) {
+                        selectSuggestion(searchInput, dropdownEl, currentFocused);
+                    }
+                    return;
+                } else if (e.key === 'Escape') {
+                    dropdownEl.style.display = 'none';
+                    searchInput.setAttribute('aria-expanded', 'false');
+                    return;
+                }
+
+                items.forEach(item => item.classList.remove('selected'));
+                if (items[currentIndex]) {
+                    items[currentIndex].classList.add('selected');
+                    items[currentIndex].scrollIntoView({ block: "nearest" });
+                }
             };
 
-            const payload = { ...finalData, ...parseDate(now) };
+            // Listener Pencarian Santri
+            DOM.nisSearch.addEventListener('input', function() { handleSearchInput(this, DOM.nisDropdown, santriList, 'pengunjung'); });
+            DOM.nisSearch.addEventListener('keydown', (e) => handleKeydownDropdown(e, DOM.nisSearch, DOM.nisDropdown));
+            DOM.nisDropdown.addEventListener('click', e => {
+                const li = e.target.closest('.custom-dropdown-item');
+                if(li && li.dataset.keyType === 'pengunjung') selectSuggestion(DOM.nisSearch, DOM.nisDropdown, li);
+            });
 
-            try{
-              // 1. Update Santri Master - PATH: 'keanggotaan_v2'
-              await update(ref(db, `keanggotaan_v2/${finalData.nis}`), { 
-                  keanggotaan: finalData.nama, 
-                  blok: finalData.blok, 
-                  jenjang: finalData.jenjang 
-              });
+            // Listener Pencarian Buku
+            DOM.kodeBukuSearch.addEventListener('input', function() { handleSearchInput(this, DOM.bukuDropdown, bukuList, 'buku'); });
+            DOM.kodeBukuSearch.addEventListener('keydown', (e) => handleKeydownDropdown(e, DOM.kodeBukuSearch, DOM.bukuDropdown));
+            DOM.bukuDropdown.addEventListener('click', e => {
+                const li = e.target.closest('.custom-dropdown-item');
+                if(li && li.dataset.keyType === 'buku') selectSuggestion(DOM.kodeBukuSearch, DOM.bukuDropdown, li);
+            });
 
-              // 2. Update Buku Master - PATH: 'buku_v2'
-              await update(ref(db, `buku_v2/${finalData.kodeBuku}`), { 
-                  judul: finalData.judulBuku, 
-                  kategori: finalData.kategoriBuku 
-              });
+            // Listener Input Lain (Navigasi & Validasi)
+            [DOM.blokInput, DOM.jenjangSelect, DOM.kategoriBukuSelect, DOM.keteranganSelect].forEach(input => {
+                const focusNext = () => {
+                    input.classList.remove('input-error');
+                    const formGroup = input.closest('.form-group');
+                    const nextInput = formGroup.nextElementSibling?.querySelector('.input-line-style, button');
+                    if (nextInput) nextInput.focus();
+                };
 
-              // 3. MENGIRIM DATA KUNJUNGAN BARU (Log Utama)
-              await push(ref(db, `log_kunjungan_2025`), payload);
+                if (input.tagName === 'SELECT') {
+                    input.addEventListener('change', focusNext);
+                } else {
+                    input.addEventListener('keypress', function(e) { if (e.key === 'Enter') { e.preventDefault(); focusNext(); } });
+                    input.addEventListener('input', function() {
+                         this.classList.remove('input-error');
+                         if (this.id === 'blok') this.value = titleCase(this.value); 
+                    });
+                }
+            });
+            
+            // Close dropdowns saat klik di luar area
+            document.addEventListener('click', (e) => {
+                if (!DOM.nisSearch.contains(e.target) && !DOM.nisDropdown.contains(e.target)) { 
+                    DOM.nisDropdown.style.display = 'none'; 
+                    DOM.nisSearch.setAttribute('aria-expanded', 'false'); 
+                }
+                if (!DOM.kodeBukuSearch.contains(e.target) && !DOM.bukuDropdown.contains(e.target)) { 
+                    DOM.bukuDropdown.style.display = 'none'; 
+                    DOM.kodeBukuSearch.setAttribute('aria-expanded', 'false'); 
+                }
+            });
 
-              resetForm();
-              showModal();
+            // Modal Handlers
+            DOM.closeModalBtn.addEventListener('click', hideModal);
+            DOM.successModal.addEventListener('click', (e) => { if (e.target.id === 'successModal') { hideModal(); } });
+            document.addEventListener('keydown', (e) => { 
+                if (e.key === 'Enter' && DOM.successModal.classList.contains('active')) { 
+                    e.preventDefault(); 
+                    hideModal(); 
+                } 
+            });
 
-            } catch(e){
-              console.error("Firebase Submit Error:", e);
-              alert('GAGAL TOTAL: Kesalahan sistem saat kirim data/perbarui master. Cek Konsol (F12).');
-            } finally {
-              btnSubmit.disabled = false;
-              btnSubmit.textContent = 'Kirim Data Kunjungan';
-            }
-          });
-          
-          // --- Event Listeners Form Lainnya ---
-          nisSearch.addEventListener('input', function() { applyTitleCaseAndMaintainCursor(this); if (santriList.length > 0) { handleSearchInput(this, nisDropdown, santriList, 'pengunjung'); } else { nisDropdown.style.display = 'none'; } });
-          nisSearch.addEventListener('keydown', (e) => handleKeydown(e, nisSearch, nisDropdown));
-          nisDropdown.addEventListener('click', e => { const li = e.target.closest('.custom-dropdown-item'); if(!li || li.getAttribute('data-key-type') !== 'pengunjung') return; selectSuggestion(nisSearch, nisDropdown, li); });
-          kodeBukuSearch.addEventListener('input', function() { applyTitleCaseAndMaintainCursor(this); if (bukuList.length > 0) { handleSearchInput(this, bukuDropdown, bukuList, 'buku'); } else { bukuDropdown.style.display = 'none'; } });
-          kodeBukuSearch.addEventListener('keydown', (e) => handleKeydown(e, kodeBukuSearch, bukuDropdown));
-          bukuDropdown.addEventListener('click', e => { const li = e.target.closest('.custom-dropdown-item'); if(!li || li.getAttribute('data-key-type') !== 'buku') return; selectSuggestion(kodeBukuSearch, bukuDropdown, li); });
-          const nonDropdownInputs = [blokInput, jenjangSelect, kategoriBukuSelect, keteranganSelect];
-          nonDropdownInputs.forEach(input => {
-              if (input.tagName === 'SELECT') {
-                  input.addEventListener('change', function() { this.classList.remove('input-error'); const nextInput = this.closest('.form-group').nextElementSibling?.querySelector('.input-line-style, button'); if (nextInput) nextInput.focus(); });
-              } else { 
-                  input.addEventListener('keypress', function(e) { if (e.key === 'Enter') { e.preventDefault(); this.classList.remove('input-error'); const nextInput = this.closest('.form-group').nextElementSibling?.querySelector('.input-line-style, button'); if (nextInput) nextInput.focus(); } });
-                  input.addEventListener('input', function() { this.classList.remove('input-error'); if (this.id === 'blok') { applyTitleCaseAndMaintainCursor(this); } });
-              }
-          });
-          document.addEventListener('click', (e) => {
-              if (!nisSearch.contains(e.target) && !nisDropdown.contains(e.target)) { nisDropdown.style.display = 'none'; nisSearch.setAttribute('aria-expanded', 'false'); }
-              if (!kodeBukuSearch.contains(e.target) && !bukuDropdown.contains(e.target)) { bukuDropdown.style.display = 'none'; kodeBukuSearch.setAttribute('aria-expanded', 'false'); }
-          });
-          const modalOverlay = $('successModal');
-          const modalCloseBtn = $('closeModalBtn');
-          modalCloseBtn.addEventListener('click', hideModal);
-          modalOverlay.addEventListener('click', (e) => { if (e.target.id === 'successModal') { hideModal(); } });
-          document.addEventListener('keydown', (e) => { if (e.key === 'Enter' && successModal.classList.contains('active')) { e.preventDefault(); hideModal(); } });
-          
-          nisSearch.focus();
+            // Fokus Awal
+            DOM.nisSearch.focus();
 
-      } catch (e) {
-          // Tangani kesalahan inisialisasi Firebase
-          console.error("FIREBASE INITIALIZATION ERROR:", e);
-          const statusEl = document.getElementById('dataStatus');
-          statusEl.style.display = 'block';
-          statusEl.textContent = '❌ KRITIS: Gagal menginisialisasi Firebase. Cek konfigurasi Anda (apiKey).';
-          statusEl.className = 'text-sm bg-red-100 text-red-800 border border-red-300 p-3 rounded-lg';
-      }
+        } catch (e) {
+            console.error("FIREBASE INITIALIZATION ERROR:", e);
+            DOM.dataStatus.style.display = 'block';
+            DOM.dataStatus.textContent = '❌ KRITIS: Gagal menginisialisasi Firebase. Cek konfigurasi Anda (apiKey).';
+            DOM.dataStatus.className = 'text-sm bg-red-100 text-red-800 border border-red-300 p-3 rounded-lg';
+        }
     </script>
 </body>
 </html>
