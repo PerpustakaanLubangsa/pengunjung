@@ -1,970 +1,397 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Admin Dashboard Lengkap</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
-  <style>
-    /* Custom Tailwind Colors */
-    .bg-gradient-to-br-main {
-      /* Gradasi gelap ke cyan (Latar Belakang Utama) */
-      background-image: linear-gradient(to bottom right, #0F172A, #06B6D4); 
-    }
-    .bg-sidebar-gradient {
-        /* Gradasi biru gelap (Sidebar) */
-        background-image: linear-gradient(to bottom, #1E3A8A, #0C4A6E); 
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Log Kunjungan Perpustakaan</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+      // 💡 Palet Warna Baru: Indigo & Cyan
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Poppins', 'sans-serif'],
+            },
+            colors: {
+              'primary-indigo': '#4F46E5', // Indigo 600
+              'light-bg': '#F9FAFB',      // Gray 50 (Background)
+              'card-bg': '#FFFFFF',       // Card Background
+              'accent-cyan': '#06B6D4',   // Cyan 500 (Aksen/Pencarian)
+            }
+          }
+        }
+      }
+    </script>
 
-    /* Keterbacaan Maksimal: Header tabel solid putih dengan teks gelap/terang yang sesuai */
-    #tableSantri thead th, #tableBuku thead th, #tablePengunjung thead th {
-        @apply sticky top-0 bg-white text-gray-800 p-3 text-sm; 
-        border-bottom: 2px solid #06B6D4; /* Border Cyan */
-        font-weight: 700; /* Bold header */
-    }
-    /* Khusus untuk Pengunjung, latar belakang header gelap agar kontras dengan latar utama yang gelap */
-    #sectionPengunjung #tablePengunjung thead th {
-        @apply bg-gray-800 text-white;
-        border-bottom-color: #06B6D4;
-    }
-    /* Baris ganjil/genap untuk semua tabel */
-    #tableSantri tbody tr:nth-child(even), #tableBuku tbody tr:nth-child(even), #tablePengunjung tbody tr:nth-child(even) {
-        @apply bg-gray-50;
-    }
-
-    #log {
-      min-height: 20px;
-      transition: color 0.3s ease;
-    }
-    html, body {
-        padding: 0;
-        margin: 0;
-        font-family: 'Inter', sans-serif;
-    }
-  </style>
+    <style>
+        body {
+            background-color: theme('colors.light-bg'); 
+            font-family: 'Poppins', sans-serif;
+        }
+        .container {
+            max-width: 1280px;
+        }
+        /* --- Gaya Tabel Kustom --- */
+        .table-container {
+            max-height: 60vh; 
+            overflow-y: auto;
+            border: 1px solid theme('colors.gray.200');
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); /* Shadow lebih lembut */
+            background-color: theme('colors.card-bg');
+        }
+        th {
+            background-color: theme('colors.gray.50'); /* Header Background */
+            color: theme('colors.gray.600'); 
+            position: sticky; 
+            top: 0;
+            z-index: 20;
+            border-bottom: 2px solid theme('colors.indigo.100');
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+        td {
+            padding: 12px 16px;
+        }
+        .data-row:nth-child(even) {
+            background-color: theme('colors.gray.50'); /* Stripe/Garis selang-seling */
+        }
+        .data-row:hover {
+            background-color: theme('colors.indigo.50'); /* Efek hover yang lebih jelas */
+        }
+        .btn-action {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .input-style {
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid theme('colors.gray.300');
+            transition: all 0.2s;
+        }
+        .input-style:focus {
+            border-color: theme('colors.primary-indigo');
+            box-shadow: 0 0 0 3px theme('colors.primary-indigo', 0.1);
+        }
+    </style>
 </head>
-<body class="bg-gradient-to-br-main text-gray-100 flex min-h-screen">
-  
-  <aside id="sidebar" class="w-20 bg-sidebar-gradient shadow-2xl flex flex-col items-center py-6 space-y-6 fixed top-0 left-0 h-full border-r border-cyan-800 z-10">
-    
-    <div class="text-cyan-300 text-3xl mb-6 p-1">
-        <i class="fa-solid fa-cloud"></i> 
-    </div>
-    
-    <button id="tabPengunjung" title="Pengunjung" class="w-14 h-14 flex items-center justify-center rounded-2xl text-2xl bg-cyan-500 text-white shadow-lg hover:bg-cyan-600 transition-all duration-300 ease-in-out transform hover:scale-105">
-        <i class="fa-solid fa-users"></i> 
-    </button>
-    <button id="tabSantri" title="Santri" class="w-14 h-14 flex items-center justify-center rounded-2xl text-2xl text-cyan-200 hover:bg-cyan-700/50 hover:text-white transition-all duration-300 ease-in-out transform hover:scale-105">
-        <i class="fa-solid fa-book-open"></i>
-    </button>
-    <button id="tabBuku" title="Buku" class="w-14 h-14 flex items-center justify-center rounded-2xl text-2xl text-cyan-200 hover:bg-cyan-700/50 hover:text-white transition-all duration-300 ease-in-out transform hover:scale-105">
-        <i class="fa-solid fa-book"></i>
-    </button>
-  </aside>
+<body class="p-6 sm:p-10">
 
-  <div class="flex-grow ml-20 p-8 w-full max-w-7xl mx-auto"> 
-    <header class="mb-8">
-      <h1 class="text-3xl font-extrabold text-white leading-tight">Admin Dashboard</h1>
-      <p class="text-md text-cyan-200 opacity-90 mt-1">Kelola data santri, buku, dan pantau pengunjung perpustakaan dengan mudah.</p>
-    </header>
+    <div class="container mx-auto">
+        <header class="p-6 rounded-xl text-white mb-8 bg-primary-indigo shadow-2xl">
+            <h1 class="text-3xl sm:text-4xl font-extrabold flex items-center">
+                <svg class="w-8 h-8 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                Dashboard Log Kunjungan
+            </h1>
+        </header>
 
-    <div class="bg-white/10 rounded-3xl shadow-2xl p-7 border border-cyan-700/50">
-      
-      <section id="sectionPengunjung" class="text-gray-100">
-        <h3 class="font-semibold text-xl mb-3 text-white">Data Pengunjung</h3>
-        <p class="text-sm text-cyan-200 opacity-80 mb-4">Data kunjungan dengan Tanggal diformat menjadi DD/MM/YYYY.</p>
-
-        <div class="mb-4">
-            <input type="text" id="searchPengunjung" placeholder="Cari Tanggal (DD/MM/YYYY), Nama/Judul Buku/Blok Pengunjung..." class="w-full px-4 py-2 bg-white/20 border border-cyan-700/50 rounded-lg text-white placeholder-gray-300 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition" />
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div id="totalAllTime" class="p-6 bg-card-bg border border-gray-200 rounded-xl shadow-lg flex flex-col items-start">
+                <p class="text-sm font-medium text-gray-500">Total Kunjungan (Semua)</p>
+                <span class="text-4xl font-extrabold text-primary-indigo mt-1">0</span>
+            </div>
+            <div id="totalToday" class="p-6 bg-card-bg border border-gray-200 rounded-xl shadow-lg flex flex-col items-start">
+                <p class="text-sm font-medium text-gray-500">Kunjungan Hari Ini</p>
+                <span class="text-4xl font-extrabold text-green-600 mt-1">0</span>
+            </div>
+            <div id="dataStatus" class="p-6 bg-yellow-50 border border-yellow-300 rounded-xl shadow-lg text-sm flex flex-col justify-center">
+                <p class="font-medium text-yellow-800">Status Data:</p>
+                <span class="text-yellow-600 mt-1">Memuat data log dari Firebase...</span>
+            </div>
         </div>
-        
-        <div class="overflow-auto max-h-[520px] rounded-xl border border-cyan-700/30 bg-white p-2 shadow-inner">
-          <table id="tablePengunjung" class="min-w-full text-sm text-gray-800">
-            <tbody>
-                <tr><td colspan="7" class="text-center p-4 text-gray-500">Data sedang dimuat...</td></tr>
-            </tbody>
-          </table>
-        </div>
-        
-        <div class="mt-4 flex flex-wrap gap-3">
-          <button type="button" id="exportPengunjung" class="px-5 py-2 bg-cyan-600 text-white rounded-lg shadow-md hover:bg-cyan-700 transition duration-200">
-            <i class="fa-solid fa-download mr-2"></i> Ekspor CSV
-          </button>
-          <button type="button" id="copyPengunjung" class="px-5 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition duration-200">
-            <i class="fa-solid fa-copy mr-2"></i> Salin Data
-          </button>
-          <button type="button" id="deleteAllPengunjung" class="ml-auto px-5 py-2 bg-red-600 text-white rounded-lg shadow-md hover:bg-red-700 transition duration-200">
-              <i class="fa-solid fa-trash-can mr-2"></i> Hapus SEMUA Data
-          </button>
-          </div>
-      </section>
 
-      <section id="sectionSantri" class="hidden text-gray-100">
-        <div class="grid md:grid-cols-2 gap-6">
-          <div>
-            <h3 class="font-semibold text-xl mb-3 text-white">Tambah / Edit Santri</h3>
-            <div class="space-y-3">
-              <input type="text" id="s_nis" placeholder="NIS" class="w-full px-4 py-2 bg-white/20 border border-cyan-700/50 rounded-lg text-white placeholder-gray-300 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition" data-mode="add" />
-              <input type="text" id="s_nama" placeholder="Nama" class="w-full px-4 py-2 bg-white/20 border border-cyan-700/50 rounded-lg text-white placeholder-gray-300 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition" />
-              <input type="text" id="s_blok" placeholder="Blok / Kamar" class="w-full px-4 py-2 bg-white/20 border border-cyan-700/50 rounded-lg text-white placeholder-gray-300 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition" />
-              <input type="text" id="s_jenjang" placeholder="Jenjang (SLTP/SLTA/PT)" class="w-full px-4 py-2 bg-white/20 border border-cyan-700/50 rounded-lg text-white placeholder-gray-300 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition" />
-              <div class="flex gap-3">
-                <button type="button" id="btnAddSantri" class="px-5 py-2 bg-green-600 text-white rounded-lg shadow-md hover:bg-green-700 transition duration-200">
-                  <i class="fa-solid fa-save mr-2"></i> Simpan Data
-                </button>
-                <button type="button" id="btnClearSantri" class="px-5 py-2 bg-gray-600 text-white rounded-lg shadow-md hover:bg-gray-700 transition duration-200">
-                  <i class="fa-solid fa-eraser mr-2"></i> Bersihkan Form
-                </button>
-              </div>
-              <p id="s_edit_status" class="text-sm text-yellow-400 hidden">Mode Edit: NIS tidak dapat diubah.</p>
-            </div>
-
-            <hr class="my-6 border-cyan-700/50" />
-
-            <label class="block mb-3 font-semibold text-white">Upload Excel (Santri) — kolom: <code>NIS, Nama, Blok, Jenjang</code></label>
-            <div class="flex gap-4 items-center mb-4">
-              <input id="fileSantri" type="file" accept=".xlsx,.xls" class="block w-full text-sm text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-cyan-500 file:text-white hover:file:bg-cyan-600 cursor-pointer"/>
-              <button type="button" id="uploadSantri" class="px-5 py-2 bg-green-600 text-white rounded-lg shadow-md hover:bg-green-700 transition duration-200">
-                <i class="fa-solid fa-upload mr-2"></i> Upload ke Firebase
-              </button>
-            </div>
-            <div id="uploadProgressSantri" class="h-2 bg-gray-600 rounded-full hidden">
-                <div id="progressBarSantri" class="h-2 bg-yellow-400 rounded-full transition-all duration-300" style="width: 0%"></div>
-            </div>
+        <div class="flex flex-col lg:flex-row gap-4 mb-8 items-stretch">
+            <input type="text" id="searchInput" placeholder="Cari Nama, NIS, Judul Buku..." class="input-style flex-grow focus:ring-accent-cyan focus:border-accent-cyan shadow-md">
             
-            <div class="flex mt-6">
-                <button type="button" id="deleteAllSantri" class="w-full px-5 py-2 bg-red-600 text-white rounded-lg shadow-md hover:bg-red-700 transition duration-200">
-                    <i class="fa-solid fa-trash-can mr-2"></i> Hapus SEMUA Data Santri
+            <div class="flex gap-4">
+                <button id="btnCopyAll" class="btn-action bg-accent-cyan hover:bg-cyan-600 text-white flex-shrink-0">
+                    <svg class="w-5 h-5 inline-block mr-1 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7z"></path></svg>
+                    Salin Semua
+                </button>
+                <button id="btnDeleteAll" class="btn-action bg-red-500 hover:bg-red-600 text-white flex-shrink-0">
+                    <svg class="w-5 h-5 inline-block mr-1 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    Hapus Semua
                 </button>
             </div>
-            </div>
-
-          <div>
-            <h3 class="font-semibold text-xl mb-3 text-white">Daftar Santri</h3>
-            <div class="mb-3">
-                <input type="text" id="searchSantri" placeholder="Cari NIS, Nama, Blok, atau Jenjang..." class="w-full px-4 py-2 bg-white/20 border border-cyan-700/50 rounded-lg text-white placeholder-gray-300 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition" />
-            </div>
-
-            <div class="overflow-auto max-h-[480px] rounded-xl border border-cyan-700/30 bg-white shadow-inner">
-              <table id="tableSantri" class="min-w-full text-sm text-gray-800"></table>
-            </div>
-          </div>
         </div>
-      </section>
 
-      <section id="sectionBuku" class="hidden text-gray-100">
-        <div class="grid md:grid-cols-2 gap-6">
-          <div>
-            <h3 class="font-semibold text-xl mb-3 text-white">Tambah / Edit Buku</h3>
-            <div class="space-y-3">
-              <input type="text" id="b_kode" placeholder="Kode" class="w-full px-4 py-2 bg-white/20 border border-cyan-700/50 rounded-lg text-white placeholder-gray-300 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition" data-mode="add" />
-              <input type="text" id="b_judul" placeholder="Judul" class="w-full px-4 py-2 bg-white/20 border border-cyan-700/50 rounded-lg text-white placeholder-gray-300 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition" />
-              <input type="text" id="b_kategori" placeholder="Kategori" class="w-full px-4 py-2 bg-white/20 border border-cyan-700/50 rounded-lg text-white placeholder-gray-300 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition" />
-              <div class="flex gap-3">
-                <button type="button" id="btnAddBuku" class="px-5 py-2 bg-green-600 text-white rounded-lg shadow-md hover:bg-green-700 transition duration-200">
-                  <i class="fa-solid fa-save mr-2"></i> Simpan Data
-                </button>
-                <button type="button" id="btnClearBuku" class="px-5 py-2 bg-gray-600 text-white rounded-lg shadow-md hover:bg-gray-700 transition duration-200">
-                  <i class="fa-solid fa-eraser mr-2"></i> Bersihkan Form
-                </button>
-              </div>
-              <p id="b_edit_status" class="text-sm text-yellow-400 hidden">Mode Edit: Kode tidak dapat diubah.</p>
-            </div>
-
-            <hr class="my-6 border-cyan-700/50" />
-
-            <label class="block mb-3 font-semibold text-white">Upload Excel (Buku) — kolom: <code>Kode, Judul, Kategori</code></label>
-            <div class="flex gap-4 items-center mb-4">
-              <input id="fileBuku" type="file" accept=".xlsx,.xls" class="block w-full text-sm text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-cyan-500 file:text-white hover:file:bg-cyan-600 cursor-pointer"/>
-              <button type="button" id="uploadBuku" class="px-5 py-2 bg-green-600 text-white rounded-lg shadow-md hover:bg-green-700 transition duration-200">
-                <i class="fa-solid fa-upload mr-2"></i> Upload ke Firebase
-              </button>
-            </div>
-            <div id="uploadProgressBuku" class="h-2 bg-gray-600 rounded-full hidden">
-                <div id="progressBarBuku" class="h-2 bg-yellow-400 rounded-full transition-all duration-300" style="width: 0%"></div>
-            </div>
-
-            <div class="flex mt-6">
-                <button type="button" id="deleteAllBuku" class="w-full px-5 py-2 bg-red-600 text-white rounded-lg shadow-md hover:bg-red-700 transition duration-200">
-                    <i class="fa-solid fa-trash-can mr-2"></i> Hapus SEMUA Data Buku
-                </button>
-            </div>
-            </div>
-
-          <div>
-            <h3 class="font-semibold text-xl mb-3 text-white">Daftar Buku</h3>
-            <div class="mb-3">
-                <input type="text" id="searchBuku" placeholder="Cari Kode, Judul, atau Kategori..." class="w-full px-4 py-2 bg-white/20 border border-cyan-700/50 rounded-lg text-white placeholder-gray-300 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition" />
-            </div>
-
-            <div class="overflow-auto max-h-[480px] rounded-xl border border-cyan-700/30 bg-white shadow-inner">
-              <table id="tableBuku" class="min-w-full text-sm text-gray-800"></table>
-            </div>
-          </div>
+        <div class="table-container">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead>
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs uppercase tracking-wider">Tanggal</th>
+                        <th class="px-4 py-3 text-left text-xs uppercase tracking-wider">Nama Santri</th>
+                        <th class="px-4 py-3 text-left text-xs uppercase tracking-wider">Blok</th>
+                        <th class="px-4 py-3 text-left text-xs uppercase tracking-wider">Jenjang</th>
+                        <th class="px-4 py-3 text-left text-xs uppercase tracking-wider">Judul Buku</th>
+                        <th class="px-4 py-3 text-left text-xs uppercase tracking-wider">Kategori</th>
+                        <th class="px-4 py-3 text-left text-xs uppercase tracking-wider">Aktivitas</th>
+                        <th class="px-4 py-3 text-left text-xs uppercase tracking-wider">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="dataTable" class="bg-white divide-y divide-gray-100 text-sm">
+                    </tbody>
+            </table>
         </div>
-      </section>
+        
+        <div id="noResults" class="hidden text-center text-gray-500 mt-12 text-xl font-medium p-10 bg-card-bg rounded-xl shadow-lg border border-gray-200">
+            <svg class="w-12 h-12 mx-auto mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            Tidak ada data log yang cocok dengan kriteria pencarian atau filter saat ini.
+        </div>
 
-      <hr class="my-6 border-cyan-700/50" />
-      <div id="log" class="text-sm text-gray-300 font-medium">Siap.</div>
     </div>
 
-    <footer class="mt-8 text-xs text-cyan-200 opacity-70 text-center">Admin Dashboard v1.0 | Pastikan Realtime Database mengizinkan akses/penulisan dari client untuk pengujian awal.</footer>
-  </div>
+    <script type="module">
+        // --- FIREBASE IMPORTS & CONFIG ---
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
+        import { getDatabase, ref, onValue, remove } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js';
 
-  <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
-    import { getDatabase, ref, set, get, child, remove, onValue } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js';
-
-    // =========================================================
-    // KONFIGURASI FIREBASE (DARI INPUT TERAKHIR ANDA)
-    // =========================================================
-    const firebaseConfig = {
-      apiKey: "AIzaSyB6gaVW3ye680YylqzSebZugmQepYRA4g4",
-      authDomain: "pengunjung-4489b.firebaseapp.com",
-      projectId: "pengunjung-4489b",
-      storageBucket: "pengunjung-4489b.firebasestorage.app",
-      messagingSenderId: "233634425303",
-      appId: "1:233634425303:web:9d45d775e703b94843c392",
-      databaseURL: "https://pengunjung-4489b-default-rtdb.firebaseio.com" 
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-
-    const logEl = document.getElementById('log');
-
-    // Global Data Storage for Search
-    let allSantriData = null;
-    let allBukuData = null;
-    let allPengunjungData = null;
-    
-    // Search Inputs
-    const searchSantri = document.getElementById('searchSantri');
-    const searchBuku = document.getElementById('searchBuku');
-    const searchPengunjung = document.getElementById('searchPengunjung');
-    
-    // Delete All Buttons
-    const deleteAllSantriBtn = document.getElementById('deleteAllSantri');
-    const deleteAllBukuBtn = document.getElementById('deleteAllBuku');
-    const deleteAllPengunjungBtn = document.getElementById('deleteAllPengunjung');
-
-
-    function showLog(message, isError = false) {
-        logEl.classList.remove('text-green-400', 'text-red-400', 'text-gray-300');
-        logEl.classList.add(isError ? 'text-red-400' : 'text-green-400');
-        logEl.innerText = message;
-    }
-    
-    // --- Excel Utilities (Dipertahankan) ---
-    function readExcelFile(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          try {
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, { type: 'array' });
-            const firstSheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[firstSheetName];
-            // Tambahkan {raw: true} untuk menjaga NIS/Kode sebagai angka jika memang begitu di Excel
-            const json = XLSX.utils.sheet_to_json(worksheet, { defval: '', header: 1, raw: true });
-            const headers = json[0];
-            const rows = json.slice(1).map(row => {
-                const obj = {};
-                headers.forEach((header, index) => {
-                    // Konversi semua nilai ke string saat mapping
-                    obj[header] = row[index] !== undefined && row[index] !== null ? row[index].toString() : '';
-                });
-                return obj;
-            });
-            resolve(rows);
-          } catch (err) { reject(err); }
+        // !!! KRITIS: GANTI DENGAN CONFIG FIREBASE ASLI PROYEK TRAYING-29BF4 !!!
+        const firebaseConfig = {
+            apiKey: "AIzaSy_GANTI_INI_DENGAN_KUNCI_API_ASLI", 
+            authDomain: "traying-29bf4.firebaseapp.com", 
+            projectId: "traying-29bf4", 
+            storageBucket: "traying-29bf4.appspot.com", 
+            messagingSenderId: "GANTI_DENGAN_SENDER_ID_ASLI", 
+            appId: "1:GANTI_DENGAN_APP_ID_ASLI", 
+            databaseURL: "https://traying-29bf4-default-rtdb.firebaseio.com" 
         };
-        reader.onerror = (err) => reject(err);
-        reader.readAsArrayBuffer(file);
-      });
-    }
 
-    function getExcelValue(row, keys) {
-        for (const key of keys) {
-            if (row.hasOwnProperty(key)) {
-                return row[key] ? row[key].toString().trim() : '';
-            }
-        }
-        const rowKeys = Object.keys(row);
-        for (const rk of rowKeys) {
-            if (keys.some(k => k.toLowerCase() === rk.toLowerCase())) {
-                return row[rk] ? row[rk].toString().trim() : '';
-            }
-        }
-        return '';
-    }
-    // --- End Excel Utilities ---
+        const DATA_PATH = 'log_kunjungan_2025';
 
-
-    // =========================================================
-    // SANTRI CRUD & LOGIC
-    // =========================================================
-    const tableSantri = document.getElementById('tableSantri');
-    const sNis = document.getElementById('s_nis');
-    const sNama = document.getElementById('s_nama');
-    const sBlok = document.getElementById('s_blok');
-    const sJenjang = document.getElementById('s_jenjang');
-    const btnAddSantri = document.getElementById('btnAddSantri');
-    const btnClearSantri = document.getElementById('btnClearSantri');
-    const sEditStatus = document.getElementById('s_edit_status');
-    const sectionSantri = document.getElementById('sectionSantri');
-
-    async function addOrUpdateSantri() {
-      const nis = sNis.value.trim();
-      const nama = sNama.value.trim();
-      const blok = sBlok.value.trim();
-      const jenjang = sJenjang.value.trim();
-
-      if (!nis || !nama || !blok || !jenjang) {
-          return showLog('Semua kolom Santri (NIS, Nama, Blok, Jenjang) wajib diisi!', true);
-      }
-
-      const payload = { nama, blok, jenjang };
-      
-      try {
-        await set(ref(db, `siswa/${nis}`), payload);
-        showLog(`Santri ${nis} (${payload.nama}) **berhasil** tersimpan/diperbarui.`, false);
-        clearSantriForm();
-      } catch (err) { 
-        console.error("Firebase Santri Error:", err); 
-        showLog('Gagal menyimpan santri. Pastikan **Firebase Rules** (/siswa/) mengizinkan penulisan.', true); 
-      }
-    }
-    
-    // NEW LOGIC: Hapus Semua Santri
-    async function deleteAllSantri() {
-        if (!confirm("PERINGATAN KERAS! Anda yakin ingin menghapus SEMUA data Santri? Tindakan ini TIDAK dapat dibatalkan.")) return;
-        showLog('⏳ Menghapus SEMUA data Santri...', false);
         try {
-            await remove(ref(db, `siswa`));
-            showLog('✅ SEMUA data Santri berhasil dihapus.', false);
-            clearSantriForm();
-        } catch (e) {
-            showLog('❌ Gagal menghapus SEMUA data Santri: ' + e.message, true);
-            console.error(e);
-        }
-    }
+            const app = initializeApp(firebaseConfig);
+            const db = getDatabase(app);
 
+            const $ = id => document.getElementById(id);
+            const dataTable = $('dataTable');
+            const dataStatus = $('dataStatus');
+            const searchInput = $('searchInput');
+            const noResults = $('noResults');
+            const btnCopyAll = $('btnCopyAll');
+            const btnDeleteAll = $('btnDeleteAll');
+            const totalAllTimeSpan = $('totalAllTime').querySelector('span');
+            const totalTodaySpan = $('totalToday').querySelector('span');
 
-    function clearSantriForm() { 
-      sNis.value=''; sNama.value=''; sBlok.value=''; sJenjang.value=''; 
-      sNis.removeAttribute('disabled');
-      sNis.dataset.mode = 'add';
-      btnAddSantri.textContent = 'Simpan Data';
-      sEditStatus.classList.add('hidden');
-      sNis.focus();
-    }
+            let logData = []; 
 
-    function startEditSantri(nis, val) {
-      clearSantriForm();
-      sNis.value = nis;
-      sNama.value = val.nama || '';
-      sBlok.value = val.blok || '';
-      sJenjang.value = val.jenjang || '';
+            const getTodayDateString = () => {
+                const today = new Date();
+                return `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
+            };
+            const todayDateString = getTodayDateString();
 
-      sNis.setAttribute('disabled', 'true'); 
-      sNis.dataset.mode = 'edit';
-      btnAddSantri.textContent = 'Perbarui Data';
-      sEditStatus.classList.remove('hidden');
-      sNama.focus();
-      showLog(`Mode Edit: Data Santri ${nis}`, false);
-    }
-    
-    // Logika Upload Santri DENGAN Progress Bar (Dipertahankan)
-    document.getElementById('uploadSantri').addEventListener('click', async ()=>{
-      const fileInput = document.getElementById('fileSantri');
-      const file = fileInput.files[0];
-      const progressBarContainer = document.getElementById('uploadProgressSantri');
-      const progressBar = document.getElementById('progressBarSantri');
-      const uploadButton = document.getElementById('uploadSantri');
-
-      if (!file) return showLog('Pilih file Excel terlebih dahulu.', true);
-
-      progressBarContainer.classList.remove('hidden');
-      progressBar.style.width = '0%';
-      uploadButton.setAttribute('disabled', 'true');
-      showLog('⏳ Membaca file Excel...', false);
-
-      try {
-        const rows = await readExcelFile(file);
-        if (!rows.length) {
-            throw new Error("File kosong atau tidak dapat dibaca.");
-        }
-        
-        showLog(`⏳ Mulai mengupload ${rows.length} baris Santri...`, false);
-        
-        let ok=0, fail=0;
-        const totalRows = rows.length;
-
-        for (let i = 0; i < totalRows; i++) {
-            const r = rows[i];
-            const nis = getExcelValue(r, ['NIS', 'nis', 'Nomor']);
-            const nama = getExcelValue(r, ['Nama', 'nama']);
-            const blok = getExcelValue(r, ['Blok', 'blok']);
-            const jenjang = getExcelValue(r, ['Jenjang', 'jenjang']);
-            
-            if (!nis) { 
-                fail++; 
-                continue; 
-            }
-            
-            const payload = { 
-                nama: nama, 
-                blok: blok, 
-                jenjang: jenjang 
-            }; 
-            
-            try { 
-                await set(ref(db, `siswa/${nis}`), payload); 
-                ok++; 
-            } catch(e){ 
-                fail++; 
-            }
-
-            const progress = Math.round(((i + 1) / totalRows) * 100);
-            progressBar.style.width = `${progress}%`;
-            
-            if (i % 50 === 0 || i === totalRows - 1) { 
-                showLog(`⏳ Mengupload: ${ok} sukses, ${fail} gagal dari ${totalRows} baris. (${progress}%)`, false);
-            }
-        }
-        
-        showLog(`✅ Upload Santri selesai. Total Sukses: ${ok}, Total Gagal (NIS kosong/error): ${fail}`, fail > 0);
-
-      } catch (error) {
-        showLog(`❌ Gagal membaca atau mengupload file Santri: ${error.message}`, true);
-        console.error(error);
-      } finally {
-        uploadButton.removeAttribute('disabled');
-        await new Promise(resolve => setTimeout(resolve, 500));
-        progressBarContainer.classList.add('hidden');
-        fileInput.value = ''; 
-      }
-    });
-
-    function deleteSantri(nis) {
-      if (!confirm(`Yakin hapus data santri dengan NIS ${nis}?`)) return;
-      try { 
-        remove(ref(db, `siswa/${nis}`)); 
-        showLog(`Santri ${nis} berhasil dihapus.`, false); 
-        clearSantriForm();
-      } catch(e){ 
-        showLog(`Gagal menghapus santri ${nis}: ${e.message}`, true); 
-        console.error(e);
-      }
-    }
-
-    // Memastikan Event Listener terpasang
-    btnAddSantri.addEventListener('click', addOrUpdateSantri);
-    btnClearSantri.addEventListener('click', clearSantriForm);
-    deleteAllSantriBtn.addEventListener('click', deleteAllSantri); // NEW DELETE ALL LISTENER
-    searchSantri.addEventListener('input', () => {
-        renderSantriTable(allSantriData, searchSantri.value);
-    });
-
-    function renderSantriTable(dataObj, query = '') {
-        if (!dataObj) { tableSantri.innerHTML = '<thead><tr><th class="p-3 text-gray-800" colspan="5">Belum ada data.</th></tr></thead>'; return; }
-        
-        let filteredRows = Object.entries(dataObj);
-        const lowerQuery = query.toLowerCase().trim();
-
-        if (lowerQuery) {
-            filteredRows = filteredRows.filter(([nis, val]) => {
-                return nis.toLowerCase().includes(lowerQuery) ||
-                       (val.nama || '').toLowerCase().includes(lowerQuery) ||
-                       (val.blok || '').toLowerCase().includes(lowerQuery) ||
-                       (val.jenjang || '').toLowerCase().includes(lowerQuery);
-            });
-        }
-
-        let html = '<thead><tr>' + ['NIS','Nama','Blok','Jenjang','Aksi'].map(h=>`<th class="px-3 py-2 text-left">${h}</th>`).join('') + '</tr></thead><tbody>';
-        
-        if (filteredRows.length === 0) {
-             html += `<tr><td colspan="5" class="text-center p-4 text-gray-500">Tidak ada hasil ditemukan untuk "${query}".</td></tr>`;
-        } else {
-            for (const [nis, val] of filteredRows) { 
-                html += `<tr class="odd:bg-gray-50 even:bg-white text-gray-800" data-nis="${nis}">`;
-                html += `<td class="border-b border-gray-200 px-3 py-2">${nis}</td>`;
-                html += `<td class="border-b border-gray-200 px-3 py-2">${val.nama||'-'}</td>`;
-                html += `<td class="border-b border-gray-200 px-3 py-2">${val.blok||'-'}</td>`;
-                html += `<td class="border-b border-gray-200 px-3 py-2">${val.jenjang||'-'}</td>`;
-                html += `<td class="border-b border-gray-200 px-3 py-2 space-x-2"><button data-action="edit" class="px-3 py-1 text-xs bg-yellow-500 text-gray-900 rounded-md hover:bg-yellow-600 transition">Edit</button> <button data-action="delete" class="px-3 py-1 text-xs bg-red-600 text-white rounded-md hover:bg-red-700 transition">Hapus</button></td>`;
-                html += `</tr>`;
-            }
-        }
-        html += '</tbody>';
-        tableSantri.innerHTML = html;
-        
-        tableSantri.querySelectorAll('button[data-action]').forEach(btn=>{
-            btn.addEventListener('click', (e)=>{
-                const tr = e.target.closest('tr');
-                const nis = tr.dataset.nis;
-                const act = e.target.dataset.action;
+            // --- FUNGSI TAMPIL DATA KE TABEL ---
+            function renderTable(dataToRender) {
+                dataTable.innerHTML = '';
                 
-                if (act==='delete') deleteSantri(nis);
-                if (act==='edit') startEditSantri(nis, allSantriData[nis]);
-            });
-        });
-    }
+                if (dataToRender.length === 0) {
+                    noResults.classList.remove('hidden');
+                    return;
+                }
+                noResults.classList.add('hidden');
 
-    function loadSiswa(){
-      onValue(ref(db,'siswa'), (snap)=>{ 
-        allSantriData = snap.val(); 
-        renderSantriTable(allSantriData, searchSantri.value); 
-        showLog('Data Santri diperbarui.', false);
-      }, (error) => {
-        showLog('Gagal memuat data Santri: '+error.message, true);
-      });
-    }
+                dataToRender.sort((a, b) => b.timestamp - a.timestamp);
 
+                dataToRender.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.classList.add('data-row'); // Tambahkan class data-row untuk styling stripe/hover
+                    row.setAttribute('data-id', item.id); 
 
-    // =========================================================
-    // BUKU CRUD & LOGIC
-    // =========================================================
-    const tableBuku = document.getElementById('tableBuku');
-    const bKode = document.getElementById('b_kode');
-    const bJudul = document.getElementById('b_judul');
-    const bKategori = document.getElementById('b_kategori');
-    const btnAddBuku = document.getElementById('btnAddBuku');
-    const btnClearBuku = document.getElementById('btnClearBuku');
-    const bEditStatus = document.getElementById('b_edit_status');
-    const sectionBuku = document.getElementById('sectionBuku');
+                    const tanggalKunjungan = `${item.tanggal}/${item.bulan}/${item.tahun}`;
 
-    async function addOrUpdateBuku(){
-      const kode = bKode.value.trim(); 
-      const judul = bJudul.value.trim();
-      const kategori = bKategori.value.trim();
-      
-      if(!kode || !judul || !kategori) {
-          return showLog('Semua kolom Buku (Kode, Judul, Kategori) wajib diisi!', true);
-      }
-      
-      const payload = { judul, kategori };
-      
-      try { 
-        await set(ref(db, `buku/${kode}`), payload); 
-        showLog(`Buku ${kode} **berhasil** tersimpan/diperbarui.`, false); 
-        clearBukuForm(); 
-      } catch(e){ 
-        console.error("Firebase Buku Error:", e);
-        showLog('Gagal menyimpan buku. Pastikan **Firebase Rules** (/buku/) mengizinkan penulisan.', true); 
-      }
-    }
-    
-    // NEW LOGIC: Hapus Semua Buku
-    async function deleteAllBuku() {
-        if (!confirm("PERINGATAN KERAS! Anda yakin ingin menghapus SEMUA data Buku? Tindakan ini TIDAK dapat dibatalkan.")) return;
-        showLog('⏳ Menghapus SEMUA data Buku...', false);
-        try {
-            await remove(ref(db, `buku`));
-            showLog('✅ SEMUA data Buku berhasil dihapus.', false);
-            clearBukuForm();
-        } catch (e) {
-            showLog('❌ Gagal menghapus SEMUA data Buku: ' + e.message, true);
-            console.error(e);
-        }
-    }
+                    let keteranganColor = 'text-gray-900 bg-gray-100';
+                    if (item.keterangan === 'Pinjam') {
+                        keteranganColor = 'text-indigo-700 bg-indigo-100 font-semibold';
+                    } else if (item.keterangan === 'Baca') {
+                        keteranganColor = 'text-green-700 bg-green-100 font-semibold';
+                    }
 
-    function clearBukuForm(){ 
-      bKode.value=''; bJudul.value=''; bKategori.value=''; 
-      bKode.removeAttribute('disabled');
-      bKode.dataset.mode = 'add';
-      btnAddBuku.textContent = 'Simpan Data';
-      bEditStatus.classList.add('hidden');
-      bKode.focus();
-    }
-
-    function startEditBuku(kode, val) {
-      clearBukuForm();
-      bKode.value = kode;
-      bJudul.value = val.judul || '';
-      bKategori.value = val.kategori || '';
-
-      bKode.setAttribute('disabled', 'true'); 
-      bKode.dataset.mode = 'edit';
-      btnAddBuku.textContent = 'Perbarui Data';
-      bEditStatus.classList.remove('hidden');
-      bJudul.focus();
-      showLog(`Mode Edit: Data Buku ${kode}`, false);
-    }
-
-    // Event Listener Buku
-    btnAddBuku.addEventListener('click', addOrUpdateBuku);
-    btnClearBuku.addEventListener('click', clearBukuForm);
-    deleteAllBukuBtn.addEventListener('click', deleteAllBuku); // NEW DELETE ALL LISTENER
-    searchBuku.addEventListener('input', () => {
-        renderBukuTable(allBukuData, searchBuku.value);
-    });
-
-    // Logika Upload Buku DENGAN Progress Bar (Dipertahankan)
-    document.getElementById('uploadBuku').addEventListener('click', async ()=>{
-      const fileInput = document.getElementById('fileBuku');
-      const file = fileInput.files[0];
-      const progressBarContainer = document.getElementById('uploadProgressBuku');
-      const progressBar = document.getElementById('progressBarBuku');
-      const uploadButton = document.getElementById('uploadBuku');
-      
-      if(!file) return showLog('Pilih file Excel terlebih dahulu.', true);
-
-      progressBarContainer.classList.remove('hidden');
-      progressBar.style.width = '0%';
-      uploadButton.setAttribute('disabled', 'true');
-      showLog('⏳ Membaca file Excel...', false);
-
-      try {
-        const rows = await readExcelFile(file);
-        if (!rows.length) {
-            throw new Error("File kosong atau tidak dapat dibaca.");
-        }
-        
-        showLog(`⏳ Mulai mengupload ${rows.length} baris Buku...`, false);
-      
-        let ok=0, fail=0;
-        const totalRows = rows.length;
-
-        for(let i = 0; i < totalRows; i++){
-            const r = rows[i];
-            const kode = getExcelValue(r, ['Kode', 'kode', 'Code']); 
-            const judul = getExcelValue(r, ['Judul', 'judul']);
-            const kategori = getExcelValue(r, ['Kategori', 'kategori']);
-
-            if(!kode){ 
-                fail++; 
-                continue; 
-            }
-            
-            const payload = { 
-                judul: judul, 
-                kategori: kategori 
-            }; 
-            try{ 
-                await set(ref(db, `buku/${kode}`), payload); 
-                ok++; 
-            } catch(e){ 
-                fail++; 
-            }
-            
-            const progress = Math.round(((i + 1) / totalRows) * 100);
-            progressBar.style.width = `${progress}%`;
-
-            if (i % 50 === 0 || i === totalRows - 1) { 
-                showLog(`⏳ Mengupload: ${ok} sukses, ${fail} gagal dari ${totalRows} baris. (${progress}%)`, false);
-            }
-        }
-        
-        showLog(`✅ Upload Buku selesai. Total Sukses: ${ok}, Total Gagal (Kode kosong/error): ${fail}`, fail > 0);
-
-      } catch (error) {
-        showLog(`❌ Gagal membaca atau mengupload file Buku: ${error.message}`, true);
-        console.error(error);
-      } finally {
-        uploadButton.removeAttribute('disabled');
-        await new Promise(resolve => setTimeout(resolve, 500));
-        progressBarContainer.classList.add('hidden');
-        fileInput.value = ''; 
-      }
-    });
-
-    
-    function renderBukuTable(dataObj, query = ''){
-        if(!dataObj){ tableBuku.innerHTML = '<thead><tr><th class="p-3 text-gray-800" colspan="4">Belum ada data.</th></tr></thead>'; return; }
-        
-        let filteredRows = Object.entries(dataObj);
-        const lowerQuery = query.toLowerCase().trim();
-
-        if (lowerQuery) {
-            filteredRows = filteredRows.filter(([kode, val]) => {
-                // Search across Kode, Judul, Kategori
-                return kode.toLowerCase().includes(lowerQuery) ||
-                       (val.judul || '').toLowerCase().includes(lowerQuery) ||
-                       (val.kategori || '').toLowerCase().includes(lowerQuery);
-            });
-        }
-
-        let html = '<thead><tr>' + ['Kode','Judul','Kategori','Aksi'].map(h=>`<th class="px-3 py-2 text-left">${h}</th>`).join('') + '</tr></thead><tbody>';
-        
-        if (filteredRows.length === 0) {
-             html += `<tr><td colspan="4" class="text-center p-4 text-gray-500">Tidak ada hasil ditemukan untuk "${query}".</td></tr>`;
-        } else {
-            for(const [kode, val] of filteredRows){
-                html += `<tr class="odd:bg-gray-50 even:bg-white text-gray-800" data-kode="${kode}">`;
-                html += `<td class="border-b border-gray-200 px-3 py-2">${kode}</td>`;
-                html += `<td class="border-b border-gray-200 px-3 py-2">${val.judul||'-'}</td>`;
-                html += `<td class="border-b border-gray-200 px-3 py-2">${val.kategori||'-'}</td>`;
-                html += `<td class="border-b border-gray-200 px-3 py-2 space-x-2"><button data-action="edit" class="px-3 py-1 text-xs bg-yellow-500 text-gray-900 rounded-md hover:bg-yellow-600 transition">Edit</button> <button data-action="delete" class="px-3 py-1 text-xs bg-red-600 text-white rounded-md hover:bg-red-700 transition">Hapus</button></td>`;
-                html += `</tr>`;
-            }
-        }
-        html += '</tbody>';
-        tableBuku.innerHTML = html;
-
-        tableBuku.querySelectorAll('button[data-action]').forEach(btn=>{
-            btn.addEventListener('click',(e)=>{
-                const tr = e.target.closest('tr'); 
-                const kode = tr.dataset.kode; 
-                const act = e.target.dataset.action;
-                if(act==='delete') deleteBuku(kode); 
-                if(act==='edit') startEditBuku(kode, allBukuData[kode]);
-            });
-        });
-    }
-
-    async function deleteBuku(kode){ 
-        if(!confirm(`Yakin hapus data buku dengan Kode ${kode}?`)) return; 
-        try{ 
-            await remove(ref(db, `buku/${kode}`)); 
-            showLog(`Buku ${kode} berhasil dihapus.`, false); 
-            clearBukuForm();
-        } catch(e){ 
-            showLog(`Gagal menghapus buku ${kode}: ${e.message}`, true); 
-            console.error(e);
-        } 
-    }
-
-    function loadBuku(){ 
-        onValue(ref(db,'buku'), (snap)=>{ 
-            allBukuData = snap.val(); 
-            renderBukuTable(allBukuData, searchBuku.value); 
-            showLog('Data Buku diperbarui.', false);
-        }, (error) => {
-            showLog('Gagal memuat data Buku: '+error.message, true);
-        });
-    }
-
-
-    // =========================================================
-    // PENGUNJUNG VIEW & LOGIC
-    // =========================================================
-    const tablePengunjung = document.getElementById('tablePengunjung');
-    const tablePengunjungHeader = `<thead><tr><th class="text-left">Tanggal</th><th class="text-left">Nama Lengkap</th><th class="text-left">Blok</th><th class="text-left">Jenjang</th><th class="text-left">Judul Buku</th><th class="text-left">Kategori</th><th class="text-left">Keterangan</th><th class="text-left">Aksi</th></tr></thead>`;
-    const copyPengunjungBtn = document.getElementById('copyPengunjung');
-
-    // NEW LOGIC: Hapus Semua Pengunjung
-    async function deleteAllPengunjung() {
-        if (!confirm("PERINGATAN KERAS! Anda yakin ingin menghapus SEMUA data Pengunjung? Tindakan ini TIDAK dapat dibatalkan.")) return;
-        showLog('⏳ Menghapus SEMUA data Pengunjung...', false);
-        try {
-            await remove(ref(db, `pengunjung`));
-            showLog('✅ SEMUA data Pengunjung berhasil dihapus.', false);
-        } catch (e) {
-            showLog('❌ Gagal menghapus SEMUA data Pengunjung: ' + e.message, true);
-            console.error(e);
-        }
-    }
-
-    // MODIFIKASI: Salin Data Pengunjung (Dipertahankan)
-    function copyPengunjungData() {
-        const table = document.getElementById('tablePengunjung');
-        const rows = table.querySelectorAll('tbody tr');
-
-        if (rows.length === 0 || (rows.length === 1 && rows[0].querySelector('td').textContent.includes('Belum ada data'))) {
-            return showLog('Tidak ada data pengunjung di tabel untuk disalin.', true);
-        }
-        
-        const headerCells = table.querySelectorAll('thead th');
-        const header = Array.from(headerCells).slice(0, 7).map(th => th.textContent.trim()).join('\t');
-        
-        let tsv = '';
-        
-        rows.forEach(tr => {
-            const cells = tr.querySelectorAll('td');
-            if (cells.length > 1) { 
-                const rowData = Array.from(cells)
-                    .slice(0, 7)
-                    .map(td => td.textContent.trim().replace(/\t/g, ' ')) 
-                    .join('\t');
-                tsv += rowData + '\n';
-            }
-        });
-
-        const finalContent = header + '\n' + tsv;
-
-        navigator.clipboard.writeText(finalContent).then(() => {
-            showLog('✅ Data Pengunjung di tabel berhasil disalin ke clipboard (format tab-separated). Paste ke Excel/Sheets).', false);
-        }).catch(err => {
-            showLog('❌ Gagal menyalin data. Pastikan browser Anda mengizinkan akses clipboard (gunakan HTTPS): ' + err, true);
-            console.error(err);
-        });
-    }
-
-    // EVENT LISTENER BARU UNTUK SALIN DATA DAN HAPUS SEMUA
-    copyPengunjungBtn.addEventListener('click', copyPengunjungData);
-    deleteAllPengunjungBtn.addEventListener('click', deleteAllPengunjung); // NEW DELETE ALL LISTENER
-    searchPengunjung.addEventListener('input', () => {
-        renderPengunjungTable(allPengunjungData, searchPengunjung.value);
-    });
-
-    function renderPengunjungTable(dataObj, query = ''){
-        if(!dataObj){ 
-            tablePengunjung.innerHTML = tablePengunjungHeader + '<tbody><tr><td colspan="8" class="text-center p-4 text-gray-500">Belum ada data pengunjung.</td></tr></tbody>'; 
-            return; 
-        }
-        
-        let filteredRows = Object.entries(dataObj); 
-        const lowerQuery = query.toLowerCase().trim();
-        
-        const dataKeys = [
-            'nama', 'blok', 'jenjang', 
-            'judulBuku', 'kategoriBuku', 'keterangan'
-        ];
-        
-        if (lowerQuery) {
-            filteredRows = filteredRows.filter(([key, val]) => {
-                const dateStr = `${val.tanggal||''}/${val.bulan||''}/${val.tahun||''}`;
-                
-                return dateStr.includes(lowerQuery) || 
-                       dataKeys.some(k => (val[k] || '').toLowerCase().includes(lowerQuery)); 
-            });
-        }
-        
-        let html = '';
-        
-        if (filteredRows.length === 0) {
-             html += `<tr><td colspan="8" class="text-center p-4 text-gray-500">Tidak ada hasil ditemukan untuk "${query}".</td></tr>`;
-        } else {
-            for(const [key, val] of filteredRows){
-                const tanggal = val.tanggal || '??';
-                const bulan = val.bulan || '??';
-                const tahun = val.tahun || '????';
-                const tanggalStr = `${tanggal}/${bulan}/${tahun}`;
-
-                html += `<tr class="odd:bg-gray-50 even:bg-white text-gray-800" data-key="${key}">`;
-                
-                // KOLOM 1: Tanggal
-                html += `<td class="border-b border-gray-200 px-3 py-2 font-semibold">${tanggalStr}</td>`;
-                
-                // Kolom Data Lain
-                dataKeys.forEach(k => {
-                    const data = val[k] || '-';
-                    html += `<td class="border-b border-gray-200 px-3 py-2">${data}</td>`; 
+                    row.innerHTML = `
+                        <td class="px-4 py-3 whitespace-nowrap text-gray-700">${tanggalKunjungan}</td>
+                        <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-800">${item.nama}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-gray-600">${item.blok}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-gray-600">${item.jenjang}</td>
+                        <td class="px-4 py-3 text-gray-800">${item.judulBuku}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-gray-600">${item.kategoriBuku}</td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${keteranganColor}">${item.keterangan}</span>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            <button data-id="${item.id}" class="btn-delete-row text-red-500 hover:text-red-700 font-semibold text-sm transition duration-150">Hapus</button>
+                        </td>
+                    `;
+                    dataTable.appendChild(row);
                 });
-                
-                // Kolom Aksi
-                html += `<td class="border-b border-gray-200 px-3 py-2"><button data-action="delete" class="px-3 py-1 text-xs bg-red-600 text-white rounded-md hover:bg-red-700 transition">Hapus</button></td>`;
-                html += `</tr>`;
             }
-        }
-        
-        tablePengunjung.innerHTML = tablePengunjungHeader + `<tbody>${html}</tbody>`;
-        
-        // Logic Hapus
-        tablePengunjung.querySelectorAll('button[data-action="delete"]').forEach(btn=>{
-            btn.addEventListener('click', async (e)=>{
-                const tr = e.target.closest('tr'); 
-                const key = tr.dataset.key; 
-                if(!confirm(`Yakin hapus record pengunjung ID ${key.substring(0, 8)}...?`)) return; 
-                try{ 
-                    await remove(ref(db, `pengunjung/${key}`)); 
-                    showLog(`Record ${key.substring(0, 8)}... dihapus.`, false); 
-                } catch(e){ 
-                    showLog(`Gagal menghapus record: ${e.message}`, true); 
-                    console.error(e);
+
+            // --- FUNGSI PENCARIAN ---
+            function handleSearch() {
+                const searchTerm = searchInput.value.toLowerCase().trim();
+
+                if (!searchTerm) {
+                    renderTable(logData); 
+                    return;
+                }
+
+                const filteredData = logData.filter(item => {
+                    return (
+                        item.nama.toLowerCase().includes(searchTerm) ||
+                        item.nis.toLowerCase().includes(searchTerm) || 
+                        item.judulBuku.toLowerCase().includes(searchTerm) ||
+                        item.kodeBuku.toLowerCase().includes(searchTerm) || 
+                        item.keterangan.toLowerCase().includes(searchTerm) ||
+                        item.blok.toLowerCase().includes(searchTerm)
+                    );
+                });
+
+                renderTable(filteredData);
+            }
+            
+            // --- FUNGSI HAPUS SATU ENTRI ---
+            function deleteEntry(id) {
+                remove(ref(db, `${DATA_PATH}/${id}`))
+                    .then(() => {
+                        console.log("Log berhasil dihapus:", id);
+                    })
+                    .catch((error) => {
+                        alert("Gagal menghapus log: " + error.message);
+                        console.error("Gagal menghapus log:", error);
+                    });
+            }
+
+            // --- FUNGSI HAPUS SEMUA ENTRI ---
+            function deleteAllEntries() {
+                remove(ref(db, DATA_PATH))
+                    .then(() => {
+                        alert("✅ Semua log kunjungan berhasil dihapus.");
+                    })
+                    .catch((error) => {
+                        alert("Gagal menghapus semua log: " + error.message);
+                        console.error("Gagal menghapus semua log:", error);
+                    });
+            }
+            
+            // --- FUNGSI SALIN SEMUA DATA ---
+            function copyTableData() {
+                const table = dataTable.closest('table');
+                if (!table) return;
+
+                let textToCopy = '';
+                
+                // 1. Dapatkan Header (Kecuali kolom terakhir "Aksi")
+                const headerRow = table.querySelector('thead tr');
+                const headers = Array.from(headerRow.querySelectorAll('th:not(:last-child)')).map(th => th.textContent.trim());
+                textToCopy += headers.join('\t') + '\n'; 
+
+                // 2. Dapatkan Data Baris (Kecuali kolom terakhir "Aksi")
+                const rows = dataTable.querySelectorAll('tr');
+                rows.forEach(row => {
+                    // Ambil teks dari setiap sel, kecuali sel terakhir (Aksi)
+                    const cells = Array.from(row.querySelectorAll('td:not(:last-child)')).map(td => {
+                        // Untuk kolom Keterangan/Aktivitas, ambil teks murni, bukan dengan styling div
+                        if (td.querySelector('span')) {
+                            return td.querySelector('span').textContent.trim();
+                        }
+                        return td.textContent.trim();
+                    });
+                    textToCopy += cells.join('\t') + '\n'; 
+                });
+
+                // 3. Salin ke Clipboard
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(textToCopy)
+                        .then(() => {
+                            const originalText = btnCopyAll.textContent;
+                            btnCopyAll.textContent = '✅ Berhasil Disalin!';
+                            setTimeout(() => { btnCopyAll.textContent = originalText; }, 2000);
+                        })
+                        .catch(err => {
+                            console.error('Gagal menyalin:', err);
+                            alert('Gagal menyalin data. Cek konsol (F12) untuk detail.');
+                        });
+                } else {
+                    alert("Browser Anda tidak mendukung Clipboard API. Silakan salin manual data di konsol.");
+                    console.log(textToCopy);
+                }
+            }
+
+
+            // --- DATA LISTENER DARI FIREBASE ---
+            onValue(ref(db, DATA_PATH), (snapshot) => {
+                const data = snapshot.val();
+                
+                if (data) {
+                    logData = Object.keys(data).map(key => ({ 
+                        id: key, 
+                        ...data[key] 
+                    }));
+                    
+                    // UPDATE STATISTIK
+                    const todayVisitors = logData.filter(item => {
+                        const itemDateString = `${item.tanggal}/${item.bulan}/${item.tahun}`;
+                        return itemDateString === todayDateString;
+                    });
+
+                    totalAllTimeSpan.textContent = logData.length;
+                    totalTodaySpan.textContent = todayVisitors.length;
+
+                    dataStatus.innerHTML = `<p class="font-medium text-green-800">Status Data:</p><span class="text-green-600 mt-1">✅ ${logData.length} entri log berhasil dimuat.</span>`;
+                    dataStatus.classList.remove('bg-yellow-50', 'bg-red-50', 'border-yellow-300', 'border-red-300');
+                    dataStatus.classList.add('bg-green-50', 'border-green-300');
+                } else {
+                    logData = [];
+                    totalAllTimeSpan.textContent = 0;
+                    totalTodaySpan.textContent = 0;
+                    dataStatus.innerHTML = `<p class="font-medium text-red-800">Status Data:</p><span class="text-red-600 mt-1">⚠️ Data log kunjungan masih kosong.</span>`;
+                    dataStatus.classList.remove('bg-yellow-50', 'bg-green-50', 'border-yellow-300', 'border-green-300');
+                    dataStatus.classList.add('bg-red-50', 'border-red-300');
+                }
+
+                renderTable(logData); 
+            }, (error) => {
+                console.error("FIREBASE ERROR (log_kunjungan_2025):", error);
+                dataStatus.innerHTML = `<p class="font-medium text-red-800">Status Data:</p><span class="text-red-600 mt-1">❌ KRITIS: GAGAL memuat data. Cek Konsol (F12).</span>`;
+                dataStatus.classList.remove('bg-yellow-50', 'bg-green-50', 'border-yellow-300', 'border-green-300');
+                dataStatus.classList.add('bg-red-50', 'border-red-300');
+            });
+
+            // --- EVENT LISTENERS ---
+            searchInput.addEventListener('input', handleSearch);
+
+            btnDeleteAll.addEventListener('click', () => {
+                if (confirm("⚠️ PERINGATAN KRITIS: Anda yakin ingin MENGHAPUS SEMUA data log kunjungan? Tindakan ini TIDAK dapat dibatalkan!")) {
+                    deleteAllEntries();
                 }
             });
-        });
-    }
 
-    function loadPengunjung(){ 
-        onValue(ref(db,'pengunjung'), (snap)=>{ 
-            allPengunjungData = snap.val(); 
-            renderPengunjungTable(allPengunjungData, searchPengunjung.value); 
-            const count = allPengunjungData ? Object.keys(allPengunjungData).length : 0;
-            showLog(`Data Pengunjung terbaru dimuat. (${count} entri)`);
-        }, (error) => {
-            showLog('Gagal memuat data Pengunjung: '+error.message, true);
-        });
-    }
+            btnCopyAll.addEventListener('click', copyTableData);
 
-    document.getElementById('exportPengunjung').addEventListener('click', ()=>{
-        get(child(ref(db), 'pengunjung')).then(snap=>{
-            const data = snap.val(); 
-            if(!data) return showLog('Tidak ada data pengunjung untuk diekspor.', true);
-            
-            const rows = Object.entries(data).map(([k,v])=> ({ id: k, ...v }));
-            
-            const colsSet = new Set(['id']); rows.forEach(r=> Object.keys(r).forEach(c=>colsSet.add(c)));
-            const cols = Array.from(colsSet).sort((a, b) => { 
-                if (a.toLowerCase() === 'tanggal') return -1;
-                if (b.toLowerCase() === 'bulan') return 1;
-                if (a.toLowerCase() === 'tahun') return 1;
-                if (a === 'id') return -1;
-                if (b === 'id') return 1;
-                return a.localeCompare(b);
+            dataTable.addEventListener('click', (e) => {
+                const deleteButton = e.target.closest('.btn-delete-row');
+                if (deleteButton) {
+                    const id = deleteButton.getAttribute('data-id');
+                    const row = deleteButton.closest('tr');
+                    const nama = row.cells[1].textContent.trim(); 
+                    if (confirm(`Yakin ingin menghapus log kunjungan dari: ${nama}?`)) {
+                        deleteEntry(id);
+                    }
+                }
             });
 
-            const csv = [cols.join(';')].concat(rows.map(r=> 
-                cols.map(c=>`"${(r[c]||'').toString().replace(/"/g,'""')}"`).join(';')
-            )).join('\n');
-            
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.href = url; a.download = 'pengunjung_perpustakaan.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-            showLog('Data Pengunjung berhasil diekspor ke CSV.', false);
-        }).catch(e=>{
-            showLog('Gagal ekspor data: '+e.message, true);
-            console.error(e);
-        });
-    });
-
-    // =========================================================
-    // TAB LOGIC (Dipertahankan)
-    // =========================================================
-
-    const tabSantri = document.getElementById('tabSantri');
-    const tabBuku = document.getElementById('tabBuku');
-    const tabPengunjung = document.getElementById('tabPengunjung');
-    
-    const allTabs = [tabPengunjung, tabSantri, tabBuku];
-
-    function setActiveTabStyle(activeTab) {
-        allTabs.forEach(tab => {
-            if (tab === activeTab) {
-                tab.classList.add('bg-cyan-500', 'text-white', 'shadow-lg');
-                tab.classList.remove('text-cyan-200', 'hover:bg-cyan-700/50');
-            } else {
-                tab.classList.remove('bg-cyan-500', 'text-white', 'shadow-lg');
-                tab.classList.add('text-cyan-200', 'hover:bg-cyan-700/50');
-            }
-        });
-    }
-
-    function showTab(name){
-      sectionSantri.classList.toggle('hidden', name!=='Santri');
-      sectionBuku.classList.toggle('hidden', name!=='Buku');
-      sectionPengunjung.classList.toggle('hidden', name!=='Pengunjung');
-      
-      let activeTabElement;
-      if (name === 'Pengunjung') { 
-          loadPengunjung(); 
-          activeTabElement = tabPengunjung;
-      } else if (name === 'Santri') {
-          loadSiswa();
-          clearSantriForm();
-          activeTabElement = tabSantri;
-      } else if (name === 'Buku') {
-          loadBuku();
-          clearBukuForm();
-          activeTabElement = tabBuku;
-      }
-      
-      setActiveTabStyle(activeTabElement);
-    }
-    
-    tabPengunjung.onclick = ()=>showTab('Pengunjung');
-    tabSantri.onclick = ()=>showTab('Santri'); 
-    tabBuku.onclick = ()=>showTab('Buku'); 
-
-    // initial load
-    showTab('Pengunjung'); 
-    showLog('Sistem siap. Memuat data Pengunjung...', false);
-    
-  </script>
+        } catch (e) {
+            console.error("FIREBASE INITIALIZATION ERROR:", e);
+            dataStatus.innerHTML = `<p class="font-medium text-red-800">Status Data:</p><span class="text-red-600 mt-1">❌ KRITIS: Gagal menginisialisasi Firebase. Cek konfigurasi Anda.</span>`;
+            dataStatus.classList.remove('bg-yellow-50', 'bg-green-50', 'border-yellow-300', 'border-green-300');
+            dataStatus.classList.add('bg-red-50', 'border-red-300');
+        }
+    </script>
 </body>
 </html>
