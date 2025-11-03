@@ -3,48 +3,52 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Form Kunjungan Perpustakaan | Tema Terang Soft Light</title>
+    <title>Form Kunjungan Perpustakaan | Remote Iframe Control (Firebase)</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
 
     <script>
+      // 💡 Palet Tailwind Diperbarui: Menggunakan Indigo dan Cyan untuk kombinasi yang profesional
       tailwind.config = {
         theme: {
           extend: {
             fontFamily: {
               sans: ['Poppins', 'sans-serif'],
             },
+            colors: {
+              'primary-accent': '#4F46E5', // Indigo 600
+              'secondary-accent': '#00838F', // Dark Cyan (untuk Modal/Aktivitas)
+              'soft-bg': '#F7F8FC', // Background Baru
+              'card-bg': '#FFFFFF', // Container Form
+              'soft-border': '#E5E7EB', // Border & Garis Input Normal
+            }
           }
         }
       }
     </script>
 
     <style>
-      /* ---------------------------------------------------- */
-      /* SKEMA WARNA BARU: TEMA TERANG (SOFT LIGHT MODE) DENGAN AKSEN DARK CYAN */
-      /* ---------------------------------------------------- */
+      /* --- VARIABEL WARNA (Disesuaikan dengan Palet Baru) --- */
       :root {
-          /* --- Palet Dark Cyan untuk Aksen (Dipertahankan) --- */
-          --color-cyan-primary: #00838F;      /* Cyan 800 - Primary/Accent (Darker) */
-          --color-cyan-dark: #006064;         /* Cyan 900 - Focus/Dark (Darkest) */
-          --color-cyan-light: #4DD0E1;        /* Cyan 400 - Line/Hover */
+          /* Aksen Utama */
+          --color-primary-accent: #4F46E5; /* Indigo */
+          --color-secondary-accent: #00838F; /* Dark Cyan */
           
-          /* Definisi Palet Terang (Soft Light Mode) */
-          --color-light-main-bg: #d0deec;      /* Background Utama (Sangat Terang, off-white) */
-          --color-light-container-bg: #FFFFFF; /* Background Kontainer (Putih Bersih) */
-          --color-light-border: #D1D5DB;       /* Garis Pembatas (Abu-abu lembut) */
-          --color-text-dark: #333333;          /* Teks Utama (Abu-abu gelap lembut) */
-          --color-text-secondary: #6B7280;     /* Teks Sekunder/Label (Abu-abu sedang) */
-          --color-text-header: #1F2937;        /* Teks Header (Abu-abu ekstra gelap) */
-
-          /* Tambahan untuk Fokus Dropdown Putih Abu */
-          --color-soft-gray-focus: #E5E7EB;   /* Gray 200 - Background Fokus Dropdown */
+          /* Tema Terang */
+          --color-light-main-bg: #F7F8FC; 
+          --color-light-container-bg: #FFFFFF;
+          --color-light-border: #E5E7EB;
+          
+          /* Teks */
+          --color-text-dark: #1F2937;
+          --color-text-secondary: #6B7280;
+          --color-text-header: #1F2937;
+          --color-soft-gray-focus: #F3F4F6; /* Gray 100 */
       }
 
       body {
           font-family: 'Poppins', sans-serif;
-          /* Background diubah menjadi Terang */
           background-color: var(--color-light-main-bg); 
           color: var(--color-text-dark);
           display: flex;
@@ -52,46 +56,70 @@
           align-items: flex-start;
           min-height: 100vh; 
           padding: 40px 20px;
+          transition: filter 0.3s; /* Tambahan transisi untuk filter */
       }
 
+      /* KRITIS: ID Kontainer Form */
       #single-form-container {
           max-width: 600px;
-          padding: 30px;
+          padding: 40px; 
           margin: 0 auto;
-          /* Container dengan warna terang */
           background: var(--color-light-container-bg); 
-          border-radius: 8px; 
+          border-radius: 12px; 
           width: 100%;
-          /* Tambahkan Shadow lembut untuk kesan "mengambang" */
-          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-          border: 1px solid var(--color-light-border); /* Border lembut */
-      }
-
-      h1, .text-3xl {
-          color: var(--color-text-header) !important;
-          border-color: var(--color-cyan-primary) !important; /* Aksen Cyan tetap */
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); 
+          border: 1px solid var(--color-light-border);
+          transition: opacity 0.3s, visibility 0.3s; /* Tambahan transisi untuk hide/show */
       }
       
-      h3, .text-2xl {
-          color: var(--color-text-header) !important;
-          border-color: var(--color-light-border) !important; /* Border lembut */
+      /* --- IFRAME FULL SCREEN (Selalu Ada, Sembunyi Default) --- */
+      #external-iframe {
+          position: fixed; /* Kunci di viewport */
+          top: 0;
+          left: 0;
+          width: 100vw; /* Lebar Penuh */
+          height: 100vh; /* Tinggi Penuh */
+          border: none;
+          background: var(--color-light-container-bg); 
+          z-index: 100; /* Di atas form */
+          display: none; /* Sembunyikan default */
+          opacity: 0;
+          transition: opacity 0.3s;
       }
 
-      label {
+      /* Kelas Aktif untuk Iframe */
+      #external-iframe.active {
           display: block;
-          margin-top: 20px;
+          opacity: 1;
+      }
+
+      /* Kelas untuk menyembunyikan Form */
+      #single-form-container.hidden-view {
+          display: none;
+          opacity: 0;
+          visibility: hidden;
+      }
+
+      /* --- STYLE LAIN (Dibiarkan sama) --- */
+      h1 { 
+          border-color: var(--color-primary-accent) !important; 
+          color: var(--color-text-dark);
+      }
+      h3 {
+          border-color: var(--color-light-border) !important;
+          color: var(--color-text-dark);
+          font-weight: 700;
+      }
+      label {
+          color: var(--color-text-secondary);
+          font-size: 14px;
           font-weight: 600;
-          color: var(--color-text-secondary); /* Teks label abu-abu */
+          display: block;
+          margin-bottom: 4px;
       }
 
-      /* ---------------------------------------------------- */
-      /* GARIS BAWAH CYAN INPUT & DROPDOWN STYLES */
-      /* ---------------------------------------------------- */
-
-      .form-group {
-          position: relative;
-      }
-
+      /* Garis Bawah Input Style */
+      .form-group { position: relative; }
       .input-line-style {
           width: 100%;
           padding: 10px 0;
@@ -99,208 +127,170 @@
           margin-bottom: 15px;
           border: none;
           outline: none;
-          /* Garis default menggunakan Warna Pembatas Terang */
           border-bottom: 2px solid var(--color-light-border); 
           background-color: transparent;
-          color: var(--color-text-dark); /* Teks gelap */
+          color: var(--color-text-dark);
           transition: border-bottom-color 0.3s, border-bottom-width 0.3s;
           font-size: 17px;
           box-sizing: border-box;
           appearance: none;
-
           @apply shadow-none !important;
           border-radius: 0 !important;
       }
-
       .input-line-style:focus {
-          /* Garis focus menggunakan Cyan Primary (Dark Cyan) */
-          border-bottom: 3px solid var(--color-cyan-primary);
+          border-bottom: 3px solid var(--color-primary-accent); /* Fokus Indigo */
       }
-
-      /* GAYA ERROR: Garis Merah */
       .input-line-style.input-error {
-          border-bottom-color: #EF4444 !important; /* Merah kontras di tema terang */
+          border-bottom-color: #EF4444 !important; /* Merah */
           border-bottom-width: 3px !important;
-          box-shadow: none !important;
       }
 
-      /* Override Select Box */
+      /* Perbaikan Style Select (Dropdown Panah) */
       #jenjang, #kategoriBuku, #keterangan {
-          /* Ganti SVG panah menjadi warna gelap sekunder */
+          -webkit-appearance: none;
+          -moz-appearance: none;
+          appearance: none;
           background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%236B7280'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd' /%3E%3C/svg%3E");
           background-repeat: no-repeat;
-          background-position: right 0px center;
-          background-size: 1.5em;
-          padding-right: 2.5rem;
-          background-color: transparent;
-          color: var(--color-text-dark);
+          background-position: right 5px center; 
+          background-size: 1.25em; 
+          padding-right: 2rem; 
       }
       
-      /* Pastikan option di select terlihat di tema terang */
       select option {
         background-color: var(--color-light-container-bg);
         color: var(--color-text-dark);
       }
 
-      /* ---------------------------------------------------- */
-      /* DROPDOWN KUSTOM (SOFT GRAY FOCUS) */
-      /* ---------------------------------------------------- */
+      /* DROPDOWN KUSTOM PENCARIAN */
       .custom-dropdown {
           position: absolute;
           top: calc(100% + 5px);
           left: 0;
           right: 0;
-          
           border: 1px solid var(--color-light-border);
-          background-color: var(--color-light-container-bg); /* Latar belakang terang */
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Shadow lembut */
-          border-radius: 4px;
-          
+          background-color: var(--color-light-container-bg);
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12); 
+          border-radius: 6px; 
           list-style: none;
           padding: 5px 0;
           margin: 0;
           display: none;
           z-index: 20;
           overflow: hidden;
+          max-height: 250px;
+          overflow-y: auto;
       }
 
       .custom-dropdown-item {
-          color: var(--color-text-dark); /* Teks gelap default */
-          padding: 10px 15px;
+          color: var(--color-text-dark);
+          padding: 12px 15px; 
           cursor: pointer;
-          transition: background-color 0.2s, color 0.2s;
+          transition: background-color 0.2s;
           font-size: 16px;
       }
-
-      /* MODIFIKASI: Fokus menggunakan Putih Abu */
       .custom-dropdown-item:hover,
       .custom-dropdown-item.selected {
-          /* Menggunakan warna abu-abu lembut untuk latar belakang */
           background-color: var(--color-soft-gray-focus); 
-          /* Mempertahankan warna teks gelap untuk kontras */
           color: var(--color-text-dark); 
       }
-
-      /* Menghapus Efek Stabilo */
-      .custom-dropdown-item span.highlight {
-          color: inherit; 
-          background-color: transparent; 
-          font-weight: inherit;
-          padding: 0;
-          border-radius: 0;
-      }
-
-      .custom-dropdown-item.selected span.highlight,
-      .custom-dropdown-item:hover span.highlight {
-          color: inherit;
-          background-color: transparent; 
-      }
-
-
-      /* GAYA TEXT TAMBAHAN DI DROPDOWN ITEM */
       .custom-dropdown-item .text-xs {
-          color: var(--color-text-secondary); /* Teks deskripsi abu-abu sekunder */
+          color: var(--color-text-secondary); 
           margin-top: 2px;
           font-size: 13px;
       }
 
-      .custom-dropdown-item.selected .text-xs,
-      .custom-dropdown-item:hover .text-xs {
-          /* Teks deskripsi dipertahankan */
-          color: var(--color-text-secondary); 
-      }
-
       /* Tombol Submit */
       #btnSubmit {
-          /* Warna tombol menggunakan Dark Cyan Primary (Dipertahankan) */
-          background-color: var(--color-cyan-primary);
-          color: var(--color-light-container-bg); /* Teks Putih */
-          padding: 12px 25px;
+          background-color: var(--color-primary-accent); 
+          color: white;
+          padding: 14px 25px; 
           border: none;
-          border-radius: 6px;
+          border-radius: 8px; 
           cursor: pointer;
           margin-top: 30px;
           font-size: 17px;
-          font-weight: bold;
-          transition: background-color 0.3s, transform 0.1s;
+          font-weight: 700;
+          transition: background-color 0.3s, transform 0.1s, box-shadow 0.3s;
           width: 100%;
-          @apply shadow-none hover:shadow-none;
+          box-shadow: 0 4px 10px rgba(79, 70, 229, 0.4); 
       }
       #btnSubmit:hover {
-          /* Warna hover menggunakan Dark Cyan Darker (Dipertahankan) */
-          background-color: var(--color-cyan-dark);
+          background-color: #4338CA; 
           transform: translateY(-1px);
+          box-shadow: 0 6px 15px rgba(79, 70, 229, 0.6);
       }
       
-      /* Gaya saat tombol disabled */
       #btnSubmit:disabled {
-          background-color: #6B7280; /* Warna abu-abu saat disabled */
+          background-color: #9CA3AF; 
           cursor: not-allowed;
           transform: none;
+          box-shadow: none;
       }
 
-      /* ---------------------------------------------------- */
-      /* MODAL (Pop-up Sukses) */
-      /* ---------------------------------------------------- */
+      /* MODAL / POP-UP SUKSES */
       .modal-overlay {
           position: fixed;
           top: 0;
           left: 0;
           width: 100%;
           height: 100%;
-          background: rgba(0, 0, 0, 0.4); /* Lebih terang dari sebelumnya (Soft Overlay) */
+          background: rgba(0, 0, 0, 0.5);
           display: none;
           justify-content: center;
           align-items: center;
-          z-index: 50;
+          z-index: 1000;
           opacity: 0;
-          transition: opacity 0.3s ease-out;
+          transition: opacity 0.3s;
       }
-
       .modal-overlay.active {
           display: flex;
           opacity: 1;
       }
-
       .modal-content {
-          background: var(--color-light-container-bg); /* Konten modal terang */
-          color: var(--color-text-dark);
+          background: var(--color-light-container-bg);
           padding: 30px;
           border-radius: 12px;
           max-width: 400px;
           width: 90%;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); /* Shadow lembut */
-          transform: translateY(-50px);
-          transition: transform 0.3s ease-out;
-          border: 1px solid var(--color-cyan-primary); /* Border Dark Cyan */
+          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+          transform: scale(0.9);
+          transition: transform 0.3s;
+      }
+      .modal-overlay.active .modal-content {
+          transform: scale(1);
+      }
+      #closeModalBtn {
+          background-color: var(--color-secondary-accent); 
+          color: white;
+          padding: 10px 25px;
+          border-radius: 8px;
+          font-weight: 600;
+          transition: background-color 0.2s;
+      }
+      #closeModalBtn:hover {
+        background-color: #006064; 
+      }
+      .text-cyan-500-custom {
+          color: var(--color-secondary-accent);
+      }
+      
+      /* DIAGNOSTIK: Dihapus */
+      #dataStatus {
+          display: none;
       }
 
-      /* GAYA TEXT (Tailwind Overrides disesuaikan untuk Light Theme) */
-      .text-gray-800 { color: var(--color-text-header); } 
-      .text-gray-600 { color: var(--color-text-secondary); } 
-      
-      /* Mengganti class custom dengan Dark Cyan */
-      .border-cyan-500-custom { border-color: var(--color-cyan-primary); }
-      
-      /* Tambahkan gaya untuk modal icon */
-      .text-cyan-500-custom { color: var(--color-cyan-primary); }
-      
-      /* Tambahkan gaya untuk modal button */
-      .bg-cyan-600-custom { 
-          background-color: var(--color-cyan-primary);
-          color: var(--color-light-container-bg);
-          transition: background-color 0.3s;
-      }
-      .bg-cyan-600-custom:hover {
-          background-color: var(--color-cyan-dark);
-      }
     </style>
 </head>
 
-<body>
+<body id="main-form-app"> <iframe id="external-iframe" src="" allowfullscreen></iframe>
 
     <div id="single-form-container">
-      <h1 class="text-3xl font-bold text-gray-800 mb-8 border-b-4 border-cyan-500-custom pb-2">Form Kunjungan Perpustakaan</h1>
+      <h1 class="text-3xl font-bold text-gray-800 mb-8 border-b-4 pb-3">Form Kunjungan Perpustakaan</h1>
+      
+      <div id="dataStatus" style="display: none;" class="p-3 text-sm rounded-lg">
+          Memuat data master dari Firebase...
+      </div>
 
       <div class="space-y-6">
 
@@ -378,7 +368,7 @@
         </div>
         <h4 class="text-2xl font-bold text-gray-800 mb-2">Data Kunjungan Berhasil Dikirim!</h4>
         <p class="text-gray-600 mb-6">Terima kasih. Data form telah direset dan siap untuk entri berikutnya.</p>
-        <button id="closeModalBtn" class="bg-cyan-600-custom text-white px-6 py-2 rounded-lg font-semibold transition">Tutup</button>
+        <button id="closeModalBtn" class="px-6 py-2 rounded-lg font-semibold transition">Tutup</button>
       </div>
     </div>
 
@@ -386,464 +376,428 @@
     <script type="module">
       // --- FIREBASE IMPORTS & CONFIG ---
       import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
-      import { getDatabase, ref, set, onValue, push } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js';
+      // KRITIS: Import onValue untuk listener
+      import { getDatabase, ref, onValue, push, update } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js';
 
-      // *** GANTI DENGAN CONFIG FIREBASE ASLI ANDA ***
+      // !!! KRITIS: GANTI DENGAN CONFIG FIREBASE ASLI PROYEK TRAYING-29BF4 !!!
       const firebaseConfig = {
-        apiKey: "AIzaSyB6gaVW3ye680YylqzSebZugmQepYRA4g4", // Ganti
-        authDomain: "pengunjung-4489b.firebaseapp.com", // Ganti
-        projectId: "pengunjung-4489b", // Ganti
-        storageBucket: "pengunjung-4489b.firebasestorage.app", // Ganti
-        messagingSenderId: "233634425303", // Ganti
-        appId: "1:233634425303:web:9d45d775e703b94843c392", // Ganti
-        databaseURL: "https://pengunjung-4489b-default-rtdb.firebaseio.com" // Ganti
+        apiKey: "AIzaSy_GANTI_INI_DENGAN_KUNCI_API_ASLI", 
+        authDomain: "traying-29bf4.firebaseapp.com", 
+        projectId: "traying-29bf4", 
+        storageBucket: "traying-29bf4.appspot.com", 
+        messagingSenderId: "GANTI_DENGAN_SENDER_ID_ASLI", 
+        appId: "1:GANTI_DENGAN_APP_ID_ASLI", 
+        databaseURL: "https://traying-29bf4-default-rtdb.firebaseio.com" 
       };
-
-      const app = initializeApp(firebaseConfig);
-      const db = getDatabase(app);
-
-      // --- HELPER FUNCTION: TITLE CASE ---
-      function titleCase(str) {
-          if (!str) return '';
-          return str.toLowerCase().split(' ').map(word => {
-              if (word.length === 0) return '';
-              return (word.charAt(0).toUpperCase() + word.slice(1));
-          }).join(' ');
-      }
-      // -----------------------------------------------------------
-
-      // --- DOM ELEMENTS & STATE ---
-      const $ = id => document.getElementById(id);
-
-      const nisSearch = $('nisSearch');
-      const kodeBukuSearch = $('kodeBukuSearch');
-      const keteranganSelect = $('keterangan');
-
-      // Dropdown Kustom
-      const nisDropdown = $('dd-nisSearch');
-      const bukuDropdown = $('dd-kodeBukuSearch');
-
-      // Input Detail/Koreksi
-      const blokInput = $('blok');
-      const jenjangSelect = $('jenjang');
-      const kategoriBukuSelect = $('kategoriBuku');
       
-      // Tombol Submit
-      const btnSubmit = $('btnSubmit');
+      // Path/Node Firebase untuk Komando Iframe
+      const IFRAME_CONTROL_PATH = 'remote_iframe_state'; 
 
-      // Elemen Modal
-      const successModal = $('successModal');
-      const closeModalBtn = $('closeModalBtn');
+      try {
+          const app = initializeApp(firebaseConfig);
+          const db = getDatabase(app);
 
-      const allInputs = [nisSearch, kodeBukuSearch, keteranganSelect, blokInput, jenjangSelect, kategoriBukuSelect];
+          const $ = id => document.getElementById(id);
+          const statusEl = $('dataStatus'); 
+          
+          // --- Variabel DOM dan State ---
+          const formContainer = $('single-form-container'); // KRITIS: Menggunakan ID Kontainer Form yang benar
+          const externalIframe = $('external-iframe'); // KRITIS: Variabel Iframe
+          const nisSearch = $('nisSearch');
+          const kodeBukuSearch = $('kodeBukuSearch');
+          const nisDropdown = $('dd-nisSearch');
+          const bukuDropdown = $('dd-kodeBukuSearch');
+          const blokInput = $('blok');
+          const jenjangSelect = $('jenjang');
+          const kategoriBukuSelect = $('kategoriBuku');
+          const keteranganSelect = $('keterangan');
+          const btnSubmit = $('btnSubmit');
+          const successModal = $('successModal');
+          const closeModalBtn = $('closeModalBtn');
+          const allInputs = [nisSearch, kodeBukuSearch, keteranganSelect, blokInput, jenjangSelect, kategoriBukuSelect];
 
-      let santriList = [];
-      let bukuList = [];
-      
-      let selectedSantri = { nis: null, nama: null };
-      let selectedBuku = { kode: null, judul: null };
+          let santriList = [];
+          let bukuList = [];
+          
+          let selectedSantri = { nis: null, nama: null };
+          let selectedBuku = { kode: null, judul: null };
+          
+          
+          // ----------------------------------------------------------------------------------
+          // --- FUNGSI SHOW/HIDE IFRAME & LISTENER KONTROL FIREBASE (Baru/Diperbarui) ---
+          // ----------------------------------------------------------------------------------
 
-      const VALID_JENJANG = ["SLTP", "SLTA", "PT"];
-      const VALID_KATEGORI = [
-          "Sejarah dan Geografi", "Kesusastraan", "Komik", "Agama",
-          "Filsafat dan Psikologi", "Ilmu Murni", "Ilmu Sosial",
-          "Ilmu Bahasa", "Berita", "Karya Umum", "Majalah"
-      ];
-
-      function parseInput(inputElement) {
-          const fullValue = inputElement.value.trim();
-          const match = fullValue.match(/\(([^)]+)\)$/);
-
-          if (match) {
-              const id = match[1].trim();
-              const name = fullValue.replace(match[0], '').trim();
-              return { id: id, name: name || id };
-          } else {
-              return { id: fullValue, name: fullValue };
+          function showIframe(url) {
+              if (!url) return;
+              externalIframe.src = url;
+              externalIframe.classList.add('active');
+              formContainer.classList.add('hidden-view'); // Sembunyikan Form
+              document.body.style.overflow = 'hidden'; 
+              console.log(`[Form Kunjungan] Iframe OPEN: ${url}`);
           }
-      }
 
-      function showModal() {
-          successModal.classList.add('active');
-      }
-
-      function hideModal() {
-          successModal.classList.remove('active');
-          nisSearch.focus();
-      }
-
-      function resetFormDisplay() {
-          nisSearch.focus();
-      }
-
-      function resetForm() {
-          allInputs.forEach(input => {
-              input.value = '';
-              input.classList.remove('input-error');
-              input.setAttribute('aria-expanded', 'false');
+          function hideIframe() {
+              externalIframe.classList.remove('active');
+              externalIframe.src = ''; // Hentikan konten
+              formContainer.classList.remove('hidden-view'); // Tampilkan Form
+              document.body.style.overflow = ''; 
+              nisSearch.focus();
+              console.log("[Form Kunjungan] Iframe CLOSED.");
+          }
+          
+          const iframeControlRef = ref(db, IFRAME_CONTROL_PATH);
+          
+          onValue(iframeControlRef, (snapshot) => {
+              const controlData = snapshot.val();
+              if (controlData) {
+                  console.log("Kontrol Iframe diterima dari Firebase:", controlData);
+                  
+                  if (controlData.status === 'OPEN' && controlData.url) {
+                      showIframe(controlData.url);
+                  } 
+                  else if (controlData.status === 'CLOSE') {
+                      hideIframe();
+                  }
+              } else {
+                  hideIframe();
+              }
+          }, (error) => {
+              console.error("FIREBASE ERROR (Remote Control Listener):", error);
+              // Tampilkan pesan error jika listener gagal
+              console.error('❌ KRITIS: GAGAL menghubungkan Remote Control Firebase.');
           });
+          
+          
+          // ----------------------------------------------------------------------------------
+          // --- FUNGSI HELPER & LOGIKA FORM (Asli) ---
+          // ----------------------------------------------------------------------------------
 
-          jenjangSelect.value = '';
-          kategoriBukuSelect.value = '';
-          keteranganSelect.value = ''; // Pastikan keterangan juga direset
+          function titleCase(str) {
+              if (!str) return '';
+              return str.toLowerCase().split(' ').map(word => {
+                  if (word.length === 0) return '';
+                  return (word.charAt(0).toUpperCase() + word.slice(1));
+              }).join(' ');
+          }
+          function parseInput(inputElement) {
+              const fullValue = inputElement.value.trim();
+              const match = fullValue.match(/\(([^)]+)\)$/);
+              if (match) {
+                  const id = match[1].trim();
+                  const name = fullValue.replace(match[0], '').trim();
+                  return { id: id, name: name || id };
+              } else {
+                  return { id: fullValue, name: fullValue };
+              }
+          }
+          function showModal() { successModal.classList.add('active'); }
+          function hideModal() { successModal.classList.remove('active'); nisSearch.focus(); }
+          function resetForm() {
+              allInputs.forEach(input => { input.value = ''; input.classList.remove('input-error'); input.setAttribute('aria-expanded', 'false'); });
+              jenjangSelect.value = '';
+              kategoriBukuSelect.value = '';
+              keteranganSelect.value = '';
+              nisDropdown.innerHTML = '';
+              bukuDropdown.innerHTML = '';
+              selectedSantri = { nis: null, nama: null };
+              selectedBuku = { kode: null, judul: null };
+          }
+          function markEmptyFields() {
+              clearErrorMarks();
+              let errorCount = 0;
+              if (!nisSearch.value.trim()) { nisSearch.classList.add('input-error'); errorCount++; }
+              if (!blokInput.value.trim()) { blokInput.classList.add('input-error'); errorCount++; }
+              if (!jenjangSelect.value) { jenjangSelect.classList.add('input-error'); errorCount++; }
+              if (!kodeBukuSearch.value.trim()) { kodeBukuSearch.classList.add('input-error'); errorCount++; }
+              if (!kategoriBukuSelect.value) { kategoriBukuSelect.classList.add('input-error'); errorCount++; }
+              if (!keteranganSelect.value) { keteranganSelect.classList.add('input-error'); errorCount++; }
+              return errorCount > 0;
+          }
+          function clearErrorMarks() { allInputs.forEach(input => { input.classList.remove('input-error'); }); }
+          function populateCustomDropdown(dropdownEl, matches, keyType) {
+              dropdownEl.innerHTML = '';
+              matches.forEach(item => {
+                  const li = document.createElement('li');
+                  li.classList.add('custom-dropdown-item');
+                  li.setAttribute('role', 'option');
 
-          nisDropdown.innerHTML = '';
-          bukuDropdown.innerHTML = '';
+                  let displayValue;
+                  let detailsText;
 
-          selectedSantri = { nis: null, nama: null };
-          selectedBuku = { kode: null, judul: null };
-      }
+                  if (keyType === 'pengunjung') {
+                      const namaTitleCase = titleCase(item.nama);
+                      displayValue = `${namaTitleCase} (${item.nis})`;
+                      detailsText = `Blok: ${item.blok || '-'} | Jenjang: ${item.jenjang || '-'}`;
+                      
+                      li.setAttribute('data-nis', item.nis);
+                      li.setAttribute('data-nama', namaTitleCase); 
+                      li.setAttribute('data-blok', item.blok || '');
+                      li.setAttribute('data-jenjang', item.jenjang || '');
 
-      function markEmptyFields() {
-          clearErrorMarks();
-          let errorCount = 0;
+                  } else { 
+                      const judulTitleCase = titleCase(item.judul);
+                      displayValue = `${judulTitleCase} (${item.kode})`;
+                      detailsText = `Kategori: ${item.kategori || '-'}`;
+                      
+                      li.setAttribute('data-kode', item.kode);
+                      li.setAttribute('data-judul', judulTitleCase); 
+                      li.setAttribute('data-kategori', item.kategori || '');
+                  }
 
-          if (!nisSearch.value.trim()) { nisSearch.classList.add('input-error'); errorCount++; }
-          if (!blokInput.value.trim()) { blokInput.classList.add('input-error'); errorCount++; }
-          if (!jenjangSelect.value) { jenjangSelect.classList.add('input-error'); errorCount++; }
-          if (!kodeBukuSearch.value.trim()) { kodeBukuSearch.classList.add('input-error'); errorCount++; }
-          if (!kategoriBukuSelect.value) { kategoriBukuSelect.classList.add('input-error'); errorCount++; }
-          if (!keteranganSelect.value) { keteranganSelect.classList.add('input-error'); errorCount++; }
+                  li.setAttribute('data-value', displayValue);
+                  li.setAttribute('data-key-type', keyType);
 
-          return errorCount > 0;
-      }
+                  li.innerHTML = displayValue + `<div class="text-xs">${detailsText}</div>`;
 
-      function clearErrorMarks() {
-          allInputs.forEach(input => {
-              input.classList.remove('input-error');
-          });
-      }
+                  dropdownEl.appendChild(li);
+              });
 
-      // --- DATA LOADING ---
-      
-      // 1. Ambil Data Santri
-      onValue(ref(db, 'siswa'), (snap) => {
-          const data = snap.val();
-          santriList = data ? Object.entries(data).map(([nis, val]) => ({ 
-              nis, 
-              nama: val.nama, 
-              blok: val.blok ? titleCase(val.blok) : '', 
-              jenjang: val.jenjang ? val.jenjang.toUpperCase() : '' 
-          })) : [];
-      });
+              dropdownEl.style.display = matches.length > 0 ? 'block' : 'none';
+              dropdownEl.closest('.form-group').querySelector('input').setAttribute('aria-expanded', matches.length > 0 ? 'true' : 'false');
+          }
+          function applyTitleCaseAndMaintainCursor(inputEl) {
+              const start = inputEl.selectionStart;
+              const end = inputEl.selectionEnd;
+              inputEl.value = titleCase(inputEl.value);
+              inputEl.setSelectionRange(start, end);
+          }
+          function selectSuggestion(inputEl, dropdownEl, li) {
+              if (!li) return;
 
-      // 2. Ambil Data Buku
-      onValue(ref(db, 'buku'), (snap) => {
-          const data = snap.val();
-          bukuList = data ? Object.entries(data).map(([kode, val]) => ({ kode, judul: val.judul, kategori: val.kategori || '' })) : [];
-      });
+              const keyType = li.getAttribute('data-key-type');
+              const selectedValue = li.getAttribute('data-value');
 
-
-      // --- FUNGSI DROPDOWN KUSTOM (Tanpa Riwayat) ---
-
-      function getHighlightedText(fullText, filterText) {
-          // Fungsi ini disederhanakan/dihilangkan fungsinya di kode asli Anda.
-          // Untuk tema terang ini, fungsi dikembalikan ke dasar (tanpa highlight)
-          return fullText; 
-      }
-
-      function populateCustomDropdown(dropdownEl, matches, keyType, filterText) {
-          dropdownEl.innerHTML = '';
-
-          matches.forEach(item => {
-              const li = document.createElement('li');
-              li.classList.add('custom-dropdown-item');
-              li.setAttribute('role', 'option');
-
-              let displayValue;
-              let detailsText;
+              inputEl.value = selectedValue;
+              dropdownEl.style.display = 'none';
+              inputEl.setAttribute('aria-expanded', 'false');
 
               if (keyType === 'pengunjung') {
-                  const namaTitleCase = titleCase(item.nama);
-                  displayValue = `${namaTitleCase} (${item.nis})`;
-                  detailsText = `Blok: ${item.blok || '-'} | Jenjang: ${item.jenjang || '-'}`;
-                  
-                  li.setAttribute('data-nis', item.nis);
-                  li.setAttribute('data-nama', namaTitleCase); 
-                  li.setAttribute('data-blok', item.blok || '');
-                  li.setAttribute('data-jenjang', item.jenjang || '');
-
-              } else { // buku
-                  const judulTitleCase = titleCase(item.judul);
-                  displayValue = `${judulTitleCase} (${item.kode})`;
-                  detailsText = `Kategori: ${item.kategori || '-'}`;
-                  
-                  li.setAttribute('data-kode', item.kode);
-                  li.setAttribute('data-judul', judulTitleCase); 
-                  li.setAttribute('data-kategori', item.kategori || '');
+                  selectedSantri.nis = li.dataset.nis;
+                  selectedSantri.nama = li.dataset.nama; 
+                  blokInput.value = li.dataset.blok ? titleCase(li.dataset.blok) : '';
+                  jenjangSelect.value = li.dataset.jenjang || '';
+              } else if (keyType === 'buku') {
+                  selectedBuku.kode = li.dataset.kode;
+                  selectedBuku.judul = li.dataset.judul; 
+                  kategoriBukuSelect.value = li.dataset.kategori || '';
               }
-
-              li.setAttribute('data-value', displayValue);
-              li.setAttribute('data-key-type', keyType);
-
-              // Tampilkan tanpa hitungan riwayat
-              li.innerHTML = getHighlightedText(displayValue, filterText) + `<div class="text-xs">${detailsText}</div>`;
-
-              dropdownEl.appendChild(li);
-          });
-
-          dropdownEl.style.display = matches.length > 0 ? 'block' : 'none';
-          dropdownEl.closest('.form-group').querySelector('input').setAttribute('aria-expanded', matches.length > 0 ? 'true' : 'false');
-      }
-
-      function applyTitleCaseAndMaintainCursor(inputEl) {
-          const start = inputEl.selectionStart;
-          const end = inputEl.selectionEnd;
-          inputEl.value = titleCase(inputEl.value);
-          inputEl.setSelectionRange(start, end);
-      }
-
-      function selectSuggestion(inputEl, dropdownEl, li) {
-          if (!li) return;
-
-          const keyType = li.getAttribute('data-key-type');
-          const selectedValue = li.getAttribute('data-value');
-
-          inputEl.value = selectedValue;
-          dropdownEl.style.display = 'none';
-          inputEl.setAttribute('aria-expanded', 'false');
-
-          if (keyType === 'pengunjung') {
-              selectedSantri.nis = li.dataset.nis;
-              selectedSantri.nama = li.dataset.nama; 
-              blokInput.value = li.dataset.blok ? titleCase(li.dataset.blok) : '';
-              jenjangSelect.value = li.dataset.jenjang || '';
-
               inputEl.classList.remove('input-error');
               blokInput.classList.remove('input-error');
               jenjangSelect.classList.remove('input-error');
-
-          } else if (keyType === 'buku') {
-              selectedBuku.kode = li.dataset.kode;
-              selectedBuku.judul = li.dataset.judul; 
-              kategoriBukuSelect.value = li.dataset.kategori || '';
-
-              inputEl.classList.remove('input-error');
               kategoriBukuSelect.classList.remove('input-error');
+
+
+              const nextInput = inputEl.closest('.form-group').nextElementSibling?.querySelector('.input-line-style, button');
+              if (nextInput) nextInput.focus();
           }
+          function handleKeydown(e, searchInput, dropdownEl) {
+              const items = dropdownEl.querySelectorAll('.custom-dropdown-item:not([style*="none"])');
+              if (items.length === 0) return;
 
-          const nextInput = inputEl.closest('.form-group').nextElementSibling?.querySelector('.input-line-style, button');
-          if (nextInput) nextInput.focus();
-      }
+              let currentFocused = dropdownEl.querySelector('.selected');
+              let currentIndex = Array.from(items).indexOf(currentFocused);
 
-      function handleKeydown(e, searchInput, dropdownEl) {
-          const items = dropdownEl.querySelectorAll('.custom-dropdown-item:not([style*="none"])');
-          if (items.length === 0) return;
-
-          let currentFocused = dropdownEl.querySelector('.selected');
-          let currentIndex = Array.from(items).indexOf(currentFocused);
-
-          if (e.key === 'ArrowDown') {
-              e.preventDefault();
-              currentIndex = (currentIndex < items.length - 1) ? currentIndex + 1 : 0;
-          } else if (e.key === 'ArrowUp') {
-              e.preventDefault();
-              currentIndex = (currentIndex > 0) ? currentIndex - 1 : items.length - 1;
-          } else if (e.key === 'Enter') {
-              e.preventDefault();
-              if (currentFocused) {
-                  selectSuggestion(searchInput, dropdownEl, currentFocused);
+              if (e.key === 'ArrowDown') {
+                  e.preventDefault();
+                  currentIndex = (currentIndex < items.length - 1) ? currentIndex + 1 : 0;
+              } else if (e.key === 'ArrowUp') {
+                  e.preventDefault();
+                  currentIndex = (currentIndex > 0) ? currentIndex - 1 : items.length - 1;
+              } else if (e.key === 'Enter') {
+                  e.preventDefault();
+                  if (currentFocused) {
+                      selectSuggestion(searchInput, dropdownEl, currentFocused);
+                  }
+                  return;
+              } else if (e.key === 'Escape') {
+                  dropdownEl.style.display = 'none';
+                  searchInput.setAttribute('aria-expanded', 'false');
+                  return;
               }
-              return;
-          } else if (e.key === 'Escape') {
-              dropdownEl.style.display = 'none';
-              searchInput.setAttribute('aria-expanded', 'false');
-              return;
+
+              items.forEach(item => item.classList.remove('selected'));
+              if (items[currentIndex]) {
+                  items[currentIndex].classList.add('selected');
+                  items[currentIndex].scrollIntoView({ block: "nearest" });
+              }
           }
+          function handleSearchInput(inputEl, dropdownEl, list, keyType) {
+              inputEl.classList.remove('input-error');
+              const val = inputEl.value.toLowerCase().trim();
+              if (keyType === 'pengunjung') {
+                  selectedSantri = { nis: null, nama: null };
+              } else { 
+                  selectedBuku = { kode: null, judul: null };
+              }
+              if(!val){
+                  dropdownEl.innerHTML='';
+                  dropdownEl.style.display = 'none';
+                  inputEl.setAttribute('aria-expanded', 'false');
+                  return;
+              }
 
-          items.forEach(item => item.classList.remove('selected'));
-          if (items[currentIndex]) {
-              items[currentIndex].classList.add('selected');
-              items[currentIndex].scrollIntoView({ block: "nearest" });
+              const matches = list.filter(item => {
+                  const searchField = keyType === 'pengunjung' ? item.nama.toLowerCase() : item.judul.toLowerCase();
+                  const idField = keyType === 'pengunjung' ? item.nis : item.kode;
+                  const blockField = (keyType === 'pengunjung' && item.blok) ? item.blok.toLowerCase() : ''; 
+
+                  return searchField.includes(val) || idField.includes(val) || blockField.includes(val);
+              }).slice(0, 10);
+
+              populateCustomDropdown(dropdownEl, matches, keyType, inputEl.value.trim());
+
+              if (matches.length > 0) {
+                    const firstItem = dropdownEl.querySelector('.custom-dropdown-item');
+                    if (firstItem) firstItem.classList.add('selected');
+              }
           }
-      }
+          // --- END FUNGSI HELPER ---
 
-      function handleSearchInput(inputEl, dropdownEl, list, keyType) {
-          inputEl.classList.remove('input-error');
+          // --- DATA LOADING & FIREBASE ---
+          let santriLoaded = false;
+          let bukuLoaded = false;
 
-          const val = inputEl.value.toLowerCase().trim();
-
-          if (keyType === 'pengunjung') {
-              selectedSantri = { nis: null, nama: null };
-          } else { 
-              selectedBuku = { kode: null, judul: null };
+          function updateStatus() {
+              if (santriLoaded && bukuLoaded) {
+                  console.log(`✅ Data Master dimuat! (Anggota: ${santriList.length}, Buku: ${bukuList.length}).`);
+              }
           }
-
-          if(!val){
-              dropdownEl.innerHTML='';
-              dropdownEl.style.display = 'none';
-              inputEl.setAttribute('aria-expanded', 'false');
-              return;
-          }
-
-          const matches = list.filter(item => {
-              const searchField = keyType === 'pengunjung' ? item.nama.toLowerCase() : item.judul.toLowerCase();
-              const idField = keyType === 'pengunjung' ? item.nis : item.kode;
-              const blockField = (keyType === 'pengunjung' && item.blok) ? item.blok.toLowerCase() : ''; 
-
-              return searchField.includes(val) || idField.includes(val) || blockField.includes(val);
-          }).slice(0, 10);
-
-          populateCustomDropdown(dropdownEl, matches, keyType, inputEl.value.trim());
-
-          if (matches.length > 0) {
-                const firstItem = dropdownEl.querySelector('.custom-dropdown-item');
-                if (firstItem) firstItem.classList.add('selected');
-          }
-      }
-
-
-      // Listener Santri
-      nisSearch.addEventListener('input', function() {
-          applyTitleCaseAndMaintainCursor(this);
-          handleSearchInput(this, nisDropdown, santriList, 'pengunjung');
-      });
-      nisSearch.addEventListener('keydown', (e) => handleKeydown(e, nisSearch, nisDropdown));
-      nisDropdown.addEventListener('click', e => {
-        const li = e.target.closest('.custom-dropdown-item'); if(!li || li.getAttribute('data-key-type') !== 'pengunjung') return;
-        selectSuggestion(nisSearch, nisDropdown, li);
-      });
-
-      // Listener Buku
-      kodeBukuSearch.addEventListener('input', function() {
-          applyTitleCaseAndMaintainCursor(this);
-          handleSearchInput(this, bukuDropdown, bukuList, 'buku');
-      });
-      kodeBukuSearch.addEventListener('keydown', (e) => handleKeydown(e, kodeBukuSearch, bukuDropdown));
-      bukuDropdown.addEventListener('click', e => {
-        const li = e.target.closest('.custom-dropdown-item'); if(!li || li.getAttribute('data-key-type') !== 'buku') return;
-        selectSuggestion(kodeBukuSearch, bukuDropdown, li);
-      });
-
-      // Event listener untuk input NON-DROPDOWN
-      const nonDropdownInputs = [blokInput, jenjangSelect, kategoriBukuSelect, keteranganSelect];
-      nonDropdownInputs.forEach(input => {
-          if (input.tagName === 'SELECT') {
-              input.addEventListener('change', function() {
-                  this.classList.remove('input-error');
-                  const nextInput = this.closest('.form-group').nextElementSibling?.querySelector('.input-line-style, button');
-                  if (nextInput) nextInput.focus();
-              });
-          } else { 
-              input.addEventListener('keypress', function(e) {
-                  if (e.key === 'Enter') {
-                      e.preventDefault();
-                      this.classList.remove('input-error');
-                      const nextInput = this.closest('.form-group').nextElementSibling?.querySelector('.input-line-style, button');
-                      if (nextInput) nextInput.focus();
-                  }
-              });
-              input.addEventListener('input', function() {
-                  this.classList.remove('input-error');
-                  if (this.id === 'blok') {
-                      applyTitleCaseAndMaintainCursor(this);
-                  }
-              });
-          }
-      });
-
-      // BLUR untuk sembunyikan dropdown
-      document.addEventListener('click', (e) => {
-          if (!nisSearch.contains(e.target) && !nisDropdown.contains(e.target)) {
-              nisDropdown.style.display = 'none';
-              nisSearch.setAttribute('aria-expanded', 'false');
-          }
-          if (!kodeBukuSearch.contains(e.target) && !bukuDropdown.contains(e.target)) {
-              bukuDropdown.style.display = 'none';
-              kodeBukuSearch.setAttribute('aria-expanded', 'false');
-          }
-      });
-
-      // Kontrol Modal
-      closeModalBtn.addEventListener('click', hideModal);
-      successModal.addEventListener('click', (e) => {
-          if (e.target.id === 'successModal') {
-              hideModal();
-          }
-      });
-
-      document.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter' && successModal.classList.contains('active')) {
-              e.preventDefault();
-              hideModal();
-          }
-      });
-      // ---------------------------------------------------
-
-      // --- LOGIKA SUBMIT PENGUNJUNG BARU (DIPERBAIKI UNTUK ANTI-DUPLIKASI) ---
-      btnSubmit.addEventListener('click', async () => {
-
-        // Menonaktifkan tombol segera setelah diklik untuk mencegah klik ganda
-        btnSubmit.disabled = true;
-        btnSubmit.textContent = 'Memproses...'; 
-
-        const hasErrors = markEmptyFields();
-        if(hasErrors) {
-          const firstError = document.querySelector('.input-line-style.input-error');
-          if (firstError) firstError.focus();
           
-          // Mengaktifkan kembali jika ada error validasi
-          btnSubmit.disabled = false;
-          btnSubmit.textContent = 'Kirim Data Kunjungan'; 
-          return;
-        }
+          onValue(ref(db, 'keanggotaan_v2'), (snapshot) => {
+              const data = snapshot.val();
+              santriList = data ? Object.entries(data).map(([nis, val]) => ({ 
+                  nis, 
+                  nama: val.keanggotaan, 
+                  blok: val.blok ? titleCase(val.blok) : '', 
+                  jenjang: val.jenjang ? val.jenjang.toUpperCase() : '' 
+              })) : [];
+              santriLoaded = true;
+              updateStatus();
+          }, (error) => {
+              console.error("FIREBASE ERROR (keanggotaan_v2):", error);
+              console.error('❌ KRITIS: GAGAL memuat data Anggota. Cek konfigurasi Firebase atau jalur data (keanggotaan_v2).');
+          });
 
-        const santriParsed = parseInput(nisSearch);
-        const bukuParsed = parseInput(kodeBukuSearch);
+          onValue(ref(db, 'buku_v2'), (snapshot) => {
+              const data = snapshot.val();
+              bukuList = data ? Object.entries(data).map(([kode, val]) => ({ 
+                  kode, 
+                  judul: val.judul, 
+                  kategori: val.kategori || '' 
+              })) : [];
+              bukuLoaded = true;
+              updateStatus();
+          }, (error) => {
+              console.error("FIREBASE ERROR (buku_v2):", error);
+              console.error('❌ KRITIS: GAGAL memuat data Buku. Cek konfigurasi Firebase atau jalur data (buku_v2).');
+          });
 
-        const now = new Date();
-        const parseDate = (d) => ({
-            timestamp: d.getTime(),
-            tanggal: String(d.getDate()).padStart(2, '0'),
-            bulan: String(d.getMonth() + 1).padStart(2, '0'),
-            tahun: d.getFullYear(),
-            jam: d.toTimeString().substring(0, 5)
-        });
+          // --- LOGIKA SUBMIT PENGUNJUNG BARU ---
+          btnSubmit.addEventListener('click', async () => {
 
-        const finalData = {
-          nis: santriParsed.id.trim(), 
-          nama: titleCase(santriParsed.name), 
-          blok: titleCase(blokInput.value.trim()), 
-          jenjang: jenjangSelect.value,
-          kodeBuku: bukuParsed.id.trim(), 
-          judulBuku: titleCase(bukuParsed.name), 
-          kategoriBuku: kategoriBukuSelect.value,
-          keterangan: keteranganSelect.value,
-        };
+            btnSubmit.disabled = true;
+            btnSubmit.textContent = 'Memproses...'; 
 
-        const payload = { ...finalData, ...parseDate(now) };
+            const hasErrors = markEmptyFields();
+            if(hasErrors) {
+              const firstError = document.querySelector('.input-line-style.input-error');
+              if (firstError) firstError.focus();
+              
+              btnSubmit.disabled = false;
+              btnSubmit.textContent = 'Kirim Data Kunjungan'; 
+              return;
+            }
 
-        try{
-          // 1. Update Santri Master 
-          await set(ref(db, `siswa/${finalData.nis}`), { nama: finalData.nama, blok: finalData.blok, jenjang: finalData.jenjang });
+            const santriParsed = parseInput(nisSearch);
+            const bukuParsed = parseInput(kodeBukuSearch);
 
-          // 2. Update Buku Master 
-          await set(ref(db, `buku/${finalData.kodeBuku}`), { judul: finalData.judulBuku, kategori: finalData.kategoriBuku });
+            const now = new Date();
+            const parseDate = (d) => ({
+                timestamp: d.getTime(),
+                tanggal: String(d.getDate()).padStart(2, '0'),
+                bulan: String(d.getMonth() + 1).padStart(2, '0'),
+                tahun: d.getFullYear(),
+                jam: d.toTimeString().substring(0, 5)
+            });
 
-          // 3. MENGIRIM DATA KUNJUNGAN BARU (Log Utama/Lengkap)
-          await push(ref(db, `pengunjung`), payload);
+            const finalData = {
+              nis: santriParsed.id.trim(), 
+              nama: titleCase(santriParsed.name), 
+              blok: titleCase(blokInput.value.trim()), 
+              jenjang: jenjangSelect.value,
+              kodeBuku: bukuParsed.id.trim(), 
+              judulBuku: titleCase(bukuParsed.name), 
+              kategoriBuku: kategoriBukuSelect.value,
+              keterangan: keteranganSelect.value,
+            };
+
+            const payload = { ...finalData, ...parseDate(now) };
+
+            try{
+              // 1. Update Santri Master - PATH: 'keanggotaan_v2'
+              await update(ref(db, `keanggotaan_v2/${finalData.nis}`), { 
+                  keanggotaan: finalData.nama, 
+                  blok: finalData.blok, 
+                  jenjang: finalData.jenjang 
+              });
+
+              // 2. Update Buku Master - PATH: 'buku_v2'
+              await update(ref(db, `buku_v2/${finalData.kodeBuku}`), { 
+                  judul: finalData.judulBuku, 
+                  kategori: finalData.kategoriBuku 
+              });
+
+              // 3. MENGIRIM DATA KUNJUNGAN BARU (Log Utama)
+              await push(ref(db, `log_kunjungan_2025`), payload);
+
+              resetForm();
+              showModal();
+
+            } catch(e){
+              console.error("Firebase Submit Error:", e);
+              alert('GAGAL TOTAL: Kesalahan sistem saat kirim data/perbarui master. Cek Konsol (F12).');
+            } finally {
+              btnSubmit.disabled = false;
+              btnSubmit.textContent = 'Kirim Data Kunjungan';
+            }
+          });
           
-          // 4. MENGIRIM DATA UNTUK HISTORI RINGKASAN (Penyimpanan Khusus)
-          await push(ref(db, `histori_ringkasan`), payload);
+          // --- Event Listeners Form Lainnya ---
+          nisSearch.addEventListener('input', function() { applyTitleCaseAndMaintainCursor(this); if (santriList.length > 0) { handleSearchInput(this, nisDropdown, santriList, 'pengunjung'); } else { nisDropdown.style.display = 'none'; } });
+          nisSearch.addEventListener('keydown', (e) => handleKeydown(e, nisSearch, nisDropdown));
+          nisDropdown.addEventListener('click', e => { const li = e.target.closest('.custom-dropdown-item'); if(!li || li.getAttribute('data-key-type') !== 'pengunjung') return; selectSuggestion(nisSearch, nisDropdown, li); });
+          kodeBukuSearch.addEventListener('input', function() { applyTitleCaseAndMaintainCursor(this); if (bukuList.length > 0) { handleSearchInput(this, bukuDropdown, bukuList, 'buku'); } else { bukuDropdown.style.display = 'none'; } });
+          kodeBukuSearch.addEventListener('keydown', (e) => handleKeydown(e, kodeBukuSearch, bukuDropdown));
+          bukuDropdown.addEventListener('click', e => { const li = e.target.closest('.custom-dropdown-item'); if(!li || li.getAttribute('data-key-type') !== 'buku') return; selectSuggestion(kodeBukuSearch, bukuDropdown, li); });
+          const nonDropdownInputs = [blokInput, jenjangSelect, kategoriBukuSelect, keteranganSelect];
+          nonDropdownInputs.forEach(input => {
+              if (input.tagName === 'SELECT') {
+                  input.addEventListener('change', function() { this.classList.remove('input-error'); const nextInput = this.closest('.form-group').nextElementSibling?.querySelector('.input-line-style, button'); if (nextInput) nextInput.focus(); });
+              } else { 
+                  input.addEventListener('keypress', function(e) { if (e.key === 'Enter') { e.preventDefault(); this.classList.remove('input-error'); const nextInput = this.closest('.form-group').nextElementSibling?.querySelector('.input-line-style, button'); if (nextInput) nextInput.focus(); } });
+                  input.addEventListener('input', function() { this.classList.remove('input-error'); if (this.id === 'blok') { applyTitleCaseAndMaintainCursor(this); } });
+              }
+          });
+          document.addEventListener('click', (e) => {
+              if (!nisSearch.contains(e.target) && !nisDropdown.contains(e.target)) { nisDropdown.style.display = 'none'; nisSearch.setAttribute('aria-expanded', 'false'); }
+              if (!kodeBukuSearch.contains(e.target) && !bukuDropdown.contains(e.target)) { bukuDropdown.style.display = 'none'; kodeBukuSearch.setAttribute('aria-expanded', 'false'); }
+          });
+          const modalOverlay = $('successModal');
+          const modalCloseBtn = $('closeModalBtn');
+          modalCloseBtn.addEventListener('click', hideModal);
+          modalOverlay.addEventListener('click', (e) => { if (e.target.id === 'successModal') { hideModal(); } });
+          document.addEventListener('keydown', (e) => { if (e.key === 'Enter' && successModal.classList.contains('active')) { e.preventDefault(); hideModal(); } });
+          
+          nisSearch.focus();
 
-          // JIKA SUKSES: Reset form dan tampilkan pop-up
-          resetForm();
-          showModal();
-
-        } catch(e){
-          console.error("Firebase Submit Error:", e);
-          alert('GAGAL TOTAL: Kesalahan sistem saat kirim data/perbarui master. Cek Konsol.');
-        } finally {
-          // Mengaktifkan kembali tombol submit (baik sukses maupun gagal)
-          btnSubmit.disabled = false;
-          btnSubmit.textContent = 'Kirim Data Kunjungan';
-        }
-      });
-      
-
-      // Init focus & display
-      resetFormDisplay();
-      nisSearch.focus();
+      } catch (e) {
+          // Tangani kesalahan inisialisasi Firebase
+          console.error("FIREBASE INITIALIZATION ERROR:", e);
+          const statusEl = document.getElementById('dataStatus');
+          statusEl.style.display = 'block';
+          statusEl.textContent = '❌ KRITIS: Gagal menginisialisasi Firebase. Cek konfigurasi Anda (apiKey).';
+          statusEl.className = 'text-sm bg-red-100 text-red-800 border border-red-300 p-3 rounded-lg';
+      }
     </script>
 </body>
 </html>
