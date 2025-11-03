@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="id">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Panel Pengendali Iframe | Remote Firebase</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+      :root {
+          --color-indigo: #4F46E5;
+          --color-cyan: #00838F;
+          --color-soft-bg: #F7F8FC;
+          --color-header-bg: #FFFFFF;
+          --color-border: #E5E7EB;
+      }
+
+      html, body {
+        height: 100%; 
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden; 
+      }
+
+      body {
+        font-family: 'Poppins', sans-serif;
+        background-color: var(--color-soft-bg); 
+        display: flex;
+        justify-content: center;
+        align-items: flex-start; 
+      }
+      
+      .panel-container {
+        width: 100vw; 
+        height: 100vh;
+        background: var(--color-header-bg); 
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+      }
+      
+      /* --- HEADER (Judul Kiri, Tombol Kanan) --- */
+      .header-control {
+        background-color: var(--color-indigo); 
+        color: white;
+        padding: 15px 20px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+      }
+      .header-control h2 { font-weight: 700; font-size: 1.25rem; margin: 0; white-space: nowrap; }
+      .button-group { display: flex; gap: 10px; margin-left: auto; }
+      .action-btn {
+        padding: 8px 15px; font-size: 14px; font-weight: 600; border-radius: 6px;
+        transition: background-color 0.2s, transform 0.1s; display: flex;
+        align-items: center; justify-content: center; white-space: nowrap;
+      }
+      .icon { margin-right: 5px; }
+      .btn-buka { background-color: #00838F; color: white; }
+      .btn-buka:hover { background-color: #006064; transform: translateY(-1px); }
+      .btn-tutup { background-color: #FBBF24; color: #1F2937; }
+      .btn-tutup:hover { background-color: #F59E0B; transform: translateY(-1px); }
+
+      /* --- IFRAME KONTEN UTAMA (alibs2.html) --- */
+      .main-content-iframe {
+          flex-grow: 1; border-top: 1px solid var(--color-border);
+          background-color: var(--color-soft-bg); padding: 10px; 
+      }
+      #alibs2-iframe {
+          width: 100%; height: 100%; border: none;
+          background: white; border-radius: 8px;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      }
+    </style>
+</head>
+<body>
+
+    <div class="panel-container">
+        
+        <div class="header-control">
+            <h2>Panel Pengendali Iframe ⚙️</h2>
+            <div class="button-group">
+                <button id="btnBukaIframe" class="action-btn btn-buka">
+                    <svg class="w-5 h-5 icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    Buka Iframe (alibs.html)
+                </button>
+
+                <button id="btnCloseIframe" class="action-btn btn-tutup">
+                    <svg class="w-5 h-5 icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    Tutup Iframe
+                </button>
+            </div>
+        </div>
+        
+        <div class="main-content-iframe">
+            <iframe id="alibs2-iframe" src="alibs2.html"></iframe>
+        </div>
+
+    </div>
+
+    <script type="module">
+        // Menggunakan Firebase Modular SDK (v9+)
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
+        import { getDatabase, ref, set } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js';
+
+        // !!! GANTI DENGAN CONFIG FIREBASE ASLI PROYEK ANDA !!! (Harus SAMA dengan index.html)
+        const firebaseConfig = {
+            apiKey: "AIzaSy_GANTI_INI_DENGAN_KUNCI_API_ASLI", 
+            authDomain: "traying-29bf4.firebaseapp.com", 
+            projectId: "traying-29bf4", 
+            databaseURL: "https://traying-29bf4-default-rtdb.firebaseio.com" 
+        };
+        
+        // Path/Node Firebase untuk Komando
+        const IFRAME_CONTROL_PATH = 'remote_iframe_state'; 
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const iframeControlRef = ref(db, IFRAME_CONTROL_PATH);
+
+        const $ = id => document.getElementById(id);
+        const btnBukaIframe = $('btnBukaIframe');
+        const btnCloseIframe = $('btnCloseIframe');
+        
+        // URL konten yang akan dimuat di index.html
+        const TARGET_URL_FORM = 'alibs.html'; 
+        
+        // 1. Tulis status OPEN ke Firebase
+        async function openIframeOnMainForm() {
+            try {
+                // Menggunakan set() untuk menimpa state sebelumnya
+                await set(iframeControlRef, { 
+                    status: 'OPEN', 
+                    url: TARGET_URL_FORM,
+                    timestamp: Date.now() // Tambahkan timestamp agar listener terpicu
+                });
+                btnBukaIframe.textContent = '✅ Perintah OPEN Terkirim';
+                setTimeout(() => btnBukaIframe.innerHTML = '<svg class="w-5 h-5 icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> Buka Iframe (alibs.html)', 1500);
+            } catch (e) {
+                alert("Gagal mengirim perintah buka Iframe ke Firebase. Cek koneksi & konfigurasi.");
+                console.error(e);
+            }
+        }
+        
+        // 2. Tulis status CLOSE ke Firebase
+        async function closeIframeOnMainForm() {
+            try {
+                await set(iframeControlRef, { 
+                    status: 'CLOSE', 
+                    url: '',
+                    timestamp: Date.now()
+                });
+                btnCloseIframe.textContent = '✅ Perintah CLOSE Terkirim';
+                setTimeout(() => btnCloseIframe.innerHTML = '<svg class="w-5 h-5 icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg> Tutup Iframe', 1500);
+            } catch (e) {
+                alert("Gagal mengirim perintah tutup Iframe ke Firebase. Cek koneksi & konfigurasi.");
+                console.error(e);
+            }
+        }
+
+        // --- Event Listeners ---
+        btnBukaIframe.addEventListener('click', openIframeOnMainForm);
+        btnCloseIframe.addEventListener('click', closeIframeOnMainForm);
+        
+    </script>
+</body>
+</html>

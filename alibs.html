@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="id">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ALibs - Realtime Writer</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js"></script>
+
+    <style>
+      /* Style untuk membuat textarea mengisi seluruh layar */
+      html, body {
+        height: 100%; 
+        margin: 0;
+        padding: 0;
+        overflow: hidden; /* Hilangkan scrollbar utama */
+      }
+      body {
+        font-family: sans-serif;
+        background-color: #F7F8FC; 
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      #messageInput {
+        width: 100vw;
+        height: 100vh;
+        padding: 20px;
+        margin: 0;
+        font-size: 5rem;
+        border: none;
+        outline: none;
+        box-sizing: border-box;
+        border-right: 5px solid #4F46E5; /* Tambahkan indikator visual */
+        resize: none; /* Nonaktifkan resize default */
+        background-color: white;
+        color: #1F2937;
+        transition: border-color 0.3s;
+      }
+      #messageInput:focus {
+        border-right-width: 8px; 
+      }
+    </style>
+</head>
+<body>
+
+    <textarea 
+        id="messageInput" 
+        placeholder="Mulai ketik pesan Anda di sini. Pesan akan tampil di layar pengunjung..."
+    ></textarea>
+
+    <script type="module">
+        // Menggunakan Firebase Modular SDK (v9+)
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
+        import { getDatabase, ref, set } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js';
+
+        // !!! GANTI DENGAN CONFIG FIREBASE ASLI PROYEK ANDA !!!
+        const firebaseConfig = {
+            apiKey: "AIzaSy_GANTI_INI_DENGAN_KUNCI_API_ASLI", 
+            authDomain: "traying-29bf4.firebaseapp.com", 
+            projectId: "traying-29bf4", 
+            databaseURL: "https://traying-29bf4-default-rtdb.firebaseio.com" 
+        };
+        
+        // KRITIS: Path Firebase untuk pesan
+        const MESSAGE_PATH = 'realtime_message/current_text'; 
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const messageRef = ref(db, MESSAGE_PATH);
+
+        const input = document.getElementById('messageInput');
+        let timer;
+        
+        // Fungsi untuk menulis pesan ke Firebase
+        function writeMessage(text) {
+             set(messageRef, {
+                 content: text,
+                 timestamp: Date.now()
+             })
+             .catch((error) => {
+                 console.error("Gagal menulis ke Firebase:", error);
+             });
+        }
+
+        // Listener input: Gunakan debounce untuk efisiensi
+        input.addEventListener('input', () => {
+            clearTimeout(timer);
+            
+            timer = setTimeout(() => {
+                writeMessage(input.value);
+            }, 300); // Tulis ke Firebase 300ms setelah user berhenti mengetik
+        });
+        
+        // Baca pesan awal dari Firebase saat dimuat (opsional, untuk melanjutkan penulisan)
+        // onValue(messageRef, (snapshot) => {
+        //      const data = snapshot.val();
+        //      if(data && data.content && input.value === "") {
+        //           input.value = data.content;
+        //      }
+        // }, { onlyOnce: true });
+
+        input.focus();
+
+    </script>
+</body>
+</html>
