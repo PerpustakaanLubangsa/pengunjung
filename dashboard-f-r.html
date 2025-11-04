@@ -1,0 +1,772 @@
+<!doctype html>
+<html lang="id">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard Gabungan Rekomendasi & Log</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+      /* --- Variabel CSS --- */
+      :root {
+          /* Warna Utama (Cyan) */
+          --color-primary-accent: #00CCCC;
+          --color-secondary-accent: #02BABA;
+          
+          /* Warna Latar Belakang & Teks */
+          --color-light-main-bg: #F7F8FC;
+          --color-light-container-bg: #FFFFFF;
+          --color-light-border: #E5E7EB;
+          --color-text-dark: #1F2937;
+          --color-text-subtle: #6B7280;
+          --color-error: #EF4444;
+          --color-success: #10B981;
+          --color-delete: #DC2626;
+      }
+
+      /* Struktur Utama */
+      body {
+          font-family: 'Poppins', sans-serif;
+          background-color: var(--color-light-main-bg);
+          color: var(--color-text-dark);
+          padding: 20px;
+          margin: 0;
+      }
+      
+      .container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 20px 30px;
+          background: var(--color-light-container-bg);
+          border-radius: 12px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      }
+
+      /* Header */
+      .header {
+          margin-bottom: 20px;
+      }
+      .header h1 {
+          font-size: 2rem;
+          font-weight: 700;
+          margin: 0;
+          padding-bottom: 8px;
+          border-bottom: 3px solid var(--color-primary-accent);
+      }
+      .header p {
+          color: var(--color-text-subtle);
+      }
+
+      /* --- TAB SYSTEM --- */
+      .tabs {
+          display: flex;
+          border-bottom: 1px solid var(--color-light-border);
+          margin-bottom: 20px;
+      }
+      .tab-button {
+          padding: 10px 20px;
+          cursor: pointer;
+          font-weight: 600;
+          color: var(--color-text-subtle);
+          border: none;
+          background: none;
+          border-bottom: 3px solid transparent;
+          transition: all 0.2s;
+          margin-bottom: -1px; 
+      }
+      .tab-button.active {
+          color: var(--color-primary-accent);
+          border-bottom: 3px solid var(--color-primary-accent);
+      }
+      .tab-content {
+          display: none;
+          padding-top: 10px;
+      }
+      .tab-content.active {
+          display: block;
+      }
+      /* --- END TAB SYSTEM --- */
+
+
+      /* Status Info */
+      #dataStatus {
+          background-color: #FEF3C7; 
+          border-left: 4px solid #F59E0B; 
+          color: #B45309; 
+          padding: 12px;
+          margin-bottom: 20px;
+          font-size: 0.875rem;
+          border-radius: 4px;
+      }
+      #dataStatus.error {
+          background-color: #FEE2E2;
+          border-left-color: var(--color-error);
+          color: var(--color-error);
+      }
+
+
+      /* Tabel */
+      .table-responsive {
+          overflow-x: auto;
+          width: 100%;
+          border-radius: 8px;
+          border: 1px solid var(--color-light-border);
+      }
+      .rekomendasi-table {
+          width: 100%;
+          border-collapse: collapse;
+          font-size: 0.9rem;
+      }
+      .rekomendasi-table th, .rekomendasi-table td {
+          padding: 12px 15px;
+          text-align: left;
+          border-bottom: 1px solid var(--color-light-border);
+          vertical-align: top;
+      }
+      .rekomendasi-table th {
+          background-color: #E0F7FA; 
+          color: var(--color-text-dark);
+          font-weight: 600;
+          text-transform: uppercase;
+      }
+      /* Tambahkan kursor dan hover untuk baris yang bisa diklik */
+      .rekomendasi-table tr {
+          cursor: pointer;
+          transition: background-color 0.2s;
+      }
+      .rekomendasi-table tr:hover {
+          background-color: #F9FAFB !important;
+      }
+      
+      /* Status Badge */
+      .status-badge {
+          display: inline-block;
+          padding: 4px 8px;
+          border-radius: 9999px; 
+          font-size: 0.75rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          line-height: 1;
+      }
+      .status-Baru {
+          background-color: #FEE2E2;
+          color: var(--color-error);
+      }
+      .status-SudahDitinjau {
+          background-color: #D1FAE5;
+          color: var(--color-success);
+      }
+
+      /* Tombol Aksi Individu */
+      .action-button {
+          background-color: #3B82F6; 
+          color: white;
+          border: none;
+          padding: 6px 10px;
+          border-radius: 6px;
+          font-size: 0.85rem;
+          cursor: pointer;
+          transition: background-color 0.2s;
+          white-space: nowrap; 
+      }
+      .action-button:hover {
+          background-color: #2563EB;
+      }
+
+      /* Kotak Aksi Massal */
+      .action-bar {
+          display: flex;
+          gap: 10px;
+          margin-bottom: 15px;
+          padding: 10px;
+          border-bottom: 1px solid var(--color-light-border);
+      }
+      .bulk-action-button, .bulk-delete-button {
+          padding: 8px 15px;
+          border-radius: 6px;
+          font-weight: 600;
+          cursor: pointer;
+          border: none;
+          transition: background-color 0.2s;
+      }
+      .bulk-action-button {
+          background-color: var(--color-success);
+          color: white;
+      }
+      .bulk-action-button:hover {
+          background-color: #059669;
+      }
+      .bulk-delete-button {
+          background-color: var(--color-delete);
+          color: white;
+      }
+      .bulk-delete-button:hover {
+          background-color: #B91C1C;
+      }
+    
+      /* Style untuk modal */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      /* Style untuk konten teks yang terpotong di tabel */
+      .truncated-cell {
+          max-width: 250px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: normal; 
+      }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+      <div class="header">
+        <h1>Dashboard Admin Log</h1>
+        <p>Pengelolaan data Rekomendasi Buku dan Feedback Pengunjung.</p>
+      </div>
+
+      <div class="tabs">
+          <button class="tab-button active" onclick="switchTab('rekomendasi', this)">Rekomendasi Buku</button>
+          <button class="tab-button" onclick="switchTab('feedback', this)">Log Feedback/Umum</button>
+      </div>
+
+      <div id="dataStatus" style="display: none;"></div>
+
+
+      <div id="rekomendasi" class="tab-content active">
+          <h2>Daftar Rekomendasi Buku</h2>
+          
+          <div class="action-bar">
+              <button class="bulk-action-button" onclick="bulkReviewRekomendasi()">Tandai Sudah Ditinjau (Massal)</button>
+              <button class="bulk-delete-button" onclick="bulkDeleteRekomendasi()">Hapus Data (Massal)</button>
+          </div>
+
+          <div class="table-responsive">
+              <table class="rekomendasi-table">
+                  <thead>
+                      <tr>
+                          <th style="width: 2%;">
+                              <input type="checkbox" id="masterRekomendasiCheck" onchange="handleMasterCheckbox(this, 'rekomendasi')">
+                          </th>
+                          <th style="width: 23%;">Judul Buku</th>
+                          <th style="width: 30%;">Alasan Merekomendasikan</th>
+                          <th style="width: 15%;">Tanggal</th>
+                          <th style="width: 10%;">Status</th>
+                          <th style="width: 15%;">Aksi</th>
+                      </tr>
+                  </thead>
+                  <tbody id="rekomendasiBody">
+                      </tbody>
+              </table>
+          </div>
+      </div>
+
+      <div id="feedback" class="tab-content">
+          <h2>Daftar Feedback & Log Umum</h2>
+          
+          <div class="action-bar">
+              <button class="bulk-action-button" onclick="bulkReviewFeedback()">Tandai Sudah Ditinjau (Massal)</button>
+              <button class="bulk-delete-button" onclick="bulkDeleteFeedback()">Hapus Data (Massal)</button>
+          </div>
+
+          <div class="table-responsive">
+              <table class="rekomendasi-table">
+                  <thead>
+                      <tr>
+                          <th style="width: 2%;">
+                              <input type="checkbox" id="masterFeedbackCheck" onchange="handleMasterCheckbox(this, 'feedback')">
+                          </th>
+                          <th style="width: 13%;">Pengirim</th>
+                          <th style="width: 20%;">Topik/Judul Masukan</th>
+                          <th style="width: 30%;">Isi Feedback</th>
+                          <th style="width: 10%;">Tanggal</th>
+                          <th style="width: 5%;">Status</th>
+                          <th style="width: 10%;">Aksi</th>
+                      </tr>
+                  </thead>
+                  <tbody id="feedbackBody">
+                      </tbody>
+              </table>
+          </div>
+      </div>
+
+    </div>
+
+    <div id="statusModal" class="modal-overlay" style="display: none;">
+      <div class="modal-content" style="text-align: center; background: white; padding: 30px; border-radius: 12px; max-width: 350px; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
+        <h4 id="modalTitle" style="font-size: 1.25rem; font-weight: 600; color: var(--color-text-dark); margin-bottom: 8px;"></h4>
+        <p id="modalMessage" style="color: var(--color-text-subtle); margin-bottom: 24px;"></p>
+        <button onclick="document.getElementById('statusModal').style.display='none';" style="background-color: var(--color-primary-accent); color: white; padding: 8px 16px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background-color 0.2s;">
+            Tutup
+        </button>
+      </div>
+    </div>
+    
+    <div id="contentViewerModal" class="modal-overlay" style="display: none;">
+      <div class="modal-content" style="text-align: left; background: white; padding: 30px; border-radius: 12px; max-width: 700px; width: 90%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
+          <h3 id="contentTitle" style="font-size: 1.5rem; font-weight: 700; color: var(--color-primary-accent); margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px;"></h3>
+          <div id="contentBody" style="max-height: 70vh; overflow-y: auto; color: var(--color-text-dark); line-height: 1.6;"></div>
+          <button onclick="document.getElementById('contentViewerModal').style.display='none';" style="margin-top: 20px; background-color: var(--color-primary-accent); color: white; padding: 10px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background-color 0.2s; width: 100%;">
+              Tutup
+          </button>
+      </div>
+    </div>
+
+
+    <script type="module">
+        // --- FIREBASE IMPORTS ---
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
+        import { getDatabase, ref, get, child, update } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js';
+
+        // KRITIS: GANTI DENGAN CONFIG FIREBASE ASLI PROYEK ANDA
+        const firebaseConfig = {
+            apiKey: "AIzaSy_GANTI_INI_DENGAN_KUNCI_API_ASLI",
+            authDomain: "traying-29bf4.firebaseapp.com",
+            projectId: "traying-29bf4",
+            databaseURL: "https://traying-29bf4-default-rtdb.firebaseio.com"
+        };
+        
+        let db = null;
+        const PATH_REKOMENDASI = 'log_rekomendasi';
+        const PATH_FEEDBACK = 'log_feedback'; 
+
+        // Global Cache dan Selection Keys
+        let rekomendasiDataCache = {};
+        let feedbackDataCache = {};
+        let selectedRekomendasiKeys = [];
+        let selectedFeedbackKeys = [];
+
+
+        try {
+            const app = initializeApp(firebaseConfig);
+            db = getDatabase(app); 
+            console.log("Firebase initialized for Dashboard.");
+        } catch(e) {
+            console.error("Firebase Gagal diinisialisasi di Dashboard:", e);
+        }
+
+        // --- DOM REFERENCES ---
+        const $ = id => document.getElementById(id);
+        
+        const DOM = {
+            rekomendasiBody: $('rekomendasiBody'),
+            feedbackBody: $('feedbackBody'),
+            dataStatus: $('dataStatus'),
+            statusModal: $('statusModal'),
+            modalTitle: $('modalTitle'),
+            modalMessage: $('modalMessage'),
+            contentViewerModal: $('contentViewerModal'),
+            contentTitle: $('contentTitle'),
+            contentBody: $('contentBody'),
+            masterRekomendasiCheck: $('masterRekomendasiCheck'),
+            masterFeedbackCheck: $('masterFeedbackCheck')
+        };
+
+        // --- HELPER FUNCTIONS (Modal & Status) ---
+        
+        const showStatusMessage = (message, isError = false) => {
+            DOM.dataStatus.textContent = message;
+            DOM.dataStatus.className = isError ? 'error' : '';
+            DOM.dataStatus.style.display = 'block';
+        };
+
+        const showModal = (title, message) => {
+            DOM.modalTitle.textContent = title;
+            DOM.modalMessage.textContent = message;
+            DOM.statusModal.style.display = 'block';
+        };
+
+        const showFullContentModal = (title, contentHTML) => {
+            DOM.contentTitle.textContent = title;
+            DOM.contentBody.innerHTML = contentHTML;
+            DOM.contentViewerModal.style.display = 'flex'; 
+        };
+        
+        const resetSelection = (type) => {
+            if (type === 'rekomendasi') {
+                selectedRekomendasiKeys = [];
+                if (DOM.masterRekomendasiCheck) DOM.masterRekomendasiCheck.checked = false;
+            } else {
+                selectedFeedbackKeys = [];
+                if (DOM.masterFeedbackCheck) DOM.masterFeedbackCheck.checked = false;
+            }
+        };
+
+
+        // --- SELECTION LOGIC ---
+
+        /** Menangani perubahan pada checkbox baris tunggal */
+        window.handleRowCheckbox = (checkbox, key, type) => {
+            const selectedKeys = type === 'rekomendasi' ? selectedRekomendasiKeys : selectedFeedbackKeys;
+            
+            if (checkbox.checked) {
+                if (!selectedKeys.includes(key)) {
+                    selectedKeys.push(key);
+                }
+            } else {
+                const index = selectedKeys.indexOf(key);
+                if (index > -1) {
+                    selectedKeys.splice(index, 1);
+                }
+            }
+
+            // Update master checkbox
+            const allCheckboxes = document.querySelectorAll(`#${type}Body input[type="checkbox"]`);
+            const masterCheckbox = type === 'rekomendasi' ? DOM.masterRekomendasiCheck : DOM.masterFeedbackCheck;
+            
+            if (masterCheckbox) {
+                masterCheckbox.checked = selectedKeys.length === allCheckboxes.length;
+            }
+        };
+
+        /** Menangani perubahan pada master checkbox */
+        window.handleMasterCheckbox = (masterCheckbox, type) => {
+            const rowCheckboxes = document.querySelectorAll(`#${type}Body input[type="checkbox"]`);
+            const selectedKeys = type === 'rekomendasi' ? selectedRekomendasiKeys : selectedFeedbackKeys;
+            
+            selectedKeys.length = 0; // Kosongkan array
+
+            rowCheckboxes.forEach(checkbox => {
+                checkbox.checked = masterCheckbox.checked;
+                if (masterCheckbox.checked) {
+                    selectedKeys.push(checkbox.value);
+                }
+            });
+        };
+
+
+        // --- FIREBASE BULK ACTIONS ---
+
+        /** Fungsi generik untuk pembaruan status massal */
+        const executeBulkUpdate = async (keys, path, updateData) => {
+            if (!keys || keys.length === 0) {
+                showModal('Aksi Gagal', 'Tidak ada data yang dipilih.');
+                return false;
+            }
+            if (!db) {
+                showModal('Aksi Gagal', 'Koneksi Firebase terputus.');
+                return false;
+            }
+            
+            const updates = {};
+            keys.forEach(key => {
+                updates[`/${path}/${key}/status`] = updateData.status;
+            });
+
+            try {
+                await update(ref(db), updates);
+                showModal('Update Berhasil', `Status ${keys.length} item telah diubah menjadi ${updateData.status}.`);
+                return true;
+            } catch (error) {
+                console.error("Gagal update status massal:", error);
+                showModal('Aksi Gagal', `Terjadi kesalahan saat mengubah status massal: ${error.message}`);
+                return false;
+            }
+        };
+
+        /** Fungsi generik untuk penghapusan massal */
+        const executeBulkDelete = async (keys, path) => {
+             if (!keys || keys.length === 0) {
+                showModal('Aksi Gagal', 'Tidak ada data yang dipilih.');
+                return false;
+            }
+            if (!db) {
+                showModal('Aksi Gagal', 'Koneksi Firebase terputus.');
+                return false;
+            }
+            
+            // Konfirmasi sebelum menghapus
+            if (!confirm(`Apakah Anda yakin ingin menghapus ${keys.length} item data ini? Aksi ini tidak dapat dibatalkan.`)) {
+                return false;
+            }
+
+            const updates = {};
+            keys.forEach(key => {
+                updates[`/${path}/${key}`] = null; // Menghapus data
+            });
+
+            try {
+                await update(ref(db), updates);
+                showModal('Hapus Berhasil', `${keys.length} item data telah berhasil dihapus.`);
+                return true;
+            } catch (error) {
+                console.error("Gagal hapus massal:", error);
+                showModal('Aksi Gagal', `Terjadi kesalahan saat menghapus data massal: ${error.message}`);
+                return false;
+            }
+        };
+
+        // --- REKOMENDASI SPECIFIC ACTIONS ---
+
+        window.bulkReviewRekomendasi = async () => {
+            const success = await executeBulkUpdate(selectedRekomendasiKeys, PATH_REKOMENDASI, { status: 'Sudah Ditinjau' });
+            if (success) {
+                resetSelection('rekomendasi');
+                fetchAndRenderRekomendasi();
+            }
+        };
+
+        window.bulkDeleteRekomendasi = async () => {
+            const success = await executeBulkDelete(selectedRekomendasiKeys, PATH_REKOMENDASI);
+            if (success) {
+                resetSelection('rekomendasi');
+                fetchAndRenderRekomendasi();
+            }
+        };
+
+        window.updateStatus = async (key, newStatus) => {
+            const updates = {};
+            updates[`/${PATH_REKOMENDASI}/${key}/status`] = newStatus;
+            try {
+                await update(ref(db), updates);
+                showModal('Update Berhasil', `Status rekomendasi telah diubah menjadi ${newStatus}.`);
+                fetchAndRenderRekomendasi(); 
+            } catch (error) {
+                 showModal('Gagal Update', `Terjadi kesalahan saat mengubah status: ${error.message}`);
+            }
+        };
+
+        // --- FEEDBACK SPECIFIC ACTIONS ---
+
+        window.bulkReviewFeedback = async () => {
+            const success = await executeBulkUpdate(selectedFeedbackKeys, PATH_FEEDBACK, { status: 'Sudah Ditinjau' });
+            if (success) {
+                resetSelection('feedback');
+                fetchAndRenderFeedback();
+            }
+        };
+
+        window.bulkDeleteFeedback = async () => {
+            const success = await executeBulkDelete(selectedFeedbackKeys, PATH_FEEDBACK);
+            if (success) {
+                resetSelection('feedback');
+                fetchAndRenderFeedback();
+            }
+        };
+        
+        window.updateFeedbackStatus = async (key, newStatus) => {
+            const updates = {};
+            updates[`/${PATH_FEEDBACK}/${key}/status`] = newStatus;
+            try {
+                await update(ref(db), updates);
+                showModal('Update Berhasil', `Status feedback telah diubah menjadi ${newStatus}.`);
+                fetchAndRenderFeedback(); 
+            } catch (error) {
+                 showModal('Gagal Update', `Terjadi kesalahan saat mengubah status: ${error.message}`);
+            }
+        };
+
+
+        // --- RENDER FUNCTIONS (with Checkbox) ---
+
+        /** Mengambil dan menampilkan data rekomendasi buku */
+        const fetchAndRenderRekomendasi = async () => {
+            if (!db) {
+                showStatusMessage('KRITIS: Gagal koneksi ke Firebase. Data tidak dapat dimuat.', true);
+                return;
+            }
+            
+            DOM.rekomendasiBody.innerHTML = '';
+            showStatusMessage('Memuat data rekomendasi buku...');
+            resetSelection('rekomendasi');
+
+            try {
+                const dbRef = ref(db);
+                const snapshot = await get(child(dbRef, PATH_REKOMENDASI));
+                
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    rekomendasiDataCache = data; 
+                    const rows = [];
+                    
+                    for (const key in data) {
+                        const rec = data[key];
+                        const statusClass = rec.status ? rec.status.replace(/\s/g, '') : 'Baru'; 
+                        const newStatus = rec.status === 'Baru' ? 'Sudah Ditinjau' : 'Baru';
+                        
+                        const truncatedAlasan = rec.alasan ? rec.alasan.substring(0, 100) + (rec.alasan.length > 100 ? '...' : '') : '-';
+                        const isSelected = selectedRekomendasiKeys.includes(key);
+
+                        const checkbox = `<input type="checkbox" value="${key}" ${isSelected ? 'checked' : ''} onclick="event.stopPropagation(); handleRowCheckbox(this, '${key}', 'rekomendasi')">`;
+
+                        const row = `
+                            <tr onclick="showRekomendasiDetail('${key}')">
+                                <td>${checkbox}</td>
+                                <td>${rec.judulBuku || '-'}</td>
+                                <td class="truncated-cell">${truncatedAlasan}</td>
+                                <td>${rec.tanggalRekomendasi || '-'}</td>
+                                <td>
+                                    <span class="status-badge status-${statusClass}">${rec.status || 'Baru'}</span>
+                                </td>
+                                <td>
+                                    <button 
+                                        class="action-button" 
+                                        onclick="event.stopPropagation(); updateStatus('${key}', '${newStatus}')"
+                                    >
+                                        Ubah ke ${newStatus}
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                        rows.push(row);
+                    }
+                    
+                    DOM.rekomendasiBody.innerHTML = rows.reverse().join(''); 
+                    DOM.dataStatus.style.display = 'none'; 
+                    
+                } else {
+                    DOM.rekomendasiBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--color-text-subtle);">Belum ada data rekomendasi buku yang dikirimkan.</td></tr>`;
+                    DOM.dataStatus.style.display = 'none';
+                }
+
+            } catch (error) {
+                console.error("Gagal mengambil data rekomendasi:", error);
+                showStatusMessage(`Gagal memuat data: ${error.message}`, true);
+            }
+        };
+
+        /** Mengambil dan menampilkan data feedback */
+        const fetchAndRenderFeedback = async () => {
+            if (!db) {
+                showStatusMessage('KRITIS: Gagal koneksi ke Firebase. Data feedback tidak dapat dimuat.', true);
+                return;
+            }
+            
+            DOM.feedbackBody.innerHTML = '';
+            showStatusMessage('Memuat data feedback...');
+            resetSelection('feedback');
+
+            try {
+                const dbRef = ref(db);
+                const snapshot = await get(child(dbRef, PATH_FEEDBACK));
+                
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    feedbackDataCache = data; 
+                    const rows = [];
+                    
+                    for (const key in data) {
+                        const fb = data[key];
+                        const statusClass = fb.status ? fb.status.replace(/\s/g, '') : 'Baru'; 
+                        const newStatus = fb.status === 'Baru' ? 'Sudah Ditinjau' : 'Baru';
+
+                        const truncatedIsi = fb.isi ? fb.isi.substring(0, 100) + (fb.isi.length > 100 ? '...' : '') : '-';
+                        const isSelected = selectedFeedbackKeys.includes(key);
+
+                        const checkbox = `<input type="checkbox" value="${key}" ${isSelected ? 'checked' : ''} onclick="event.stopPropagation(); handleRowCheckbox(this, '${key}', 'feedback')">`;
+                        
+                        const row = `
+                            <tr onclick="showFeedbackDetail('${key}')">
+                                <td>${checkbox}</td>
+                                <td>${fb.nama || 'Anonim'}</td>
+                                <td>${fb.judul || '-'}</td>
+                                <td class="truncated-cell">${truncatedIsi}</td>
+                                <td>${fb.tanggal || '-'} ${fb.jam ? `<br>(${fb.jam})` : ''}</td>
+                                <td>
+                                    <span class="status-badge status-${statusClass}">${fb.status || 'Baru'}</span>
+                                </td>
+                                <td>
+                                    <button 
+                                        class="action-button" 
+                                        onclick="event.stopPropagation(); updateFeedbackStatus('${key}', '${newStatus}')"
+                                    >
+                                        Ubah ke ${newStatus}
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                        rows.push(row);
+                    }
+                    
+                    DOM.feedbackBody.innerHTML = rows.reverse().join(''); 
+                    DOM.dataStatus.style.display = 'none'; 
+                    
+                } else {
+                    DOM.feedbackBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--color-text-subtle);">Belum ada data feedback yang dikirimkan.</td></tr>`;
+                    DOM.dataStatus.style.display = 'none';
+                }
+
+            } catch (error) {
+                console.error("Gagal mengambil data feedback:", error);
+                showStatusMessage(`Gagal memuat data feedback: ${error.message}`, true);
+            }
+        };
+
+        // --- DETAIL MODAL FUNCTIONS ---
+
+        window.showRekomendasiDetail = (key) => {
+            const data = rekomendasiDataCache[key];
+            if (data) {
+                const title = `Rekomendasi: ${data.judulBuku || 'Tidak Ada Judul'}`;
+                const content = `
+                    <strong>Judul Buku:</strong> ${data.judulBuku || '-'}<br>
+                    <strong>Pengirim:</strong> ${data.nama || 'Anonim'}<br>
+                    <strong>Email:</strong> ${data.email || '-'}<br>
+                    <strong>Tanggal:</strong> ${data.tanggalRekomendasi || '-'}<br>
+                    <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
+                    <strong>Alasan Merekomendasikan (Teks Lengkap):</strong><br>
+                    <div style="white-space: pre-wrap; word-wrap: break-word; margin-top: 10px; border: 1px solid #ddd; padding: 15px; background: #fcfcfc; border-radius: 8px;">
+                        ${data.alasan || 'Tidak ada alasan.'}
+                    </div>
+                `;
+                showFullContentModal(title, content);
+            }
+        };
+
+        window.showFeedbackDetail = (key) => {
+            const data = feedbackDataCache[key];
+            if (data) {
+                const title = `Feedback: ${data.judul || 'Tidak Ada Judul'}`;
+                const content = `
+                    <strong>Pengirim:</strong> ${data.nama || 'Anonim'}<br>
+                    <strong>Email:</strong> ${data.email || '-'}<br>
+                    <strong>Topik/Judul Masukan:</strong> ${data.judul || '-'}<br>
+                    <strong>Tanggal/Jam:</strong> ${data.tanggal || '-'} (${data.jam || '-'})<br>
+                    <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
+                    <strong>Isi Feedback (Teks Lengkap):</strong><br>
+                    <div style="white-space: pre-wrap; word-wrap: break-word; margin-top: 10px; border: 1px solid #ddd; padding: 15px; background: #fcfcfc; border-radius: 8px; max-height: 350px; overflow-y: auto;">
+                        ${data.isi || 'Tidak ada isi feedback.'}
+                    </div>
+                `;
+                showFullContentModal(title, content);
+            }
+        };
+
+
+        // --- TAB SYSTEM LOGIC ---
+
+        window.switchTab = (tabId, element) => {
+            // Hapus kelas 'active' dari semua tombol dan konten
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            // Tambahkan kelas 'active' ke tombol dan konten yang dipilih
+            element.classList.add('active');
+            $(tabId).classList.add('active');
+            
+            // Logika pemuatan data berdasarkan tab
+            if (tabId === 'rekomendasi') {
+                fetchAndRenderRekomendasi();
+            } else if (tabId === 'feedback') {
+                fetchAndRenderFeedback();
+            }
+        };
+
+
+        // --- INITIAL LOAD ---
+        // Panggil fungsi render untuk tab default (Rekomendasi)
+        fetchAndRenderRekomendasi();
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="id">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Rekomendasikan Buku Baru</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+      /* --- Variabel CSS --- */
+      :root {
+          /* Warna Utama (Cyan) */
+          --color-primary-accent: #00CCCC;
+          --color-secondary-accent: #02BABA;
+          
+          /* Warna Latar Belakang & Teks */
+          --color-light-main-bg: #F7F8FC;
+          --color-light-container-bg: #FFFFFF;
+          --color-light-border: #E5E7EB;
+          --color-text-dark: #1F2937;
+          --color-text-subtle: #6B7280;
+          --color-error: #EF4444;
+      }
+
+      /* Struktur Utama */
+      body {
+          font-family: 'Poppins', sans-serif;
+          background-color: var(--color-light-main-bg);
+          color: var(--color-text-dark);
+          display: flex;
+          justify-content: center;
+          align-items: flex-start;
+          min-height: 100vh;
+          padding: 40px 20px;
+          margin: 0;
+      }
+
+      /* Kontainer Formulir */
+      #formContainer {
+          max-width: 600px;
+          padding: 40px;
+          margin: 0 auto;
+          background: var(--color-light-container-bg);
+          border-radius: 12px;
+          width: 100%;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+          border: 1px solid var(--color-light-border);
+          box-sizing: border-box;
+      }
+
+      /* Judul */
+      .heading-title {
+          font-size: 1.875rem; /* 30px */
+          font-weight: 700;
+          color: var(--color-text-dark);
+          margin-bottom: 8px;
+          padding-bottom: 12px;
+          border-bottom: 4px solid var(--color-primary-accent);
+      }
+      .heading-subtitle {
+          color: var(--color-text-subtle);
+          margin-bottom: 32px;
+      }
+      
+      /* Gaya Input & Textarea */
+      .form-group { margin-bottom: 20px; }
+      .form-group label {
+          display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text-subtle); margin-bottom: 4px;
+      }
+      .input-style {
+          width: 100%; padding: 12px; border: 1px solid var(--color-light-border); outline: none;
+          border-radius: 8px; background-color: #F9FAFB;
+          transition: border-color 0.3s, box-shadow 0.3s;
+          font-size: 16px; box-sizing: border-box; resize: vertical;
+      }
+      .input-style:focus {
+          border-color: var(--color-primary-accent);
+          box-shadow: 0 0 0 3px rgba(2, 186, 186, 0.3);
+      }
+      .input-style.error { border-color: var(--color-error) !important; }
+
+      /* --- AUTOCPMLETE DROPDOWN CUSTOM STYLE --- */
+      .autocomplete-container {
+          position: relative;
+      }
+      .autocomplete-items-list {
+          position: absolute;
+          border: 1px solid var(--color-light-border);
+          border-top: none;
+          z-index: 99;
+          /* Tentukan posisi dibawah input */
+          top: 100%;
+          left: 0;
+          right: 0;
+          max-height: 200px;
+          overflow-y: auto;
+          background-color: var(--color-light-container-bg);
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+          border-radius: 0 0 8px 8px;
+          display: none; /* Default hidden, shown by JS */
+      }
+      .autocomplete-item {
+          padding: 10px 12px;
+          cursor: pointer;
+          font-size: 16px;
+          color: var(--color-text-dark);
+          transition: background-color 0.2s;
+          border-bottom: 1px solid #F3F4F6;
+      }
+      .autocomplete-item:last-child {
+          border-bottom: none;
+      }
+      .autocomplete-item:hover, .autocomplete-item.active {
+          background-color: #E0F7FA; /* Warna Hover Soft Cyan */
+          color: var(--color-text-dark);
+      }
+      /* --- END AUTOCPMLETE DROPDOWN CUSTOM STYLE --- */
+
+
+      /* Tombol Kirim */
+      #btnSubmitRekomendasi {
+          background-color: var(--color-primary-accent); color: white; padding: 14px 25px;
+          border: none; border-radius: 8px; cursor: pointer; 
+          font-size: 17px; font-weight: 700;
+          transition: background-color 0.3s, transform 0.1s, box-shadow 0.3s;
+          width: 100%; box-shadow: 0 4px 10px rgba(0, 204, 204, 0.4);
+          margin-top: 20px;
+      }
+      #btnSubmitRekomendasi:hover { 
+          background-color: var(--color-secondary-accent); 
+          transform: translateY(-1px); 
+          box-shadow: 0 6px 15px rgba(0, 204, 204, 0.6); 
+      }
+      #btnSubmitRekomendasi:disabled { 
+          background-color: #9CA3AF; 
+          cursor: not-allowed; 
+          transform: none; 
+          box-shadow: none; 
+      }
+      
+      /* Tombol Kembali */
+      #btnBack {
+          display: block; /* Agar menempati lebar penuh */
+          background-color: #F3F4F6;
+          color: var(--color-text-dark);
+          border: 1px solid #D1D5DB;
+          padding: 12px 24px;
+          border-radius: 8px;
+          font-weight: 600;
+          text-align: center;
+          text-decoration: none;
+          transition: background-color 0.2s;
+          margin-top: 16px;
+      }
+      #btnBack:hover {
+          background-color: #E5E7EB;
+      }
+
+      /* Modal Sukses/Gagal */
+      .modal-overlay {
+          position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+          background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center;
+          z-index: 2000; opacity: 0; transition: opacity 0.3s;
+      }
+      .modal-overlay.active { display: flex; opacity: 1; }
+      .modal-content {
+          background: var(--color-light-container-bg); padding: 30px; border-radius: 12px;
+          max-width: 400px;
+          width: 90%; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+          transform: scale(0.9); transition: transform 0.3s;
+      }
+      .modal-overlay.active .modal-content { transform: scale(1); }
+      .text-cyan-500-custom { color: var(--color-secondary-accent); }
+    </style>
+</head>
+
+<body>
+    <div id="formContainer">
+      <h1 class="heading-title">✨ Rekomendasi Buku Baru</h1>
+      <p class="heading-subtitle">Berikan masukan buku-buku baru yang Anda harapkan akan ditambahkan ke koleksi perpustakaan. Judul buku yang pernah direkomendasikan akan muncul sebagai saran.</p>
+
+      <form id="rekomendasiForm">
+          <div class="form-group">
+              <label for="judul">Judul Buku <span style="color: var(--color-error);">*</span></label>
+              
+              <div class="autocomplete-container">
+                  <input type="text" id="judul" class="input-style" placeholder="Cth: Atomic Habits" required autocomplete="off">
+                  
+                  <div id="judulDropdown" class="autocomplete-items-list">
+                      </div>
+              </div>
+
+          </div>
+          
+          <div class="form-group">
+              <label for="alasan">Alasan Merekomendasikan (Opsional)</label>
+              <textarea id="alasan" class="input-style" rows="4" placeholder="Mengapa buku ini perlu ada di perpustakaan?"></textarea>
+          </div>
+
+          <button type="submit" id="btnSubmitRekomendasi">Kirim Rekomendasi Buku</button>
+
+          <a href="index.html" id="btnBack">
+             < Kembali ke Formulir Kunjungan
+          </a>
+      </form>
+    </div>
+
+    <div id="statusModal" class="modal-overlay">
+      <div class="modal-content" style="text-align: center;">
+        <div id="modalIcon" style="font-size: 3rem;" class="mb-4 text-cyan-500-custom">
+          </div>
+        <h4 id="modalTitle" style="font-size: 1.5rem; font-weight: 700; color: var(--color-text-dark); margin-bottom: 8px;"></h4>
+        <p id="modalMessage" style="color: var(--color-text-subtle); margin-bottom: 24px;"></p>
+        
+        <button onclick="window.location.href='index.html'" style="background-color: var(--color-primary-accent); color: white; padding: 8px 16px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background-color 0.2s;">
+            Kembali ke Formulir Utama
+        </button>
+      </div>
+    </div>
+
+    <script type="module">
+        // --- FIREBASE IMPORTS ---
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
+        import { getDatabase, ref, get, child } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js';
+        import { push } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js';
+
+
+        // ⚠️ KRITIS: GANTI DENGAN CONFIG FIREBASE ASLI PROYEK ANDA
+        const firebaseConfig = {
+            apiKey: "AIzaSy_GANTI_INI_DENGAN_KUNCI_API_ASLI",
+            authDomain: "traying-29bf4.firebaseapp.com",
+            projectId: "traying-29bf4",
+            databaseURL: "https://traying-29bf4-default-rtdb.firebaseio.com"
+        };
+        
+        let db = null;
+        let recommendedBookTitles = []; 
+        let currentActiveItem = -1; // Untuk navigasi keyboard
+
+        try {
+            const app = initializeApp(firebaseConfig);
+            db = getDatabase(app); 
+            console.log("Firebase initialized for Rekomendasi.");
+        } catch(e) {
+            console.error("Firebase Gagal diinisialisasi di halaman rekomendasi:", e);
+        }
+
+        // --- DOM REFERENCES ---
+        const $ = id => document.getElementById(id);
+        
+        const DOM = {
+            judul: $('judul'),
+            alasan: $('alasan'),
+            btnSubmitRekomendasi: $('btnSubmitRekomendasi'),
+            rekomendasiForm: $('rekomendasiForm'),
+            statusModal: $('statusModal'),
+            modalIcon: $('modalIcon'),
+            modalTitle: $('modalTitle'),
+            modalMessage: $('modalMessage'),
+            judulDropdown: $('judulDropdown')
+        };
+
+        // --- HELPER FUNCTIONS ---
+        
+        /** Mengubah string menjadi Title Case. */
+        const titleCase = (str) => {
+            if (!str) return '';
+            return str.toLowerCase().replace(/(^|\s)\S/g, function(firstChar) {
+                return firstChar.toUpperCase();
+            });
+        };
+
+        /** Menampilkan modal status. */
+        const showModal = (isSuccess, title, message) => {
+            if (isSuccess) {
+                DOM.modalIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="margin: 0 auto;"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+                DOM.modalTitle.textContent = title;
+                DOM.modalMessage.textContent = message;
+                DOM.modalIcon.style.color = 'var(--color-secondary-accent)';
+            } else {
+                DOM.modalIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="margin: 0 auto;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.398 16c-.77 1.333.192 3 1.732 3z" /></svg>`;
+                DOM.modalTitle.textContent = title;
+                DOM.modalMessage.textContent = message;
+                DOM.modalIcon.style.color = 'var(--color-error)';
+            }
+            DOM.statusModal.classList.add('active');
+        };
+
+        /** Reset formulir. */
+        const resetForm = () => {
+            DOM.judul.value = '';
+            DOM.alasan.value = '';
+            DOM.judul.classList.remove('error');
+            hideDropdown();
+        };
+
+        /** Mengambil semua judul buku yang sudah direkomendasikan dari Firebase */
+        const fetchRecommendedTitles = async () => {
+            if (!db) return;
+
+            try {
+                const dbRef = ref(db);
+                const snapshot = await get(child(dbRef, `log_rekomendasi`));
+                
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    const titles = new Set(); 
+                    for (const key in data) {
+                        if (data[key].judulBuku) {
+                            titles.add(data[key].judulBuku);
+                        }
+                    }
+                    recommendedBookTitles = Array.from(titles).sort(); 
+                }
+            } catch (error) {
+                console.error("Gagal mengambil data rekomendasi buku:", error);
+            }
+        };
+
+        // --- CUSTOM DROPDOWN LOGIC ---
+
+        const hideDropdown = () => {
+            DOM.judulDropdown.style.display = 'none';
+            currentActiveItem = -1;
+        };
+
+        const setActive = (index) => {
+            const items = DOM.judulDropdown.children;
+            if (items.length === 0) return;
+
+            // Hapus status aktif lama
+            for (let i = 0; i < items.length; i++) {
+                items[i].classList.remove('active');
+            }
+
+            // Tentukan index baru
+            if (index >= items.length) index = 0;
+            if (index < 0) index = items.length - 1;
+
+            currentActiveItem = index;
+            items[currentActiveItem].classList.add('active');
+
+            // Gulirkan agar item aktif terlihat
+            items[currentActiveItem].scrollIntoView({ block: "nearest" });
+        }
+
+        const filterAndDisplay = (inputValue) => {
+            const val = inputValue.toUpperCase();
+            
+            // Bersihkan dropdown lama
+            DOM.judulDropdown.innerHTML = '';
+            currentActiveItem = -1;
+
+            if (!val) {
+                hideDropdown();
+                return;
+            }
+
+            // Filter dan buat elemen saran
+            const matches = recommendedBookTitles.filter(title => title.toUpperCase().includes(val));
+            
+            if (matches.length > 0) {
+                matches.forEach((title) => {
+                    const item = document.createElement('div');
+                    item.className = 'autocomplete-item';
+                    
+                    // Highlight kata yang cocok (opsional, tapi bagus)
+                    const index = title.toUpperCase().indexOf(val);
+                    const part1 = title.substr(0, index);
+                    const part2 = title.substr(index, val.length);
+                    const part3 = title.substr(index + val.length);
+
+                    item.innerHTML = part1 + '<strong>' + part2 + '</strong>' + part3;
+
+                    item.addEventListener('click', function() {
+                        DOM.judul.value = this.textContent; // Gunakan textContent untuk menghindari tag strong
+                        hideDropdown();
+                        // Terapkan TitleCase pada data yang dipilih
+                        DOM.judul.value = titleCase(DOM.judul.value);
+                    });
+
+                    DOM.judulDropdown.appendChild(item);
+                });
+
+                DOM.judulDropdown.style.display = 'block';
+            } else {
+                hideDropdown();
+            }
+        };
+
+
+        // --- EVENT HANDLERS ---
+        
+        // 1. INPUT JUDUL (Title Case, Filter, dan Dropdown)
+        DOM.judul.addEventListener('input', function() {
+            const start = this.selectionStart;
+            const end = this.selectionEnd;
+
+            // a) Terapkan Title Case Realtime
+            const originalValue = this.value;
+            this.value = titleCase(originalValue);
+            this.setSelectionRange(start, end);
+            
+            // b) Filter dan tampilkan dropdown
+            filterAndDisplay(this.value);
+
+            // c) Hapus penanda error
+            this.classList.remove('error');
+        });
+
+        // 2. KEYBOARD NAVIGATION (UP, DOWN, ENTER)
+        DOM.judul.addEventListener('keydown', function(e) {
+            const items = DOM.judulDropdown.children;
+            if (items.length === 0) return;
+
+            if (e.key === "ArrowDown") {
+                e.preventDefault();
+                setActive(currentActiveItem + 1);
+            } else if (e.key === "ArrowUp") {
+                e.preventDefault();
+                setActive(currentActiveItem - 1);
+            } else if (e.key === "Enter") {
+                if (currentActiveItem > -1) {
+                    e.preventDefault();
+                    items[currentActiveItem].click();
+                }
+            } else if (e.key === "Escape") {
+                hideDropdown();
+            }
+        });
+
+        // 3. HIDE DROPDOWN ON OUTSIDE CLICK
+        document.addEventListener('click', (e) => {
+            if (e.target.id !== 'judul' && !DOM.judulDropdown.contains(e.target)) {
+                hideDropdown();
+            }
+        });
+
+        // 4. FORM SUBMISSION
+        DOM.rekomendasiForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const judul = DOM.judul.value.trim();
+            let hasError = false;
+
+            if (!judul) { DOM.judul.classList.add('error'); hasError = true; } else { DOM.judul.classList.remove('error'); }
+            
+            if (hasError) return;
+
+            DOM.btnSubmitRekomendasi.disabled = true;
+            DOM.btnSubmitRekomendasi.textContent = 'Mengirim...';
+
+            const now = new Date();
+            const payload = {
+                judulBuku: titleCase(judul), 
+                alasan: DOM.alasan.value.trim() || "-",
+                pengarang: "-",
+                kategori: "-",
+                perekomen: "Anonim",
+                tanggalRekomendasi: `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`,
+                timestamp: now.getTime(),
+                status: "Baru"
+            };
+
+            try{
+                if (db) {
+                    await push(ref(db, `log_rekomendasi`), payload);
+                    
+                    showModal(true, 'Rekomendasi Berhasil Dikirim! 🥳', 'Terima kasih atas rekomendasi buku yang menarik. Kami akan meninjau saran Anda.');
+                    resetForm();
+                    // Muat ulang daftar judul di background
+                    await fetchRecommendedTitles(); 
+                } else {
+                    console.log("SIMULASI: Data Rekomendasi berhasil dikumpulkan.", payload);
+                    showModal(true, 'Rekomendasi Berhasil Dikirim!', 'Mode Simulasi: Data dikirim ke konsol. Harap perbaiki konfigurasi Firebase Anda.');
+                    resetForm();
+                }
+
+            } catch(error){
+                console.error("Firebase Rekomendasi Submit Error:", error);
+                showModal(false, 'Gagal Mengirim Rekomendasi 😢', `Terjadi kesalahan saat mencoba mengirim data. Detail: ${error.message}`);
+            } finally {
+                DOM.btnSubmitRekomendasi.disabled = false;
+                DOM.btnSubmitRekomendasi.textContent = 'Kirim Rekomendasi Buku';
+            }
+        });
+        
+        DOM.alasan.addEventListener('input', () => DOM.alasan.classList.remove('error'));
+
+        // --- INITIAL LOAD ---
+        fetchRecommendedTitles();
+
+    </script>
+</body>
+</html>
