@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Form Kunjungan Perpustakaan | Final Version</title>
+    <title>Form Kunjungan Perpustakaan | Tanpa Iframe & Alibs</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -50,7 +50,6 @@
           align-items: flex-start;
           min-height: 100vh;
           padding: 40px 20px;
-          transition: filter 0.3s;
       }
 
       /* Kontainer Formulir */
@@ -63,24 +62,8 @@
           width: 100%;
           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
           border: 1px solid var(--color-light-border);
-          transition: opacity 0.3s, visibility 0.3s;
       }
       
-      /* Iframe Kontrol Jarak Jauh */
-      #externalIframe {
-          position: fixed;
-          top: 0; left: 0;
-          width: 100vw; height: 100vh;
-          border: none;
-          background: var(--color-light-container-bg);
-          z-index: 1000;
-          display: none;
-          opacity: 0;
-          transition: opacity 0.3s;
-      }
-      #externalIframe.active { display: block; opacity: 1; }
-      #formContainer.hidden-view { display: none; opacity: 0; visibility: hidden; }
-
       /* Styling Elemen Formulir */
       h1 { border-color: var(--color-primary-accent) !important; color: var(--color-text-dark); }
       h3 { border-color: var(--color-light-border) !important; color: var(--color-text-dark); font-weight: 700; }
@@ -144,22 +127,58 @@
       .modal-overlay.active { display: flex; opacity: 1; }
       .modal-content {
           background: var(--color-light-container-bg); padding: 30px; border-radius: 12px;
-          max-width: 400px; width: 90%; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+          max-width: 450px; 
+          width: 90%; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
           transform: scale(0.9); transition: transform 0.3s;
       }
       .modal-overlay.active .modal-content { transform: scale(1); }
-      #closeModalBtn {
-          background-color: var(--color-secondary-accent); color: white; padding: 10px 25px;
-          border-radius: 8px; font-weight: 600; transition: background-color 0.2s;
+      /* Gaya untuk tombol opsi baru */
+      .option-button {
+          padding: 12px 20px;
+          border-radius: 8px;
+          font-weight: 600;
+          transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+          display: inline-block;
+          text-align: center;
+          width: 100%; 
+          margin-bottom: 10px; 
+          box-shadow: 0 2px 5px rgba(0,0,0,0.1);
       }
-      #closeModalBtn:hover { background-color: #006064; }
+      /* PENGUBAHAN: Tombol Rekomendasi (Cyan Tembus Pandang) */
+      #btnRekomendasi {
+          background-color: rgba(2, 186, 186, 0.1); /* Cyan Tembus Pandang */
+          color: var(--color-text-dark); 
+          border: 1px solid var(--color-primary-accent); 
+      }
+      #btnRekomendasi:hover {
+          background-color: rgba(2, 186, 186, 0.2);
+          border-color: #02BABA;
+      }
+      /* Tombol Feedback */
+      #btnFeedback {
+          background-color: var(--color-primary-accent);
+          color: white;
+          border: 1px solid var(--color-primary-accent);
+      }
+      #btnFeedback:hover {
+          background-color: #008080;
+          border-color: #008080;
+      }
+      #closeModalBtn {
+          background-color: #9CA3AF; 
+          color: white;
+          padding: 10px 25px;
+          border-radius: 8px;
+          font-weight: 600;
+          transition: background-color 0.2s;
+          margin-top: 10px;
+      }
+      #closeModalBtn:hover { background-color: #6B7280; }
       .text-cyan-500-custom { color: var(--color-secondary-accent); }
     </style>
 </head>
 
 <body>
-    <iframe id="externalIframe" src="" allowfullscreen></iframe>
-
     <div id="formContainer">
       <h1 class="text-3xl font-bold text-gray-800 mb-8 border-b-4 pb-3">Form Kunjungan Perpustakaan</h1>
 
@@ -204,6 +223,8 @@
               <label for="kategoriBuku">Kategori Buku</label>
               <select id="kategoriBuku" class="input-line-style">
                   <option value="" selected>-- Pilih Kategori --</option>
+                  <option value="Managemen">Managemen</option>
+                  <option value="Kesenian">Kesenian</option>
                   <option value="Sejarah dan Geografi">Sejarah dan Geografi</option>
                   <option value="Kesusastraan">Kesusastraan</option>
                   <option value="Komik">Komik</option>
@@ -249,8 +270,16 @@
           </svg>
         </div>
         <h4 class="text-2xl font-bold text-gray-800 mb-2">Data Kunjungan Berhasil Dikirim!</h4>
-        <p class="text-gray-600 mb-6">Terima kasih. Data form telah direset dan siap untuk entri berikutnya.</p>
-        <button id="closeModalBtn" class="px-6 py-2 rounded-lg font-semibold transition">Tutup</button>
+        <p class="text-gray-600 mb-6">Terima kasih. Apakah Anda ingin memberikan masukan untuk Perpustakaan?</p>
+
+        <a href="rekomendasi.html" id="btnRekomendasi" class="option-button">
+            ✨ Rekomendasikan Buku Baru
+        </a>
+        <a href="feedback.html" id="btnFeedback" class="option-button">
+            🗣️ Beri Saran & Keresahan (Feedback)
+        </a>
+        
+        <button id="closeModalBtn" class="px-6 py-2 rounded-lg font-semibold transition">Selesai / Kembali ke Formulir</button>
       </div>
     </div>
 
@@ -269,14 +298,12 @@
             appId: "1:GANTI_DENGAN_APP_ID_ASLI",
             databaseURL: "https://traying-29bf4-default-rtdb.firebaseio.com"
         };
-        const IFRAME_CONTROL_PATH = 'remote_iframe_state';
         
         // --- DOM REFERENCES ---
         const $ = id => document.getElementById(id);
         
         const DOM = {
             formContainer: $('formContainer'),
-            externalIframe: $('externalIframe'),
             nisSearch: $('nisSearch'),
             kodeBukuSearch: $('kodeBukuSearch'),
             nisDropdown: $('dd-nisSearch'),
@@ -361,25 +388,6 @@
             if (!DOM.kategoriBukuSelect.value) { DOM.kategoriBukuSelect.classList.add('input-error'); errorCount++; }
             if (!DOM.keteranganSelect.value) { DOM.keteranganSelect.classList.add('input-error'); errorCount++; }
             return errorCount > 0;
-        };
-
-        // --- IFRAME CONTROL LOGIC ---
-        const showIframe = (url) => {
-            if (!url) return;
-            DOM.externalIframe.src = url;
-            DOM.externalIframe.classList.add('active');
-            DOM.formContainer.classList.add('hidden-view');
-            document.body.style.overflow = 'hidden';
-            console.log(`[Form Kunjungan] Iframe OPEN: ${url}`);
-        };
-
-        const hideIframe = () => {
-            DOM.externalIframe.classList.remove('active');
-            DOM.externalIframe.src = '';
-            DOM.formContainer.classList.remove('hidden-view');
-            document.body.style.overflow = '';
-            DOM.nisSearch.focus();
-            console.log("[Form Kunjungan] Iframe CLOSED.");
         };
 
         // --- DROPDOWN LOGIC ---
@@ -491,19 +499,7 @@
             };
             DOM.dataStatus.style.display = 'block';
 
-            // 1. Remote Control Iframe Listener
-            onValue(ref(db, IFRAME_CONTROL_PATH), (snapshot) => {
-                const controlData = snapshot.val();
-                if (controlData && controlData.status === 'OPEN' && controlData.url) {
-                    showIframe(controlData.url);
-                } else {
-                    hideIframe(); 
-                }
-            }, (error) => {
-                console.error("FIREBASE ERROR (Remote Control Listener):", error);
-            });
-
-            // 2. Data Santri Listener
+            // 1. Data Santri Listener
             onValue(ref(db, 'keanggotaan_v2'), (snapshot) => {
                 const data = snapshot.val();
                 santriList = data ? Object.entries(data).map(([nis, val]) => ({
@@ -520,7 +516,7 @@
                 DOM.dataStatus.style.display = 'block';
             });
 
-            // 3. Data Buku Listener
+            // 2. Data Buku Listener
             onValue(ref(db, 'buku_v2'), (snapshot) => {
                 const data = snapshot.val();
                 bukuList = data ? Object.entries(data).map(([kode, val]) => ({
@@ -687,12 +683,22 @@
 
             // Modal Handlers
             DOM.closeModalBtn.addEventListener('click', hideModal);
-            DOM.successModal.addEventListener('click', (e) => { if (e.target.id === 'successModal') { hideModal(); } });
+            DOM.successModal.addEventListener('click', (e) => { 
+                // Jika user klik di luar modal tapi masih di overlay, sembunyikan modal
+                if (e.target.id === 'successModal') { hideModal(); } 
+            });
             document.addEventListener('keydown', (e) => { 
-                if (e.key === 'Enter' && DOM.successModal.classList.contains('active')) { 
-                    e.preventDefault(); 
-                    hideModal(); 
-                } 
+                if (DOM.successModal.classList.contains('active')) {
+                     // Menutup modal dengan ESC
+                    if (e.key === 'Escape') { 
+                        e.preventDefault(); 
+                        hideModal(); 
+                    // Menutup modal dengan ENTER (Simulasi klik tombol tutup)
+                    } else if (e.key === 'Enter') { 
+                        e.preventDefault(); 
+                        hideModal();
+                    }
+                }
             });
 
             // Fokus Awal
