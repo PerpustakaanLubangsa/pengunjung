@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Form Kunjungan Perpustakaan | Tanpa Iframe & Alibs</title>
+    <title>Form Kunjungan Perpustakaan | Iframe URL Idle</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -16,8 +16,8 @@
               sans: ['Poppins', 'sans-serif'],
             },
             colors: {
-              'primary-accent': '#02BABA', // Indigo 600
-              'secondary-accent': '#02BABA', // Dark Cyan untuk Modal
+              'primary-accent': '#02BABA', 
+              'secondary-accent': '#02BABA', 
               'soft-bg': '#F7F8FC',
               'card-bg': '#FFFFFF',
               'soft-border': '#E5E7EB',
@@ -132,46 +132,29 @@
           transform: scale(0.9); transition: transform 0.3s;
       }
       .modal-overlay.active .modal-content { transform: scale(1); }
-      /* Gaya untuk tombol opsi baru */
       .option-button {
-          padding: 12px 20px;
-          border-radius: 8px;
-          font-weight: 600;
+          padding: 12px 20px; border-radius: 8px; font-weight: 600;
           transition: background-color 0.2s, color 0.2s, border-color 0.2s;
-          display: inline-block;
-          text-align: center;
-          width: 100%; 
-          margin-bottom: 10px; 
-          box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+          display: inline-block; text-align: center; width: 100%; 
+          margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
       }
-      /* PENGUBAHAN: Tombol Rekomendasi (Cyan Tembus Pandang) */
       #btnRekomendasi {
-          background-color: rgba(2, 186, 186, 0.1); /* Cyan Tembus Pandang */
+          background-color: rgba(2, 186, 186, 0.1); 
           color: var(--color-text-dark); 
           border: 1px solid var(--color-primary-accent); 
       }
       #btnRekomendasi:hover {
-          background-color: rgba(2, 186, 186, 0.2);
-          border-color: #02BABA;
+          background-color: rgba(2, 186, 186, 0.2); border-color: #02BABA;
       }
-      /* Tombol Feedback */
       #btnFeedback {
-          background-color: var(--color-primary-accent);
-          color: white;
-          border: 1px solid var(--color-primary-accent);
+          background-color: var(--color-primary-accent); color: white; border: 1px solid var(--color-primary-accent);
       }
       #btnFeedback:hover {
-          background-color: #008080;
-          border-color: #008080;
+          background-color: #008080; border-color: #008080;
       }
       #closeModalBtn {
-          background-color: #9CA3AF; 
-          color: white;
-          padding: 10px 25px;
-          border-radius: 8px;
-          font-weight: 600;
-          transition: background-color 0.2s;
-          margin-top: 10px;
+          background-color: #9CA3AF; color: white; padding: 10px 25px; border-radius: 8px; font-weight: 600;
+          transition: background-color 0.2s; margin-top: 10px;
       }
       #closeModalBtn:hover { background-color: #6B7280; }
       .text-cyan-500-custom { color: var(--color-secondary-accent); }
@@ -180,19 +163,18 @@
       #idleModal {
           position: fixed; top: 0; left: 0; width: 100%; height: 100%;
           background: rgba(0, 0, 0, 0.6); 
-          display: none; /* Initial state */
+          display: none; 
           z-index: 3000;
           opacity: 0; transition: opacity 0.3s;
       }
       #idleModal.active { 
           display: flex; 
           opacity: 1; 
-          justify-content: center; /* Tambahkan lagi untuk memastikan iframe 100% di tengah */
+          justify-content: center;
           align-items: center;
       }
 
       #idleContent {
-          /* Full screen */
           width: 100%; height: 100%; 
           max-width: none; max-height: none;
           border-radius: 0; 
@@ -205,8 +187,10 @@
           flex-grow: 1; 
           border: none; 
           width: 100%; 
-          height: 100%; /* Pastikan Iframe mengisi penuh konten */
+          height: 100%; 
           border-radius: 0;
+          background-color: white; 
+          /* KETERANGAN: pointer-events akan diatur melalui JavaScript */
       }
       /* Sembunyikan elemen modal sebelumnya yang tidak dibutuhkan di mode full screen */
       #idleContent h4, #closeIdleBtn { display: none; }
@@ -222,20 +206,16 @@
       </div>
 
       <div class="space-y-6">
-
           <h3 class="font-bold text-2xl border-b pb-2 text-gray-800 pt-4 mb-4">Data Santri</h3>
-
           <div class="form-group" id="group-santri">
               <label for="nisSearch">Nama, NISN, atau Blok Santri</label>
               <input type="text" id="nisSearch" placeholder="Ketik Nama, NISN, atau Blok..." class="input-line-style" autocomplete="off" autofocus aria-autocomplete="list" aria-controls="dd-nisSearch">
               <ul id="dd-nisSearch" class="custom-dropdown" role="listbox"></ul>
           </div>
-
           <div class="form-group" id="group-blok">
               <label for="blok">Blok / Kamar</label>
               <input type="text" id="blok" class="input-line-style" placeholder="Diisi Otomatis atau Koreksi">
           </div>
-
           <div class="form-group" id="group-jenjang">
               <label for="jenjang">Jenjang Pendidikan</label>
               <select id="jenjang" class="input-line-style">
@@ -247,13 +227,11 @@
           </div>
 
           <h3 class="font-bold text-2xl border-b pb-2 text-gray-800 pt-8 mb-4">Data Buku</h3>
-
           <div class="form-group" id="group-bukuSearch">
               <label for="kodeBukuSearch">Judul & Kode Buku</label>
               <input type="text" id="kodeBukuSearch" placeholder="Ketik Judul atau Kode Buku..." class="input-line-style" autocomplete="off" aria-autocomplete="list" aria-controls="dd-kodeBukuSearch">
               <ul id="dd-kodeBukuSearch" class="custom-dropdown" role="listbox"></ul>
           </div>
-
           <div class="form-group" id="group-kategoriBuku">
               <label for="kategoriBuku">Kategori Buku</label>
               <select id="kategoriBuku" class="input-line-style">
@@ -273,7 +251,6 @@
                   <option value="Majalah">Majalah</option>
               </select>
           </div>
-
           <div class="form-group" id="group-keterangan">
               <label for="keterangan">Keterangan Aktivitas</label>
               <select id="keterangan" class="input-line-style">
@@ -282,10 +259,8 @@
                   <option value="Pinjam">Pinjam</option>
               </select>
           </div>
-
           <div class="form-group" id="group-submit">
                <button type="button" id="btnSubmit">Kirim Data Kunjungan</button>
-               
                <p class="text-center mt-5 text-sm text-gray-600">
                    Belum terdaftar sebagai anggota? 
                    <a href="pendaftaran.html" class="font-bold text-primary-accent hover:text-02BABA hover:underline transition">
@@ -293,7 +268,6 @@
                    </a>
                </p>
           </div>
-
       </div>
     </div>
 
@@ -320,7 +294,11 @@
 
     <div id="idleModal">
         <div id="idleContent">
-            <iframe id="idleIframe" src="https://perpustakaanlubangsa.github.io/index/kata" loading="lazy"></iframe>
+            <iframe 
+                id="idleIframe" 
+                src="https://perpustakaanlubangsa.github.io/index/kata" 
+                loading="lazy">
+            </iframe>
         </div>
     </div>
     <script type="module">
@@ -339,7 +317,6 @@
             databaseURL: "https://traying-29bf4-default-rtdb.firebaseio.com"
         };
         
-        // --- DOM REFERENCES ---
         const $ = id => document.getElementById(id);
         
         const DOM = {
@@ -356,9 +333,8 @@
             successModal: $('successModal'),
             closeModalBtn: $('closeModalBtn'),
             dataStatus: $('dataStatus'),
-            // --- MODAL IDLE BARU ---
             idleModal: $('idleModal'),
-            idleIframe: $('idleIframe'), // Tambahkan referensi iframe
+            idleIframe: $('idleIframe'),
         };
 
         const formInputs = [
@@ -366,28 +342,32 @@
             DOM.kodeBukuSearch, DOM.kategoriBukuSelect, DOM.keteranganSelect
         ];
 
-        // --- GLOBAL STATE ---
         let santriList = [];
         let bukuList = [];
         let selectedSantri = { nis: null, nama: null };
         let selectedBuku = { kode: null, judul: null };
         
-        // --- IDLE TIMER LOGIC (MODIFIKASI) ---
+        // --- IDLE TIMER LOGIC ---
         const IDLE_TIME_MS = 2000; // 2 detik
         let idleTimer;
+        const IFRAME_URL = "https://perpustakaanlubangsa.github.io/index/kata"; 
 
         /** Menampilkan modal idle full screen. */
         const showIdleModal = () => {
-            // Pastikan iframe siap sebelum ditampilkan
-            if (DOM.idleIframe.src !== "https://perpustakaanlubangsa.github.io/index/kata") {
-                 DOM.idleIframe.src = "https://perpustakaanlubangsa.github.io/index/kata";
+            if (DOM.idleIframe.src !== IFRAME_URL) {
+                 DOM.idleIframe.src = IFRAME_URL;
             }
+            // 🌟 PERBAIKAN: Set pointer-events ke 'none' agar klik menembus iframe ke idleModal
+            DOM.idleIframe.style.pointerEvents = 'none'; 
             DOM.idleModal.classList.add('active');
         };
 
         /** Menyembunyikan modal idle dan mereset timer. */
         const resetIdleTimer = () => {
             clearTimeout(idleTimer);
+            
+            // 🌟 PERBAIKAN: Kembalikan pointer-events ke 'auto' saat modal tidak aktif
+            DOM.idleIframe.style.pointerEvents = 'auto'; 
             
             // HILANGKAN MODAL SEGERA saat ada interaksi
             DOM.idleModal.classList.remove('active');
@@ -396,20 +376,27 @@
             idleTimer = setTimeout(showIdleModal, IDLE_TIME_MS);
         };
 
-        // Event listener untuk mendeteksi interaksi (MOUSE, KEYBOARD, TOUCH)
+        // **********************************************
+        // LISTENER INTERAKSI PENTING UNTUK MENUTUP IFRAME
+        // **********************************************
+        
+        // 1. Tangkap SEMUA Interaksi di Halaman Utama (Paling andal, karena event harusnya terdeteksi di DOM teratas)
         document.addEventListener('mousemove', resetIdleTimer);
         document.addEventListener('keydown', resetIdleTimer);
         document.addEventListener('mousedown', resetIdleTimer);
         document.addEventListener('touchstart', resetIdleTimer);
         
+        // 2. Tangkap Klik pada Overlay Modal itu sendiri.
+        // Ini akan menangkap klik yang menembus iframe (karena pointer-events:none)
+        DOM.idleModal.addEventListener('click', resetIdleTimer); 
+
         // Mulai timer saat halaman dimuat
         resetIdleTimer();
-        // --- END IDLE TIMER LOGIC ---
+        // **********************************************
 
 
-        // --- HELPER FUNCTIONS ---
+        // --- HELPER FUNCTIONS (TETAP) ---
         
-        /** Mengubah string menjadi Title Case. */
         const titleCase = (str) => {
             if (!str) return '';
             return str.toLowerCase().split(' ').map(word => {
@@ -418,7 +405,6 @@
             }).join(' ');
         };
 
-        /** Parse input untuk mendapatkan ID dan Nama/Judul dari format "Nama (ID)". */
         const parseInput = (inputElement) => {
             const fullValue = inputElement.value.trim();
             const match = fullValue.match(/\(([^)]+)\)$/); 
@@ -431,7 +417,6 @@
             }
         };
 
-        /** Reset semua input formulir dan state. */
         const resetForm = () => {
             formInputs.forEach(input => {
                 input.value = '';
@@ -445,19 +430,17 @@
             DOM.nisSearch.focus();
         };
 
-        /** Menampilkan modal sukses. */
         const showModal = () => {
-             // Pastikan modal idle tertutup saat modal sukses muncul
-             DOM.idleModal.classList.remove('active');
+             DOM.idleModal.classList.remove('active'); 
+             // Pastikan pointer-events kembali normal setelah modal idle hilang
+             DOM.idleIframe.style.pointerEvents = 'auto'; 
              DOM.successModal.classList.add('active');
         };
 
-        /** Menyembunyikan modal sukses. */
         const hideModal = () => {
              DOM.successModal.classList.remove('active');
         };
 
-        /** Menandai bidang yang kosong. Mengembalikan true jika ada error. */
         const markEmptyFields = () => {
             formInputs.forEach(input => input.classList.remove('input-error'));
             let errorCount = 0;
@@ -469,8 +452,6 @@
             if (!DOM.keteranganSelect.value) { DOM.keteranganSelect.classList.add('input-error'); errorCount++; }
             return errorCount > 0;
         };
-
-        // --- DROPDOWN LOGIC (TETAP) ---
 
         const populateCustomDropdown = (dropdownEl, matches, keyType) => {
             dropdownEl.innerHTML = '';
@@ -564,7 +545,8 @@
             populateCustomDropdown(dropdownEl, matches, keyType);
         };
 
-        // --- FIREBASE INITIALIZATION & DATA LOADING ---
+
+        // --- FIREBASE INITIALIZATION & DATA LOADING (TETAP) ---
         try {
             const app = initializeApp(firebaseConfig);
             const db = getDatabase(app);
@@ -618,8 +600,7 @@
             DOM.btnSubmit.addEventListener('click', async () => {
                 DOM.btnSubmit.disabled = true;
                 DOM.btnSubmit.textContent = 'Memproses...';
-                // Reset timer idle jika pengguna aktif submit
-                resetIdleTimer();
+                resetIdleTimer(); 
 
                 if(markEmptyFields()) {
                     document.querySelector('.input-line-style.input-error')?.focus();
@@ -684,9 +665,7 @@
 
             // Handler Keyboard (Panah Atas/Bawah & Enter) untuk Dropdown
             const handleKeydownDropdown = (e, searchInput, dropdownEl) => {
-                // Reset timer idle
                 resetIdleTimer();
-
                 const items = dropdownEl.querySelectorAll('.custom-dropdown-item:not([style*="none"])');
                 if (items.length === 0) return;
 
@@ -752,7 +731,6 @@
                          if (this.id === 'blok') this.value = titleCase(this.value); 
                     });
                 }
-                // Tambahkan reset idle timer untuk semua input
                 input.addEventListener('focus', resetIdleTimer);
             });
             
@@ -768,39 +746,31 @@
                 }
             });
 
-            // Modal Handlers (Success Modal)
+            // Modal Handlers (Success Modal & Idle Modal)
             DOM.closeModalBtn.addEventListener('click', hideModal);
             DOM.successModal.addEventListener('click', (e) => { 
-                // Jika user klik di luar modal tapi masih di overlay, sembunyikan modal
                 if (e.target.id === 'successModal') { hideModal(); } 
             });
             document.addEventListener('keydown', (e) => { 
-                // Jika modal sukses aktif
                 if (DOM.successModal.classList.contains('active')) {
                      if (e.key === 'Escape' || e.key === 'Enter') { 
                         e.preventDefault(); 
                         hideModal();
                     }
                 }
-                 // Handle ESC key to close idle modal (jika modal idle sedang aktif)
+                // Jika modal idle aktif dan ditekan ESC, maka resetIdleTimer terpanggil otomatis
                 if (DOM.idleModal.classList.contains('active') && e.key === 'Escape') {
                     e.preventDefault();
                     resetIdleTimer(); // Hide dan set timer ulang
                 }
             });
-            
-            // Modal Handlers (Idle Modal) - Hanya perlu menangkap klik overlay
-            DOM.idleModal.addEventListener('click', (e) => {
-                if (e.target.id === 'idleModal' || e.target.id === 'idleContent') { 
-                    // Klik pada overlay/container akan dihitung sebagai interaksi, sehingga resetIdleTimer akan dipanggil melalui document listener.
-                }
-            });
 
+            // Reset timer saat submit button di-klik
+            DOM.btnSubmit.addEventListener('click', resetIdleTimer);
+            
             // Fokus Awal
             DOM.nisSearch.focus();
             
-            // Reset timer saat submit button di-klik
-            DOM.btnSubmit.addEventListener('click', resetIdleTimer);
 
         } catch (e) {
             console.error("FIREBASE INITIALIZATION ERROR:", e);
