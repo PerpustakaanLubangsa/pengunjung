@@ -40,8 +40,22 @@
           --color-soft-gray-focus: #F3F4F6;
       }
 
+      /* ================================================= */
+      /* --- CSS BARU UNTUK MENYEMBUNYIKAN SCROLLBAR --- */
+      /* ================================================= */
+
+      /* WebKit (Chrome, Safari, Edge modern) */
+      ::-webkit-scrollbar {
+          display: none; /* Menyembunyikan tampilan bilah */
+          width: 0;     /* Mengatur lebar scrollbar menjadi nol */
+      }
+
       /* Struktur Utama */
       body {
+          /* Firefox & IE/Edge Lama */
+          -ms-overflow-style: none;  /* IE dan Edge lama */
+          scrollbar-width: none;  /* Firefox */
+
           font-family: 'Poppins', sans-serif;
           background-color: var(--color-light-main-bg);
           color: var(--color-text-dark);
@@ -51,6 +65,9 @@
           min-height: 100vh;
           padding: 40px 20px;
       }
+      /* ================================================= */
+      /* --- AKHIR CSS PENYEMBUNYIAN SCROLLBAR --- */
+      /* ================================================= */
 
       /* Kontainer Formulir */
       #formContainer {
