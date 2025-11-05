@@ -175,6 +175,41 @@
       }
       #closeModalBtn:hover { background-color: #6B7280; }
       .text-cyan-500-custom { color: var(--color-secondary-accent); }
+
+      /* --- STYLE KHUSUS UNTUK IFRAME IDLE (FULL SCREEN) --- */
+      #idleModal {
+          position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+          background: rgba(0, 0, 0, 0.6); 
+          display: none; /* Initial state */
+          z-index: 3000;
+          opacity: 0; transition: opacity 0.3s;
+      }
+      #idleModal.active { 
+          display: flex; 
+          opacity: 1; 
+          justify-content: center; /* Tambahkan lagi untuk memastikan iframe 100% di tengah */
+          align-items: center;
+      }
+
+      #idleContent {
+          /* Full screen */
+          width: 100%; height: 100%; 
+          max-width: none; max-height: none;
+          border-radius: 0; 
+          box-shadow: none;
+          padding: 0;
+          display: flex; flex-direction: column;
+      }
+
+      #idleIframe {
+          flex-grow: 1; 
+          border: none; 
+          width: 100%; 
+          height: 100%; /* Pastikan Iframe mengisi penuh konten */
+          border-radius: 0;
+      }
+      /* Sembunyikan elemen modal sebelumnya yang tidak dibutuhkan di mode full screen */
+      #idleContent h4, #closeIdleBtn { display: none; }
     </style>
 </head>
 
@@ -283,6 +318,11 @@
       </div>
     </div>
 
+    <div id="idleModal">
+        <div id="idleContent">
+            <iframe id="idleIframe" src="https://perpustakaanlubangsa.github.io/index/kata" loading="lazy"></iframe>
+        </div>
+    </div>
     <script type="module">
         // --- FIREBASE IMPORTS ---
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
@@ -316,6 +356,9 @@
             successModal: $('successModal'),
             closeModalBtn: $('closeModalBtn'),
             dataStatus: $('dataStatus'),
+            // --- MODAL IDLE BARU ---
+            idleModal: $('idleModal'),
+            idleIframe: $('idleIframe'), // Tambahkan referensi iframe
         };
 
         const formInputs = [
@@ -328,6 +371,41 @@
         let bukuList = [];
         let selectedSantri = { nis: null, nama: null };
         let selectedBuku = { kode: null, judul: null };
+        
+        // --- IDLE TIMER LOGIC (MODIFIKASI) ---
+        const IDLE_TIME_MS = 2000; // 2 detik
+        let idleTimer;
+
+        /** Menampilkan modal idle full screen. */
+        const showIdleModal = () => {
+            // Pastikan iframe siap sebelum ditampilkan
+            if (DOM.idleIframe.src !== "https://perpustakaanlubangsa.github.io/index/kata") {
+                 DOM.idleIframe.src = "https://perpustakaanlubangsa.github.io/index/kata";
+            }
+            DOM.idleModal.classList.add('active');
+        };
+
+        /** Menyembunyikan modal idle dan mereset timer. */
+        const resetIdleTimer = () => {
+            clearTimeout(idleTimer);
+            
+            // HILANGKAN MODAL SEGERA saat ada interaksi
+            DOM.idleModal.classList.remove('active');
+            
+            // SET TIMER BARU untuk memunculkan kembali jika idle selama 2 detik
+            idleTimer = setTimeout(showIdleModal, IDLE_TIME_MS);
+        };
+
+        // Event listener untuk mendeteksi interaksi (MOUSE, KEYBOARD, TOUCH)
+        document.addEventListener('mousemove', resetIdleTimer);
+        document.addEventListener('keydown', resetIdleTimer);
+        document.addEventListener('mousedown', resetIdleTimer);
+        document.addEventListener('touchstart', resetIdleTimer);
+        
+        // Mulai timer saat halaman dimuat
+        resetIdleTimer();
+        // --- END IDLE TIMER LOGIC ---
+
 
         // --- HELPER FUNCTIONS ---
         
@@ -369,6 +447,8 @@
 
         /** Menampilkan modal sukses. */
         const showModal = () => {
+             // Pastikan modal idle tertutup saat modal sukses muncul
+             DOM.idleModal.classList.remove('active');
              DOM.successModal.classList.add('active');
         };
 
@@ -390,7 +470,7 @@
             return errorCount > 0;
         };
 
-        // --- DROPDOWN LOGIC ---
+        // --- DROPDOWN LOGIC (TETAP) ---
 
         const populateCustomDropdown = (dropdownEl, matches, keyType) => {
             dropdownEl.innerHTML = '';
@@ -538,6 +618,8 @@
             DOM.btnSubmit.addEventListener('click', async () => {
                 DOM.btnSubmit.disabled = true;
                 DOM.btnSubmit.textContent = 'Memproses...';
+                // Reset timer idle jika pengguna aktif submit
+                resetIdleTimer();
 
                 if(markEmptyFields()) {
                     document.querySelector('.input-line-style.input-error')?.focus();
@@ -602,6 +684,9 @@
 
             // Handler Keyboard (Panah Atas/Bawah & Enter) untuk Dropdown
             const handleKeydownDropdown = (e, searchInput, dropdownEl) => {
+                // Reset timer idle
+                resetIdleTimer();
+
                 const items = dropdownEl.querySelectorAll('.custom-dropdown-item:not([style*="none"])');
                 if (items.length === 0) return;
 
@@ -667,6 +752,8 @@
                          if (this.id === 'blok') this.value = titleCase(this.value); 
                     });
                 }
+                // Tambahkan reset idle timer untuk semua input
+                input.addEventListener('focus', resetIdleTimer);
             });
             
             // Close dropdowns saat klik di luar area
@@ -681,28 +768,39 @@
                 }
             });
 
-            // Modal Handlers
+            // Modal Handlers (Success Modal)
             DOM.closeModalBtn.addEventListener('click', hideModal);
             DOM.successModal.addEventListener('click', (e) => { 
                 // Jika user klik di luar modal tapi masih di overlay, sembunyikan modal
                 if (e.target.id === 'successModal') { hideModal(); } 
             });
             document.addEventListener('keydown', (e) => { 
+                // Jika modal sukses aktif
                 if (DOM.successModal.classList.contains('active')) {
-                     // Menutup modal dengan ESC
-                    if (e.key === 'Escape') { 
-                        e.preventDefault(); 
-                        hideModal(); 
-                    // Menutup modal dengan ENTER (Simulasi klik tombol tutup)
-                    } else if (e.key === 'Enter') { 
+                     if (e.key === 'Escape' || e.key === 'Enter') { 
                         e.preventDefault(); 
                         hideModal();
                     }
+                }
+                 // Handle ESC key to close idle modal (jika modal idle sedang aktif)
+                if (DOM.idleModal.classList.contains('active') && e.key === 'Escape') {
+                    e.preventDefault();
+                    resetIdleTimer(); // Hide dan set timer ulang
+                }
+            });
+            
+            // Modal Handlers (Idle Modal) - Hanya perlu menangkap klik overlay
+            DOM.idleModal.addEventListener('click', (e) => {
+                if (e.target.id === 'idleModal' || e.target.id === 'idleContent') { 
+                    // Klik pada overlay/container akan dihitung sebagai interaksi, sehingga resetIdleTimer akan dipanggil melalui document listener.
                 }
             });
 
             // Fokus Awal
             DOM.nisSearch.focus();
+            
+            // Reset timer saat submit button di-klik
+            DOM.btnSubmit.addEventListener('click', resetIdleTimer);
 
         } catch (e) {
             console.error("FIREBASE INITIALIZATION ERROR:", e);
