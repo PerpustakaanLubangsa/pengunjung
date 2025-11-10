@@ -243,9 +243,6 @@
         <button type="button" data-target-id="iframe-index" data-tooltip="Halaman Utama" class="nav-icon active">
             <i class="fas fa-home"></i> 
         </button>
-        <button type="button" data-target-id="iframe-riwayat" data-tooltip="Riwayat Transaksi" class="nav-icon">
-            <i class="fas fa-history"></i>
-        </button>
         <button type="button" data-target-id="iframe-admin" data-tooltip="Panel Admin" class="nav-icon">
             <i class="fas fa-user-shield"></i>
         </button>
@@ -258,13 +255,6 @@
         src="index.html" 
         title="Halaman Utama" 
         class="page-iframe active">
-    </iframe>
-    
-    <iframe 
-        id="iframe-riwayat" 
-        data-src="riwayat.html" 
-        title="Riwayat Transaksi" 
-        class="page-iframe">
     </iframe>
     
     <iframe 
@@ -282,7 +272,6 @@
 
 <script>
     const navButtons = document.querySelectorAll('.nav-icon');
-    const iframes = document.querySelectorAll('.page-iframe');
     const loadingOverlay = document.getElementById('loading-overlay');
     // Set iframe-index sebagai default aktif
     let activeIframeId = 'iframe-index'; 
