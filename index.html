@@ -3,21 +3,23 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Form Kunjungan Perpustakaan</title>
+    <title>Form Kunjungan - Perpustakaan Lubangsa</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <script>
       tailwind.config = {
         theme: {
           extend: {
-            fontFamily: { sans: ['Poppins', 'sans-serif'] },
+            fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] },
             colors: {
-              'primary-indigo': '#4F46E5',
-              'accent-cyan': '#06B6D4',
-              'dark-bg': '#0F172A',
-              'card-bg': '#1E293B',
+              'gold': '#d4af37',
+              'gold-dark': '#b8952d',
+              'dark-bg': '#05070a',
+              'card-bg': '#11141b',
+              'border-muted': '#1e293b'
             }
           }
         }
@@ -26,11 +28,14 @@
 
     <style>
       body {
-          background-color: #0F172A;
+          background-color: #05070a;
           color: #F1F5F9;
           display: flex;
           justify-content: center;
-          padding: 40px 20px;
+          align-items: center;
+          min-height: 100vh;
+          margin: 0;
+          padding: 15px;
       }
 
       .custom-dropdown {
@@ -38,141 +43,139 @@
           top: 100%;
           left: 0;
           right: 0;
-          background: #1E293B;
-          border: 1px solid #475569;
+          background: #11141b;
+          border: 1px solid #d4af37;
           border-radius: 8px;
           margin-top: 4px;
-          box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+          box-shadow: 0 10px 25px rgba(0,0,0,0.7);
           z-index: 9999;
-          max-height: 250px;
+          max-height: 200px;
           overflow-y: auto;
           display: none;
       }
 
       .dropdown-item {
-          padding: 12px 16px;
+          padding: 10px 14px;
           cursor: pointer;
-          border-bottom: 1px solid #334155;
-      }
-
-      .dropdown-item:hover {
-          background-color: #334155;
+          border-bottom: 1px solid #1e293b;
       }
 
       .input-field {
           width: 100%;
-          background-color: #1E293B;
-          border: 1px solid #334155;
-          border-radius: 8px;
-          padding: 12px;
+          background-color: #11141b;
+          border: 1px solid #1e293b;
+          border-radius: 10px;
+          padding: 10px 14px;
           color: white;
           outline: none;
           transition: all 0.2s;
-          appearance: none;
-      }
-
-      /* Fix untuk teks dropdown select di Windows/Chrome */
-      select.input-field option {
-          background-color: #1E293B;
-          color: white;
+          font-size: 0.9rem;
       }
 
       .input-field:focus {
-          border-color: #06B6D4;
-          box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.2);
+          border-color: #d4af37;
+          box-shadow: 0 0 8px rgba(212, 175, 55, 0.15);
       }
 
-      /* Perbaikan gaya error agar teks tetap terlihat */
       .input-error {
           border-color: #EF4444 !important;
-          background-color: #450a0a !important; /* Latar belakang merah gelap agar teks putih tetap kontras */
-          color: #ffffff !important;
-          animation: shake 0.2s ease-in-out 0s 2;
-      }
-
-      /* Khusus untuk dropdown/select saat error */
-      select.input-error option {
-          background-color: #1E293B;
-          color: white;
+          background-color: rgba(239, 68, 68, 0.05) !important;
+          animation: shake 0.3s ease;
       }
 
       @keyframes shake {
-          0% { transform: translateX(0); }
-          25% { transform: translateX(5px); }
-          50% { transform: translateX(-5px); }
-          75% { transform: translateX(5px); }
-          100% { transform: translateX(0); }
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(3px); }
+          75% { transform: translateX(-3px); }
       }
 
-      ::-webkit-scrollbar { display: none; }
+      ::-webkit-scrollbar { width: 3px; }
+      ::-webkit-scrollbar-thumb { background: #d4af37; }
     </style>
 </head>
 
 <body class="antialiased">
-    <div class="max-w-md w-full mx-auto">
-        <div class="bg-card-bg border border-slate-700 p-8 rounded-2xl shadow-2xl">
-            <header class="mb-8 text-center">
-                <div class="inline-flex p-3 rounded-full bg-primary-indigo/10 mb-4">
-                    <svg class="w-8 h-8 text-primary-indigo" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+    <div class="max-w-md w-full">
+        <div class="bg-card-bg border border-border-muted p-6 rounded-[1.5rem] shadow-2xl relative">
+            <header class="mb-6 text-center">
+                <div class="inline-flex p-3 rounded-xl bg-gold/10 mb-3 border border-gold/20">
+                    <i class="fas fa-book-reader text-xl text-gold"></i>
                 </div>
-                <h1 class="text-2xl font-bold text-white tracking-tight">Kunjungan Perpustakaan</h1>
-                <p id="dataStatus" class="text-[10px] text-accent-cyan mt-1 uppercase tracking-widest opacity-70">Menghubungkan Database...</p>
+                <h1 class="text-xl font-bold text-white tracking-tight uppercase">Buku Tamu</h1>
+                <p id="dataStatus" class="text-[9px] text-gold mt-1 uppercase tracking-widest opacity-70">Menghubungkan...</p>
             </header>
 
             <form id="logForm" class="space-y-4">
                 <div class="relative">
-                    <input type="text" id="nisSearch" placeholder="Cari Nama / NISN..." class="input-field required-input" autocomplete="off">
+                    <label class="text-[9px] uppercase tracking-widest text-slate-500 ml-1 mb-1 block">Data Pengunjung</label>
+                    <input type="text" id="nisSearch" placeholder="Nama / NISN..." class="input-field required-input" autocomplete="off">
                     <ul id="dd-nisSearch" class="custom-dropdown"></ul>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
-                    <input type="text" id="blok" placeholder="Blok/Kamar" class="input-field required-input">
-                    <select id="jenjang" class="input-field required-input">
-                        <option value="">Jenjang</option>
-                        <option value="SLTP">SLTP</option>
-                        <option value="SLTA">SLTA</option>
-                        <option value="PT">PT</option>
-                    </select>
+                    <div>
+                        <label class="text-[9px] uppercase tracking-widest text-slate-500 ml-1 mb-1 block">Blok/Kamar</label>
+                        <input type="text" id="blok" placeholder="Lokasi" class="input-field required-input">
+                    </div>
+                    <div>
+                        <label class="text-[9px] uppercase tracking-widest text-slate-500 ml-1 mb-1 block">Jenjang</label>
+                        <select id="jenjang" class="input-field required-input">
+                            <option value="">Pilih</option>
+                            <option value="SLTP">SLTP</option>
+                            <option value="SLTA">SLTA</option>
+                            <option value="PT">PT</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="relative">
-                    <input type="text" id="kodeBukuSearch" placeholder="Cari Judul / Kode Buku..." class="input-field required-input" autocomplete="off">
+                    <label class="text-[9px] uppercase tracking-widest text-slate-500 ml-1 mb-1 block">Referensi Buku</label>
+                    <input type="text" id="kodeBukuSearch" placeholder="Judul / Kode..." class="input-field required-input" autocomplete="off">
                     <ul id="dd-kodeBukuSearch" class="custom-dropdown"></ul>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
-                    <select id="kategoriBuku" class="input-field required-input text-sm">
-                        <option value="">Kategori</option>
-                        <option value="Agama">Agama</option>
-                        <option value="Filsafat dan Psikologi">Filsafat & Psikologi</option>
-                        <option value="Ilmu Sosial">Ilmu Sosial</option>
-                        <option value="Ilmu Bahasa">Ilmu Bahasa</option>
-                        <option value="Ilmu Murni">Ilmu Murni</option>
-                        <option value="Kesenian">Kesenian</option>
-                        <option value="Kesusastraan">Kesusastraan</option>
-                        <option value="Sejarah dan Geografi">Sejarah & Geografi</option>
-                        <option value="Komik">Komik</option>
-                        <option value="Managemen">Managemen</option>
-                    </select>
-                    <select id="keterangan" class="input-field required-input text-sm">
-                        <option value="">Aktivitas</option>
-                        <option value="Baca">Baca</option>
-                        <option value="Pinjam">Pinjam</option>
-                    </select>
+                    <div>
+                        <label class="text-[9px] uppercase tracking-widest text-slate-500 ml-1 mb-1 block">Kategori</label>
+                        <select id="kategoriBuku" class="input-field required-input text-xs">
+                            <option value="">Pilih</option>
+                            <option value="Agama">Agama</option>
+                            <option value="Filsafat dan Psikologi">Filsafat & Psiko</option>
+                            <option value="Ilmu Sosial">Ilmu Sosial</option>
+                            <option value="Ilmu Bahasa">Ilmu Bahasa</option>
+                            <option value="Ilmu Murni">Ilmu Murni</option>
+                            <option value="Kesenian">Kesenian</option>
+                            <option value="Kesusastraan">Kesusastraan</option>
+                            <option value="Sejarah dan Geografi">Sejarah</option>
+                            <option value="Komik">Komik</option>
+                            <option value="Managemen">Managemen</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[9px] uppercase tracking-widest text-slate-500 ml-1 mb-1 block">Aktivitas</label>
+                        <select id="keterangan" class="input-field required-input text-xs">
+                            <option value="">Pilih</option>
+                            <option value="Baca">Baca</option>
+                            <option value="Pinjam">Pinjam</option>
+                        </select>
+                    </div>
                 </div>
 
-                <button type="button" id="btnSubmit" class="w-full bg-primary-indigo text-white font-bold py-3 rounded-lg mt-2 hover:bg-indigo-700 transition shadow-lg shadow-indigo-500/20">
+                <button type="button" id="btnSubmit" class="w-full bg-gold hover:bg-gold-dark text-dark-bg font-bold py-3 rounded-lg mt-2 transition shadow-lg uppercase tracking-widest text-xs">
                     Kirim Laporan
                 </button>
             </form>
         </div>
     </div>
 
-    <div id="successModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-[10000]">
-        <div class="bg-card-bg p-8 rounded-2xl max-w-xs w-full text-center border border-slate-700">
-            <div class="text-accent-cyan text-5xl mb-4">✓</div>
-            <h2 class="text-xl font-bold text-white mb-6">Data Terkirim</h2>
-            <button id="closeModalBtn" class="w-full bg-slate-700 text-white py-2 rounded-lg font-semibold">Tutup</button>
+    <div id="successModal" class="fixed inset-0 bg-dark-bg/90 backdrop-blur-sm hidden items-center justify-center z-[10000] p-4">
+        <div class="bg-card-bg p-8 rounded-[1.5rem] max-w-xs w-full text-center border border-gold/30">
+            <div class="w-16 h-16 bg-gold/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-gold/20">
+                <i class="fas fa-check text-2xl text-gold"></i>
+            </div>
+            <h2 class="text-lg font-bold text-white mb-1">Berhasil!</h2>
+            <p class="text-slate-400 text-xs mb-6">Data kunjungan telah tercatat.</p>
+            <button id="closeModalBtn" class="w-full bg-border-muted text-white py-2 rounded-lg font-semibold text-sm">Selesai</button>
         </div>
     </div>
 
@@ -181,7 +184,7 @@
         import { getDatabase, ref, onValue, push } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js';
 
         const firebaseConfig = {
-            apiKey: "AIzaSy_GANTI_INI_DENGAN_KUNCI_API_ASLI",
+            apiKey: "AIzaSyByw2om-sKHqgCWBDcE7FEtONoUoJbn9M",
             authDomain: "traying-29bf4.firebaseapp.com",
             projectId: "traying-29bf4",
             databaseURL: "https://traying-29bf4-default-rtdb.firebaseio.com"
@@ -234,33 +237,27 @@
             const handleSearch = (input, dropdown, list, type) => {
                 const val = input.value.toLowerCase().trim();
                 input.classList.remove('input-error');
-                
                 if (!val) { dropdown.style.display = 'none'; return; }
-                
                 const matches = list.filter(item => {
                     const name = type === 'user' ? (item.nama || '') : (item.judul || '');
                     const id = type === 'user' ? (item.nis || '') : (item.kode || '');
                     return name.toLowerCase().includes(val) || id.toLowerCase().includes(val);
                 }).slice(0, 5);
-
                 dropdown.innerHTML = '';
                 matches.forEach(item => {
                     const li = document.createElement('li');
                     li.className = 'dropdown-item';
                     li.innerHTML = type === 'user' 
-                        ? `<div class="text-sm font-bold text-white">${item.nama}</div><div class="text-[10px] text-slate-400">${item.nis}</div>`
-                        : `<div class="text-sm font-bold text-white">${item.judul}</div><div class="text-[10px] text-slate-400">${item.kode}</div>`;
-                    
+                        ? `<div class="text-xs font-bold text-white">${item.nama}</div><div class="text-[9px] text-gold/60 uppercase">${item.nis}</div>`
+                        : `<div class="text-xs font-bold text-white">${item.judul}</div><div class="text-[9px] text-gold/60 uppercase">${item.kode}</div>`;
                     li.onclick = () => {
                         if (type === 'user') {
                             input.value = item.nama;
                             DOM.blokInput.value = item.blok;
                             DOM.jenjangSelect.value = item.jenjang;
-                            [DOM.blokInput, DOM.jenjangSelect].forEach(el => el.classList.remove('input-error'));
                         } else {
                             input.value = item.judul;
                             DOM.kategoriBukuSelect.value = item.kategori;
-                            DOM.kategoriBukuSelect.classList.remove('input-error');
                         }
                         dropdown.style.display = 'none';
                     };
@@ -269,56 +266,41 @@
                 dropdown.style.display = matches.length ? 'block' : 'none';
             };
 
-            document.querySelectorAll('.required-input').forEach(el => {
-                el.addEventListener('change', () => el.classList.remove('input-error'));
-                el.addEventListener('input', () => el.classList.remove('input-error'));
-            });
-
             DOM.nisSearch.addEventListener('input', () => handleSearch(DOM.nisSearch, DOM.nisDropdown, santriList, 'user'));
             DOM.kodeBukuSearch.addEventListener('input', () => handleSearch(DOM.kodeBukuSearch, DOM.bukuDropdown, bukuList, 'buku'));
 
             DOM.btnSubmit.onclick = async () => {
                 const inputs = document.querySelectorAll('.required-input');
                 let isValid = true;
-
                 inputs.forEach(input => {
                     if (!input.value.trim()) {
                         input.classList.add('input-error');
                         isValid = false;
-                    } else {
-                        input.classList.remove('input-error');
                     }
                 });
-
                 if (!isValid) return;
-
                 DOM.btnSubmit.disabled = true;
-                DOM.btnSubmit.innerText = "Mengirim...";
-
+                DOM.btnSubmit.innerText = "Kirim...";
                 const now = new Date();
-                const payload = {
-                    nama: DOM.nisSearch.value,
-                    nis: DOM.nisSearch.value,
-                    blok: DOM.blokInput.value,
-                    jenjang: DOM.jenjangSelect.value,
-                    judulBuku: DOM.kodeBukuSearch.value,
-                    kodeBuku: DOM.kodeBukuSearch.value,
-                    kategoriBuku: DOM.kategoriBukuSelect.value,
-                    keterangan: DOM.keteranganSelect.value,
-                    timestamp: now.getTime(),
-                    tanggal: String(now.getDate()).padStart(2, '0'),
-                    bulan: String(now.getMonth() + 1).padStart(2, '0'),
-                    tahun: now.getFullYear(),
-                    jam: now.toTimeString().substring(0, 5)
-                };
-
                 try {
-                    await push(ref(db, DATA_PATH), payload);
+                    await push(ref(db, DATA_PATH), {
+                        nama: DOM.nisSearch.value,
+                        nis: DOM.nisSearch.value,
+                        blok: DOM.blokInput.value,
+                        jenjang: DOM.jenjangSelect.value,
+                        judulBuku: DOM.kodeBukuSearch.value,
+                        kodeBuku: DOM.kodeBukuSearch.value,
+                        kategoriBuku: DOM.kategoriBukuSelect.value,
+                        keterangan: DOM.keteranganSelect.value,
+                        timestamp: now.getTime(),
+                        tanggal: String(now.getDate()).padStart(2, '0'),
+                        bulan: String(now.getMonth() + 1).padStart(2, '0'),
+                        tahun: now.getFullYear(),
+                        jam: now.toTimeString().substring(0, 5)
+                    });
                     DOM.successModal.style.display = 'flex';
                     DOM.form.reset();
-                } catch (e) { 
-                    alert("Gagal menyimpan data."); 
-                } finally {
+                } catch (e) { alert("Gagal."); } finally {
                     DOM.btnSubmit.disabled = false;
                     DOM.btnSubmit.innerText = "Kirim Laporan";
                 }
@@ -329,7 +311,6 @@
                 if (!DOM.nisSearch.contains(e.target)) DOM.nisDropdown.style.display = 'none';
                 if (!DOM.kodeBukuSearch.contains(e.target)) DOM.bukuDropdown.style.display = 'none';
             });
-
         } catch (e) { console.error(e); }
     </script>
 </body>
